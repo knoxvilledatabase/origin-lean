@@ -14,6 +14,7 @@ Usage:
     python3 scripts/origin.py suggest <domain>      show uncovered genuine declarations
     python3 scripts/origin.py stub <domain>         append uncovered as def stubs
     python3 scripts/origin.py quality [domain]      show stub vs real declaration counts
+    python3 scripts/origin.py patterns             find patterns that consolidate to Core
 """
 
 import re
@@ -890,6 +891,142 @@ def cmd_quality(domain=None):
 
 
 # =============================================================================
+# Patterns — find structural patterns that could consolidate to Core
+# =============================================================================
+
+def cmd_patterns():
+    """Scan Origin files for repeated structural patterns on Option."""
+    import re as _re
+    from collections import defaultdict
+
+    skip = {"Index.lean", "Test.lean", "Core.lean"}
+
+    # Pattern detectors — each returns list of (decl_name, context_snippet)
+    # We scan each def/theorem looking at its body for characteristic patterns.
+
+    # Pattern 1: Predicate lift — match on Option, some => pred, none => False
+    pred_lift_re = _re.compile(
+        r'\|\s*some\s+\w+\s*=>\s*\w+.*\n\s*\|\s*none\s*=>\s*False')
+
+    # Pattern 2: Binary lift — match on (Option, Option), some/some => some f, _ => none
+    binary_lift_re = _re.compile(
+        r'\|\s*some\s+\w+\s*,\s*some\s+\w+\s*=>\s*some')
+
+    # Pattern 3: Match-and-absorb — none branch returns none (not in Core.lean)
+    absorb_re = _re.compile(
+        r'\|\s*(?:none\s*,\s*_|_\s*,\s*none|none)\s*=>\s*none')
+
+    # Pattern 4: Named Option.map wrapper — def foo ... := ... Option.map or .map
+    map_wrapper_re = _re.compile(
+        r'^\s*(?:def|abbrev)\s+(\S+).*:=\s*(?:Option\.map|\.map)\s')
+
+    # Pattern 5: cases <;> simp pattern — the standard Option proof pattern
+    cases_simp_re = _re.compile(
+        r'cases\s+\w+\s*<;>\s*(?:cases\s+\w+\s*<;>\s*)?(?:cases\s+\w+\s*<;>\s*)?simp')
+
+    results = {
+        'pred_lift': defaultdict(list),     # file -> [decl_names]
+        'binary_lift': defaultdict(list),
+        'absorb': defaultdict(list),
+        'map_wrapper': defaultdict(list),
+        'cases_simp': defaultdict(list),
+    }
+
+    for f in sorted(ORIGIN.glob("*.lean")):
+        if f.name in skip:
+            continue
+        text = f.read_text(errors="replace")
+        fname = f.stem
+
+        # Find all declarations and their bodies
+        lines = text.split("\n")
+        i = 0
+        while i < len(lines):
+            m = ORIGIN_DECL_RE.match(lines[i])
+            if m and "private " not in lines[i]:
+                kind, name = m.group(1), m.group(2)
+                # Collect body until next declaration or section marker
+                body_lines = [lines[i]]
+                j = i + 1
+                while j < len(lines):
+                    line = lines[j]
+                    if (line.strip() == "" and j > i + 1) or "=====" in line:
+                        break
+                    if ORIGIN_DECL_RE.match(line) and j > i + 1:
+                        break
+                    body_lines.append(line)
+                    j += 1
+                body = "\n".join(body_lines)
+
+                # Check patterns
+                if pred_lift_re.search(body):
+                    results['pred_lift'][fname].append(name)
+                if binary_lift_re.search(body):
+                    results['binary_lift'][fname].append(name)
+                if absorb_re.search(body) and kind in ("def", "abbrev"):
+                    results['absorb'][fname].append(name)
+                if map_wrapper_re.match(lines[i]):
+                    results['map_wrapper'][fname].append(name)
+                if cases_simp_re.search(body) and kind in ("theorem", "lemma"):
+                    results['cases_simp'][fname].append(name)
+
+                i = j
+            else:
+                i += 1
+
+    # Display
+    ui.header("P A T T E R N S", "Structural patterns that could consolidate to Core")
+
+    patterns = [
+        ('pred_lift',
+         'Predicate lift (| some a => pred a, | none => False)',
+         'Candidate for Core: liftPred'),
+        ('binary_lift',
+         'Binary lift (| some a, some b => some (f a b), ...)',
+         'Already in Core: liftBin₂ — these should use it'),
+        ('absorb',
+         'Match-and-absorb (none branch returns none)',
+         'Already in Core: mul/add instances — check if redundant'),
+        ('map_wrapper',
+         'Named Option.map wrapper (def foo := Option.map f)',
+         'Should use .map directly — eliminate the wrapper'),
+        ('cases_simp',
+         'cases <;> simp proof pattern',
+         'Standard — no consolidation needed, but count is useful'),
+    ]
+
+    total_consolidatable = 0
+    for key, description, recommendation in patterns:
+        data = results[key]
+        count = sum(len(v) for v in data.values())
+        files = len(data)
+        if count == 0:
+            continue
+
+        if key in ('pred_lift', 'binary_lift', 'map_wrapper'):
+            total_consolidatable += count
+
+        print(f"  {ui.BOLD}{description}{ui.RESET}")
+        print(f"  {count} occurrences across {files} files")
+
+        for fname in sorted(data.keys()):
+            names = data[fname]
+            names_str = ", ".join(names[:5])
+            if len(names) > 5:
+                names_str += f", ... +{len(names) - 5} more"
+            print(f"    {fname}: {names_str}")
+
+        print(f"  {ui.DIM}→ {recommendation}{ui.RESET}")
+        print()
+
+    ui.separator()
+    print(f"  {ui.BOLD}Consolidatable:{ui.RESET} {total_consolidatable} definitions "
+          f"could move to Core or use existing Core primitives")
+    print(f"  {ui.BOLD}Core today:{ui.RESET} {sum(1 for _ in (ORIGIN / 'Core.lean').read_text().split(chr(10)) if ORIGIN_DECL_RE.match(_))} declarations in {sum(1 for _ in (ORIGIN / 'Core.lean').read_text().split(chr(10)))} lines")
+    print()
+
+
+# =============================================================================
 # Dedup — find duplicate definitions across Origin files
 # =============================================================================
 
@@ -1126,6 +1263,8 @@ def main():
             cmd_quality(sys.argv[2])
         else:
             cmd_quality()
+    elif cmd == "patterns":
+        cmd_patterns()
     else:
         print(f"Unknown command: {cmd}")
         print(__doc__)
