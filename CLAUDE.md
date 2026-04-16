@@ -163,6 +163,39 @@ handle DRY, let me expand it." Don't. The classifier identifies
 *what*. The sandbox identifies *how*. They're sequential steps, not
 competing ones. Making the classifier do both makes it worse at both.
 
+**Three scripts, three generations:**
+
+- **`origin.py`** — the original. Kept as reference. Don't use.
+- **`origin2.py`** — class-based rewrite. Mathlib-specific. Has the
+  pipeline, classifier, parser, extractor, audit, compress. All
+  Mathlib knowledge (paths, typeclass names, domain structure) is
+  hardcoded. This is the reference for `origin3.py`.
+- **`origin3.py`** — the generic rewrite. **This is the next build.**
+
+`origin3.py` separates the generic Lean optimizer from the
+project-specific configuration:
+
+```
+Generic Lean Optimizer (Axis 2 — works on any Lean project)
+  + Config file (Axis 1 — what dissolves, project-specific)
+  = Origin pipeline
+```
+
+The optimizer takes a config object — source paths, dissolution
+rules, import substitutions, tactic list. No hardcoded Mathlib
+paths. No hardcoded typeclass names. The Mathlib-to-Origin
+configuration is just one config among possible configs.
+
+The sandbox and audit are already generic — they don't know about
+Mathlib. The parser and classifier need refactoring: the classifier
+becomes a rule engine that reads dissolution patterns from config
+instead of hardcoded regexes.
+
+**Why this matters:** the DRY optimizer (Axis 2) is useful for ANY
+Lean project. Anyone with a verbose Lean codebase can use it. Origin
+adds Axis 1 (the 17 typeclasses dissolve) as a config layer on top.
+The tool is bigger than Origin.
+
 When an AI system reasons about mathematics using Origin instead of
 Mathlib, it's working with less context to hold, less ambiguity about
 which version of a theorem applies, less energy per inference, and a

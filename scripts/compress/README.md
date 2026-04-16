@@ -256,11 +256,31 @@ Option α separating what rings conflate. This is already measured:
 
 ## Architecture
 
+**Three generations:**
+
+- `origin.py` — the original. Reference only.
+- `origin2.py` — class-based, Mathlib-specific. Has pipeline,
+  classifier, parser, extractor, audit, compress. All Mathlib
+  knowledge hardcoded. This is the reference for origin3.
+- `origin3.py` — **the next build.** Generic Lean optimizer +
+  project-specific config. Separates Axis 2 (DRY, works on any
+  Lean project) from Axis 1 (dissolution rules, Origin-specific).
+
+The config replaces every hardcoded Mathlib reference:
+- Source/output paths
+- Dissolution rules (regex patterns + reasons)
+- Import substitutions (strip Mathlib.X, add Origin.Core)
+- Tactic priority list
+- File skip patterns
+
 ```
 scripts/
-  origin2.py              — the pipeline (extraction, classification, build)
+  origin.py               — original reference (don't use)
+  origin2.py              — Mathlib-specific reference
+  origin3.py              — generic Lean optimizer (THE TOOL)
   compress/
     __init__.py            — imports
+    sandbox.py             — atomic unit: test one proof, Lean verifies
     patterns.py            — every compression pattern as a class
     README.md              — this file (the "show your work" file)
 ```
