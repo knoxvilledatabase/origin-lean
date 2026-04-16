@@ -318,6 +318,7 @@ derives. Trimming them is the first measured compression of the sketches.
 |--------|--------|-------|---------|-----------|
 | CategoryTheory | 94 | 61 | 33 | 35% |
 | FieldTheory | 95 | 63 | 32 | 34% |
+| GroupTheory | 121 | 102 | 19 | 16% |
 
 ## Active Patterns
 

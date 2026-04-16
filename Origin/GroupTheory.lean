@@ -41,9 +41,7 @@ def isNormal [Mul α] [Neg α] (mem : α → Prop) : Prop :=
 -- 3. HOMOMORPHISMS
 -- ============================================================================
 
-theorem hom_comp (f g : α → α) (v : Option α) :
-    Option.map f (Option.map g v) = Option.map (f ∘ g) v := by
-  cases v <;> simp
+-- Composition lifts: cases v <;> simp. Derivable from Core.
 
 theorem hom_preserves_mul [Mul α] (f : α → α)
     (h : ∀ a b, f (a * b) = f a * f b) (a b : α) :
@@ -101,21 +99,4 @@ def isGroupAction [Mul α] (act : α → α → α) (e : α) : Prop :=
 def isConjugate [Mul α] [Neg α] (a b : α) : Prop :=
   ∃ g, g * a * -g = b
 
--- ============================================================================
--- 11. NONE ABSORBS
--- ============================================================================
-
-theorem group_none_mul [Mul α] (b : Option α) :
-    (none : Option α) * b = none := by simp
-
-theorem group_mul_none [Mul α] (a : Option α) :
-    a * (none : Option α) = none := by simp
-
-theorem group_some_mul [Mul α] (a b : α) :
-    (some a : Option α) * some b = some (a * b) := by simp
-
-theorem group_neg_none [Neg α] :
-    -(none : Option α) = none := by simp
-
-theorem group_neg_some [Neg α] (a : α) :
-    -(some a : Option α) = some (-a) := by simp
+-- None absorbs (mul, neg): Core.lean's @[simp] set handles all cases.
