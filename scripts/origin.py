@@ -12,6 +12,7 @@ Usage:
     python3 scripts/origin.py generate <domain>     draft Origin file from Mathlib
     python3 scripts/origin.py classify <domain>     classify declarations
     python3 scripts/origin.py suggest <domain>      show uncovered genuine declarations
+    python3 scripts/origin.py stub <domain>         append uncovered as def stubs
 """
 
 import re
@@ -439,19 +440,52 @@ def cmd_classify(path):
 # Suggest — show uncovered Mathlib declarations for a domain
 # =============================================================================
 
-def cmd_suggest(domain):
-    """Show Mathlib genuine declarations not yet covered by Origin."""
+def _stub_name(mathlib_name):
+    """Convert a Mathlib declaration name to a stub name for Origin.
+
+    Takes the last component (after the final dot), appends ' if it
+    doesn't already end with one.  Returns None for unparseable names.
+    E.g. "Foo.bar_baz" -> "bar_baz'".
+    """
+    stem = mathlib_name.split(".")[-1]
+    if stem.startswith("_root_."):
+        stem = stem[len("_root_."):]
+    # Strip leading underscores
+    stem = stem.lstrip("_")
+    if not stem:
+        return None
+    # Filter out parser artifacts — must start with letter or Unicode identifier start
+    if not (stem[0].isalpha() or stem[0] == '«'):
+        return None
+    # Filter names with commas, backticks, braces, colons — not valid identifiers
+    if any(c in stem for c in '`,{}:;()[]'):
+        return None
+    # Append ' to avoid collisions with Lean/Mathlib builtins
+    if stem.startswith('«') and stem.endswith('»'):
+        # Guillemet-quoted: put ' inside: «Foo» -> «Foo'»
+        stem = '«' + stem[1:-1] + "'»"
+    elif not stem.endswith("'"):
+        stem = stem + "'"
+    return stem
+
+
+def _get_uncovered(domain):
+    """Return (covered, uncovered, origin_stems, all_origin_names) for a domain.
+
+    Each item in covered/uncovered is (kind, name, filename).
+    origin_stems: set of lowercase name stems in this domain's Origin file(s).
+    all_origin_names: dict mapping name -> module for ALL Origin files (for collision detection).
+    """
     d = EXTRACTED / f"Mathlib_{domain}"
     if not d.exists():
-        ui.fail(f"Not found: {domain}")
-        return
+        return None, None, None, None
 
-    # 1. Collect all genuine Mathlib declarations
+    # 1. Collect genuine Mathlib declarations
     mathlib_decl_re = re.compile(
         r'^(?:.*?)?(private\s+|protected\s+)?(noncomputable\s+)?'
         r'(theorem|lemma|def|structure|class|instance|abbrev|inductive)\s+(\S+)')
 
-    mathlib_decls = []  # (kind, name, label, filename)
+    mathlib_decls = []
     for f in sorted(d.rglob("*.lean")):
         text = f.read_text(errors="replace")
         fname = f.relative_to(EXTRACTED)
@@ -464,7 +498,7 @@ def cmd_suggest(domain):
                 if label == "genuine":
                     mathlib_decls.append((kind, name, str(fname)))
 
-    # 2. Collect Origin declarations (name stems)
+    # 2. Collect this domain's Origin declarations
     origin_names = set()
     for fname in [f"{domain}.lean", f"{domain}2.lean"]:
         p = ORIGIN / fname
@@ -474,10 +508,19 @@ def cmd_suggest(domain):
                 if m and "private " not in line:
                     origin_names.add(m.group(2))
 
-    # 3. Match: a Mathlib declaration is "covered" if Origin has a declaration
-    #    with the same name (case-insensitive, ignoring namespace prefixes)
     origin_stems = {n.split(".")[-1].lower() for n in origin_names}
 
+    # 3. Collect ALL Origin names across all files (for collision detection)
+    all_origin_names = {}  # name -> module
+    for lean_file in sorted(ORIGIN.glob("*.lean")):
+        if lean_file.stem in {"Index", "Test"}:
+            continue
+        for line in lean_file.read_text(errors="replace").split("\n"):
+            m = ORIGIN_DECL_RE.match(line)
+            if m and "private " not in line:
+                all_origin_names[m.group(2)] = lean_file.stem
+
+    # 4. Partition into covered/uncovered
     covered = []
     uncovered = []
     for kind, name, fname in mathlib_decls:
@@ -487,12 +530,29 @@ def cmd_suggest(domain):
         else:
             uncovered.append((kind, name, fname))
 
-    # 4. Display
-    total = len(mathlib_decls)
+    return covered, uncovered, origin_stems, all_origin_names
+
+
+def cmd_suggest(domain):
+    """Show Mathlib genuine declarations not yet covered by Origin."""
+    covered, uncovered, _, all_origin_names = _get_uncovered(domain)
+    if covered is None:
+        ui.fail(f"Not found: {domain}")
+        return
+
+    # Display
+    total = len(covered) + len(uncovered)
     n_covered = len(covered)
     n_uncovered = len(uncovered)
 
     ui.header("S U G G E S T", f"{domain} — {n_covered}/{total} genuine covered, {n_uncovered} uncovered")
+
+    # Check for potential name collisions
+    collisions = []
+    for kind, name, fname in uncovered:
+        stub_name = _stub_name(name)
+        if stub_name and stub_name in all_origin_names:
+            collisions.append((stub_name, all_origin_names[stub_name]))
 
     if uncovered:
         # Group by file
@@ -505,9 +565,19 @@ def cmd_suggest(domain):
             decls = by_file[fname]
             print(f"\n  {ui.BOLD}{fname}{ui.RESET} ({len(decls)} uncovered):")
             for kind, name in decls[:15]:  # cap display at 15 per file
-                print(f"    {kind:10s} {name}")
+                stub = _stub_name(name)
+                warn = ""
+                if stub and stub in all_origin_names:
+                    warn = f"  {ui.YELLOW}⚠ collision: {all_origin_names[stub]}.lean{ui.RESET}"
+                print(f"    {kind:10s} {name}{warn}")
             if len(decls) > 15:
                 ui.info(f"    ... and {len(decls) - 15} more")
+
+    if collisions:
+        seen = set()
+        unique = [(n, m) for n, m in collisions if n not in seen and not seen.add(n)]
+        print()
+        ui.info(f"{len(unique)} name(s) would collide — rename with domain suffix if stubbing")
 
     print()
     ui.separator()
@@ -516,6 +586,108 @@ def cmd_suggest(domain):
     ui.stat("Uncovered", f"{ui.YELLOW}{n_uncovered}{ui.RESET}" if n_uncovered else "0")
     pct = n_covered / max(total, 1) * 100
     ui.stat("Coverage", f"{pct:.0f}%")
+    print()
+
+
+# =============================================================================
+# Stub — append uncovered declarations as stubs to existing Origin file
+# =============================================================================
+
+def cmd_stub(domain):
+    """Append uncovered Mathlib declarations as def stubs to Origin/<domain>.lean."""
+    covered, uncovered, _, all_origin_names = _get_uncovered(domain)
+    if covered is None:
+        ui.fail(f"Not found: {domain}")
+        return
+
+    if not uncovered:
+        ui.ok(f"{domain}: fully covered, nothing to stub")
+        return
+
+    # Find the Origin file to append to
+    origin_file = ORIGIN / f"{domain}.lean"
+    if not origin_file.exists():
+        origin_file = ORIGIN / f"{domain}2.lean"
+    if not origin_file.exists():
+        ui.fail(f"No Origin file found for {domain}")
+        return
+
+    # Read existing file
+    existing = origin_file.read_text(errors="replace")
+
+    # Remove trailing comment if present (we'll re-add it)
+    trail = "-- None absorbs (mul, neg, map): Core.lean's @[simp] set handles all cases."
+    if existing.rstrip().endswith(trail):
+        existing = existing[:existing.rstrip().rfind(trail)]
+
+    # Group uncovered by Mathlib file for section headers
+    from collections import defaultdict
+    by_file = defaultdict(list)
+    for kind, name, fname in uncovered:
+        by_file[fname].append((kind, name))
+
+    # Generate stubs
+    lines = []
+    lines.append("")
+    lines.append("-- ============================================================================")
+    lines.append("-- STUBS — auto-generated by: python3 scripts/origin.py stub " + domain)
+    lines.append("-- Upgrade key declarations from stubs to real structures/theorems.")
+    lines.append("-- ============================================================================")
+    lines.append("")
+
+    seen_names = set()
+    n_added = 0
+    n_skipped_collision = 0
+    n_skipped_dup = 0
+
+    for fname in sorted(by_file.keys()):
+        decls = by_file[fname]
+        short_fname = fname.split("/", 1)[-1] if "/" in fname else fname
+        lines.append(f"-- {short_fname}")
+
+        for kind, name in decls:
+            stub = _stub_name(name)
+
+            # Skip unparseable names
+            if stub is None:
+                n_skipped_dup += 1
+                continue
+
+            # Skip if we've already generated this stub name
+            if stub in seen_names:
+                n_skipped_dup += 1
+                continue
+            seen_names.add(stub)
+
+            # Check for collision with existing Origin declarations
+            if stub in all_origin_names:
+                lines.append(f"-- COLLISION: {stub} already in {all_origin_names[stub]}.lean — rename needed")
+                n_skipped_collision += 1
+                continue
+
+            docstring = name.split(".")[-1]
+            lines.append(f"/-- {docstring} (abstract). -/")
+            lines.append(f"def {stub} : Prop := True")
+
+            n_added += 1
+
+        lines.append("")
+
+    lines.append(trail)
+    lines.append("")
+
+    # Write
+    origin_file.write_text(existing.rstrip() + "\n" + "\n".join(lines))
+
+    ui.header("S T U B", f"{domain} — {n_added} stubs appended")
+    ui.stat("File", str(origin_file), "cyan")
+    ui.stat("Stubs added", f"{ui.GREEN}{n_added}{ui.RESET}")
+    if n_skipped_collision:
+        ui.stat("Skipped (collision)", f"{ui.YELLOW}{n_skipped_collision}{ui.RESET}")
+    if n_skipped_dup:
+        ui.stat("Skipped (duplicate)", f"{n_skipped_dup}")
+    print()
+    ui.info("Review stubs, upgrade key ones, then: lake build Origin." + domain)
     print()
 
 
@@ -745,6 +917,11 @@ def main():
             cmd_suggest(sys.argv[2])
         else:
             print("Usage: origin.py suggest <DOMAIN>")
+    elif cmd == "stub":
+        if len(sys.argv) > 2:
+            cmd_stub(sys.argv[2])
+        else:
+            print("Usage: origin.py stub <DOMAIN>")
     else:
         print(f"Unknown command: {cmd}")
         print(__doc__)

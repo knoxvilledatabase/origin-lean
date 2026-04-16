@@ -139,12 +139,13 @@ context window is worth exactly zero.
 
 ## Step 6: The tool
 
-One tool, eight commands:
+One tool, nine commands:
 
 ```bash
 python3 scripts/origin.py status            # PROGRESS REPORT — run this first
 python3 scripts/origin.py list              # show all domains
 python3 scripts/origin.py suggest <domain>  # show uncovered genuine declarations
+python3 scripts/origin.py stub <domain>     # append uncovered as def stubs
 python3 scripts/origin.py index             # generate Origin/Index.lean (the dedup)
 python3 scripts/origin.py dedup             # find duplicate definitions (detailed)
 python3 scripts/origin.py audit <domain>    # DRY profile a Mathlib domain
@@ -166,9 +167,15 @@ python3 scripts/origin.py status
 # 2. Pick a domain to deepen. Run suggest to see what's missing:
 python3 scripts/origin.py suggest <domain>
 # Shows covered vs uncovered genuine declarations, grouped by file
+# ⚠ warnings show names that would collide with other Origin files
 
-# 3. Deepen the domain:
-#    - suggest shows exactly which declarations to add
+# 3. Optionally, auto-generate stubs for all uncovered declarations:
+python3 scripts/origin.py stub <domain>
+# Appends def name' : Prop := True for each uncovered declaration
+# Skips collisions automatically. Then upgrade key stubs to real code.
+
+# 4. Deepen the domain:
+#    - suggest/stub show exactly which declarations to add
 #    - Add missing domain-specific definitions
 #    - Add demonstrations: by simp, cases <;> simp [h]
 #    - Keep every definition that any model might need
