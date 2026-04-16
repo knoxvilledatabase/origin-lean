@@ -1,13 +1,16 @@
 # For AI Agents — Onboarding Exercise
 
-**Work through all steps now. Don't ask for permission — just do it.
-Read each file, answer the checkpoint questions, show your answers.
-If you can't answer them, re-read until you can. The questions ARE
-the alignment.**
+**Do not skip steps. Each step has checkpoint questions. If you can't
+answer them, re-read until you can. The questions ARE the alignment.**
+
+**Show your answers before proceeding.** Don't summarize — answer each
+question specifically. A session that rushes past the checkpoints will
+misclassify `≠ 0`, think origin is nothing, or add typeclasses that
+shouldn't exist.
 
 ---
 
-## Step 1: Read `Origin/Core.lean` (166 lines)
+## Step 1: Read `Origin/Core.lean` (124 lines)
 
 Read every line. Then answer:
 
@@ -51,15 +54,15 @@ Origin puts the ground outside. `Option α`: `none` is the ground,
 
 ---
 
-## Step 3: Read one sketch (`Origin/GroupTheory.lean`, ~102 lines)
+## Step 3: Read one domain (`Origin/GroupTheory.lean`, ~314 lines)
 
 Read it. Then answer:
 
-- What did the sketch keep? Why?
+- What did Origin keep? Why?
 - What was removed? Why doesn't it need to exist?
 - What proof pattern closes the demonstrations?
-- Mathlib GroupTheory: 35,883 lines. This sketch: 102 lines. Where
-  did 99.7% of the code go?
+- Mathlib GroupTheory: 35,883 lines. Origin: 314 lines. Where
+  did 99.1% of the code go?
 
 ---
 
@@ -136,11 +139,12 @@ context window is worth exactly zero.
 
 ## Step 6: The tool
 
-One tool, seven commands:
+One tool, eight commands:
 
 ```bash
 python3 scripts/origin.py status            # PROGRESS REPORT — run this first
 python3 scripts/origin.py list              # show all domains
+python3 scripts/origin.py suggest <domain>  # show uncovered genuine declarations
 python3 scripts/origin.py index             # generate Origin/Index.lean (the dedup)
 python3 scripts/origin.py dedup             # find duplicate definitions (detailed)
 python3 scripts/origin.py audit <domain>    # DRY profile a Mathlib domain
@@ -157,13 +161,14 @@ python3 scripts/origin.py classify <domain> # show dissolved/genuine/conflates
 # 1. See where things stand (run this FIRST)
 python3 scripts/origin.py status
 # Green = deepened (>200 lines), Yellow = sketch, Dim = needs work
+# Decls column shows Origin declarations / Mathlib genuine
 
-# 2. Pick a yellow or dim domain to deepen
-#    Use: python3 scripts/origin.py classify <domain>
-#    to see what Mathlib has for that domain
+# 2. Pick a domain to deepen. Run suggest to see what's missing:
+python3 scripts/origin.py suggest <domain>
+# Shows covered vs uncovered genuine declarations, grouped by file
 
-# 3. Deepen the sketch:
-#    - Read the extracted files in extracted/Mathlib_<domain>/
+# 3. Deepen the domain:
+#    - suggest shows exactly which declarations to add
 #    - Add missing domain-specific definitions
 #    - Add demonstrations: by simp, cases <;> simp [h]
 #    - Keep every definition that any model might need
@@ -201,6 +206,13 @@ your approach feels complex, go back to the last thing that worked.
 
 **Never delete `@[simp]` declarations.** Invisible dependencies.
 716 build failures learned this the hard way.
+
+**Watch for name collisions across files.** Common names like
+`IsMartingale`, `IsIrreducible`, `bernoulli`, `IsDistributive`,
+`IsSimplyConnected` appear in multiple domains. Run `origin.py index`
+early — it catches collisions before `lake build` does. When you hit
+one, rename with a domain-specific suffix (e.g., `IsMartingaleProb`,
+`IsIrreducibleChain`, `bernoulliDist`).
 
 **Origin is never a destination.** Parts don't "reach" origin. Parts
 don't "become" origin. The question doesn't apply. You can't arrive
