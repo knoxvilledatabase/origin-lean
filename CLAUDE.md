@@ -616,14 +616,20 @@ INFRA_SIG word-bounded, #adaptation_note doc close fix):
 ```
 5,016 files  |  4,893 pass /   123 fail  |    207 error patterns  |  6m
 ```
-Dissolved: 1,254 → 289. Genuine: 141,015 → 141,782.
 
-Top remaining error patterns after run 20:
-- `failed to synthesize` (30 files) — cross-file typeclass dependencies
-- `unsolved goals` (29) — proofs broken by missing content
-- `unexpected identifier` (18) — Tactic metaprogramming
-- `unknown tactic` (15) — Tactic domain
-- `type mismatch` (13) — proof-level issues
+Run 26 (+ nested comment depth tracking, deprecated alias body consumption,
+broadened dependency resolver, @[inherit_doc X] fix):
+```
+5,015 files  |  4,931 pass /    84 fail  |    141 error patterns  |  8m
+```
+Dissolved: 289 → 260. Pass rate: 97.5% → 98.3%.
+
+Top remaining error patterns after run 26:
+- `type mismatch` (12) — proof-level, cross-file
+- `string gap` (11) — Tactic metaprogramming string literals
+- `rewrite failed` (11) — proofs referencing cross-file dissolved content
+- `unsolved goals` (10) — broken proofs
+- `@[to_additive] failed` (5) — additive mirror of dissolved code
 
 Each run fixes patterns in the script. Error count drops.
 The process: run → read top pattern → fix script → run again.
@@ -709,9 +715,11 @@ file by file, domain by domain, and write only what's genuinely new.
     Lean syntax constructs handled: alias, notation, macro, syntax, elab,
     infixl/r, prefix, postfix, library_note, set_option ... in,
     #adaptation_note doc comments, noncomputable section.
-14. ✅ **Remaining 123 failures.** 27 are Tactic (metaprogramming — backtick
-    quasiquotation, string gaps in macros). 96 are math files with cross-file
-    dependencies or cascade errors from dissolved content in other files.
+14. ✅ **98.3% pass rate.** 4,931 / 5,015 files. 84 remaining.
+    - 13 Tactic (metaprogramming — backtick quasiquotation, string gaps)
+    - 71 math files (cross-file dependencies, cascade errors, @[to_additive])
+    - Nested comment depth tracking, deprecated alias body consumption
+    - Session: 849 → 84 failures (-90%). 2,903 → 141 error patterns (-95%).
 
 ### What's next: run the pipeline
 
