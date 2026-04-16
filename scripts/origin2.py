@@ -325,7 +325,7 @@ class Parser:
                 # @[inherit_doc] attached to a notation/declaration is load-bearing
                 if cmd == "@[deprecated" and stripped.startswith("@[deprecated"):
                     pass  # always strip deprecated
-                elif "@[inherit_doc]" in stripped and self.INHERIT_DOC_KEEP.search(stripped):
+                elif "@[inherit_doc" in stripped and self.INHERIT_DOC_KEEP.search(stripped):
                     return None  # don't strip — let passthrough/declaration handle it
                 # Consume the stripped command and any attached doc comment.
                 # Pattern: library_note "..."/-- ... multi-line ... -/
@@ -399,9 +399,9 @@ class Parser:
             return None
         if self.DECL_KEYWORD_RE.search(stripped):
             return None  # Let declaration handler take it
-        # @[inherit_doc] scoped[...] notation — pass through as-is
-        if "@[inherit_doc]" in stripped and self.INHERIT_DOC_KEEP.search(stripped):
-            return None  # Let passthrough handler take it
+        # @[inherit_doc ...] with notation/scoped/infixr etc — pass through as-is
+        if "@[inherit_doc" in stripped and self.INHERIT_DOC_KEEP.search(stripped):
+            return None  # Let passthrough/fallback handler take it
 
         attr_lines = [line]
         i += 1
