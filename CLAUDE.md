@@ -196,12 +196,13 @@ context window is worth exactly zero.
 
 ## Step 6: The tool
 
-One tool, twelve commands:
+One tool, thirteen commands:
 
 ```bash
 python3 scripts/origin.py status            # PROGRESS REPORT — run this first
 python3 scripts/origin.py quality           # QUALITY — stub vs real per domain
-python3 scripts/origin.py quality <domain>  # quality for one domain
+python3 scripts/origin.py quality <domain>  # quality + detailed T1 stub listing
+python3 scripts/origin.py show <name>       # show Mathlib original for a stub name
 python3 scripts/origin.py patterns          # find Option patterns that belong in Core
 python3 scripts/origin.py clean             # remove stale stubs that collide with Core
 python3 scripts/origin.py list              # show all domains
@@ -266,8 +267,10 @@ python3 scripts/origin.py stub <domain>
 # 5. Upgrade stubs to real code:
 #    a. Start with structures/classes/inductives — they're load-bearing.
 #       Other defs reference these types. Get them right first.
-#    b. For each stub, read its Mathlib source (quality tells you the file).
-#       Understand the real type shape: fields, constructors, parameters.
+#    b. For each stub, run: python3 scripts/origin.py show "name'"
+#       This prints the full Mathlib original — structure fields,
+#       inductive constructors, function signature. Read it. Understand
+#       the real type shape before writing the Origin version.
 #    c. Write the Origin version: real fields, real constructors, real
 #       parameters. Use Core primitives: liftPred, liftBin₂, Option.map.
 #    d. NEVER pattern-match on some/none in a domain file.
