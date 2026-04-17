@@ -30,7 +30,7 @@ Therefore: n × origin = origin
 Here's our proof:
 
 ```
-origin.lean     304 lines    zero sorries
+origin.lean     312 lines    zero sorries
 ```
 
 ```bash

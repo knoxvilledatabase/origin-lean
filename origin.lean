@@ -21,6 +21,14 @@ theorem origin [Add α] [Mul α] [Neg α]
       _ = n * n + -(n * n)         := by rw [mul_neg]
       _ = zero                     := by rw [cancel]
 
+-- The insight: none is three things at once.
+--   Additive identity:    none + x = x        (the ground added changes nothing)
+--   Multiplicative absorber: none * x = none   (nothing to multiply with)
+--   Division absorber:    none⁻¹ = none        (can't divide by the ground)
+-- One element. Three behaviors. Zero conflict.
+-- Mathlib needs 17 typeclasses because 0 plays all three roles and they collide.
+-- Origin: they don't collide because they're all the same element doing what the ground does.
+
 instance [Mul α] : Mul (Option α) where
   mul a b := match a, b with
     | none, _ => none
