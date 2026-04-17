@@ -89,10 +89,7 @@ theorem affine_morphism [Mul α] (f : α → α)
     Option.map f (some (a * b)) = some (f a * f b) := by
   simp [h_mul]
 
-/-- Morphism composition lifts through Option. -/
-theorem morphism_comp (f g : α → α) (v : Option α) :
-    Option.map g (Option.map f v) = Option.map (g ∘ f) v := by
-  cases v <;> simp
+-- morphism_comp now in Core as option_map_comp
 
 -- ============================================================================
 -- 5. PROJECTIVE SPACE

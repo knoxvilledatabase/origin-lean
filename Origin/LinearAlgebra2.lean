@@ -125,18 +125,13 @@ def IsLinearMap [Add α] [Mul α] (f : α → α) : Prop :=
 def kernel' (f : α → α) (zero : α) : α → Prop :=
   fun a => f a = zero
 
-/-- Image (range) of a linear map. -/
-def image' (f : α → α) : α → Prop :=
-  fun b => ∃ a, f a = b
+-- image' now in Core
 
 /-- Rank-nullity theorem (abstract): dim(ker) + dim(im) = dim(V). -/
 def rankNullity (dimKer dimIm dimV : Nat) : Prop :=
   dimKer + dimIm = dimV
 
-/-- Linear map composition lifts through Option. -/
-theorem linearMap_comp (f g : α → α) (v : Option α) :
-    Option.map g (Option.map f v) = Option.map (g ∘ f) v := by
-  cases v <;> simp
+-- linearMap_comp now in Core as option_map_comp
 
 -- ============================================================================
 -- 5. DIMENSION AND BASIS

@@ -259,11 +259,28 @@ theorem no_some_fixed_point
   | some a => simp at hv; exact absurd hv (hf a)
 
 -- ============================================================================
+-- Generic Concepts (used across multiple domains)
+-- ============================================================================
+
+/-- Image of a function: the set of outputs. -/
+def image' (f : α → α) : α → Prop := fun b => ∃ a, f a = b
+
+/-- Option.map functoriality: map g ∘ map f = map (g ∘ f). -/
+@[simp] theorem option_map_comp (f : α → β) (g : β → γ) (v : Option α) :
+    Option.map g (Option.map f v) = Option.map (g ∘ f) v := by
+  cases v <;> simp [Function.comp]
+
+/-- Adjunction test: round-trip in both directions. -/
+def IsAdj (toHom : (α → α) → (α → α)) (fromHom : (α → α) → (α → α)) : Prop :=
+  (∀ f, toHom (fromHom f) = f) ∧ (∀ f, fromHom (toHom f) = f)
+
+-- ============================================================================
 -- That's it.
 -- ============================================================================
 
 -- One theorem (origin). Instances for *, +, -. A simp set. liftBin₂.
--- liftPred. no_some_fixed_point. Standard notation. Everything else follows.
+-- liftPred. no_some_fixed_point. image'. option_map_comp. IsAdj.
+-- Standard notation. Everything else follows.
 --
 -- none is the whole. some is a part. * + - work on Option with
 -- standard notation. The ground absorbs. The parts compute.

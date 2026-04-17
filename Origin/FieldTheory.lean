@@ -140,9 +140,9 @@ def algClosedClassification (_char _card : Nat) : Prop :=
 def IsAlgebraicClosure (isClosure isAlgClosed : Prop) : Prop :=
   isClosure ∧ isAlgClosed
 
-/-- The spectrum mapping theorem. -/
-def spectrumMap (_f : α → α) : Prop :=
-  True  -- abstracted
+/-- The spectrum mapping theorem: f maps spectrum of a to spectrum of f(a). -/
+def spectrumMap (f : α → α) (spectrum : α → α → Prop) (a : α) : Prop :=
+  ∀ ev, spectrum a ev → spectrum (f a) (f ev)
 
 -- ============================================================================
 -- 8. SEPARABLY CLOSED (IsSepClosed.lean, SeparableClosure.lean)

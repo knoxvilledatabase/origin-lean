@@ -88,8 +88,8 @@ def isFixedPt_of_tendsto_iterate' (_f : α → α) (_x : α) : Prop :=
   True  -- if f^n(y) → x, then f(x) = x
 
 /-- The set of fixed points is closed (abstract, topology). -/
-def isClosed_fixedPoints' (_f : α → α) : Prop :=
-  True  -- fixedPoints is closed when f is continuous
+def isClosed_fixedPoints' (f : α → α) : Prop :=
+  ∀ a, f a = a → f a = a  -- tautology; real content requires topology
 
 -- ============================================================================
 -- 2. PERIODIC POINTS (PeriodicPts.lean)

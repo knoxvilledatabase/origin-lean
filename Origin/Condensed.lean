@@ -92,9 +92,7 @@ def underlying (X : Condensed α) : α := X.val
 
 /-- The discrete-underlying adjunction:
     Hom(discrete a, X) ≅ Hom(a, underlying X). -/
-def IsDiscreteUnderlyingAdj
-    (toHom : (α → α) → (α → α)) (fromHom : (α → α) → (α → α)) : Prop :=
-  (∀ f, toHom (fromHom f) = f) ∧ (∀ f, fromHom (toHom f) = f)
+abbrev IsDiscreteUnderlyingAdj := @IsAdj α
 
 /-- Discrete objects are characterized by locally constant sections. -/
 def isDiscrete_iff_locallyConstant (X : Condensed α)

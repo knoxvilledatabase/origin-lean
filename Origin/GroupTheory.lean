@@ -77,8 +77,7 @@ def kernel [Mul α] (f : α → α) (e : α) : α → Prop :=
   fun a => f a = e
 
 /-- Image of a homomorphism. -/
-def image (f : α → α) : α → Prop :=
-  fun b => ∃ a, f a = b
+abbrev image := @image' α
 
 /-- Homomorphism composition lifts through Option. -/
 theorem hom_preserves_mul [Mul α] (f : α → α)

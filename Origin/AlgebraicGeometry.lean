@@ -170,10 +170,7 @@ def Gamma (X : Scheme' α) (globalSections : Scheme' α → β) : β :=
   globalSections X
 
 /-- The Spec-Γ adjunction: Hom(X, Spec R) ≅ Hom(R, Γ(X)). -/
-def IsSpecGammaAdj
-    (toHom : (α → α) → (α → α))
-    (fromHom : (α → α) → (α → α)) : Prop :=
-  (∀ f, toHom (fromHom f) = f) ∧ (∀ f, fromHom (toHom f) = f)
+abbrev IsSpecGammaAdj := @IsAdj α
 
 -- ============================================================================
 -- 8. AFFINE OPENS
