@@ -18,3 +18,12 @@ lean_lib Origin where
 
 lean_lib Proofs where
   srcDir := "."
+
+lean_lib «origin» where
+  srcDir := "."
+
+lean_lib «core» where
+  srcDir := "."
+
+lean_lib «laws» where
+  srcDir := "."
