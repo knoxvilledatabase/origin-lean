@@ -714,7 +714,13 @@ def cmd_stub(domain):
 # Quality — show stub vs real declaration counts
 # =============================================================================
 
-STUB_RE = re.compile(r'^\s*def\s+\S+\s*:\s*Prop\s*:=\s*True\s*$')
+# Stub detection: catches True in any disguise.
+# Matches: def X' : Prop := True
+#          def X' (α : Type*) : Prop := True
+#          def X' {α : Type u} : Prop := True
+#          def X' [Foo α] : Prop := True
+# The test: does the body carry mathematical content? If it's True, no.
+STUB_RE = re.compile(r'^\s*def\s+\S+\s*(?:\([^)]*\)\s*|\{[^}]*\}\s*|\[[^\]]*\]\s*)*:\s*Prop\s*:=\s*True\s*$')
 
 # Tier 1: structures, classes, inductives, defs, abbrevs in Mathlib.
 # These define types and computations — stubs hiding them are the worst.

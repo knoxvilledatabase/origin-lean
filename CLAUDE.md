@@ -263,6 +263,12 @@ python3 scripts/origin.py stub <domain>
 #    - NEVER prove algebraic laws — they're in Core
 #    - Key structures/inductives first, then theorems that use them
 #    - Import only Origin.Core
+#
+#    "Upgraded" means: a model can use the definition without reading
+#    Mathlib. A structure needs real fields. A def needs meaningful
+#    parameters or a real body. `def X' (α : Type*) : Prop := True`
+#    is still a stub — it just wears a disguise. If the body is
+#    `True` in any form, it's not upgraded.
 
 # 6. Build (under 1 second — no Mathlib rebuild)
 lake build Origin.<DomainName>
