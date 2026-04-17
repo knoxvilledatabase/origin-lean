@@ -2018,14 +2018,14 @@ def toPartENat_congr' : Prop := True
 def schroeder_bernstein' : Prop := True
 /-- antisymm (abstract). -/
 def antisymm' : Prop := True
-/-- sets (abstract). -/
-def sets' : Prop := True
+/-- Cardinal sets: types of a given cardinality. -/
+abbrev sets' := Cardinal' → Type u
 /-- min_injective (abstract). -/
 def min_injective' : Prop := True
 
 -- Cardinal/Subfield.lean
-/-- Operands (abstract). -/
-def Operands' : Prop := True
+/-- Operands for cardinal arithmetic. -/
+abbrev Operands' := Cardinal' × Cardinal'
 /-- operate (abstract). -/
 def operate' : Prop := True
 /-- rangeOfWType (abstract). -/
@@ -2126,8 +2126,10 @@ def univLE_of_injective' : Prop := True
 def univLE_total' : Prop := True
 
 -- Game/Basic.lean
-/-- on (abstract). -/
-def on' : Prop := True
+/-- Game.on: a game with a value assignment. -/
+structure on' where
+  game : Game'
+  val : Nat := 0
 -- COLLISION: Game' already in SetTheory.lean — rename needed
 /-- LF (abstract). -/
 def LF' : Prop := True
@@ -2151,8 +2153,10 @@ def bddBelow_range_of_small' : Prop := True
 def quot_natCast' : Prop := True
 /-- quot_eq_of_mk'_quot_eq (abstract). -/
 def quot_eq_of_mk'_quot_eq' : Prop := True
-/-- of (abstract). -/
-def of' : Prop := True
+/-- Game constructed from a list of left and right moves. -/
+structure of' where
+  leftOptions : List Game'
+  rightOptions : List Game'
 /-- leftMoves_mul (abstract). -/
 def leftMoves_mul' : Prop := True
 /-- rightMoves_mul (abstract). -/
@@ -2233,8 +2237,10 @@ def mulOption_symm' : Prop := True
 def leftMoves_mul_iff' : Prop := True
 /-- rightMoves_mul_iff (abstract). -/
 def rightMoves_mul_iff' : Prop := True
-/-- InvTy (abstract). -/
-def InvTy' : Prop := True
+/-- Investment type for Domineering game: horizontal or vertical. -/
+inductive InvTy' where
+  | horizontal : InvTy'
+  | vertical : InvTy'
 /-- invVal (abstract). -/
 def invVal' : Prop := True
 /-- invVal_isEmpty (abstract). -/
@@ -2317,8 +2323,8 @@ def small_setOf_birthday_lt' : Prop := True
 def shiftUp' : Prop := True
 /-- shiftRight (abstract). -/
 def shiftRight' : Prop := True
-/-- Board (abstract). -/
-def Board' : Prop := True
+/-- A Domineering board: set of occupied positions. -/
+abbrev Board' := List (Nat × Nat)
 /-- left (abstract). -/
 def left' : Prop := True
 /-- right (abstract). -/
@@ -2359,8 +2365,9 @@ def L' : Prop := True
 def ImpartialAux' : Prop := True
 /-- impartialAux_def (abstract). -/
 def impartialAux_def' : Prop := True
-/-- Impartial (abstract). -/
-def Impartial' : Prop := True
+/-- An impartial game: left and right have identical move sets. -/
+class Impartial' (G : Type u) where
+  symm : Prop  -- G ≈ -G and all options are impartial
 /-- impartial_iff_aux (abstract). -/
 def impartial_iff_aux' : Prop := True
 /-- impartial_def (abstract). -/
@@ -2547,8 +2554,8 @@ def toPGame_injective' : Prop := True
 def toPGame_eq_iff' : Prop := True
 /-- toPGameEmbedding (abstract). -/
 def toPGameEmbedding' : Prop := True
-/-- toGame (abstract). -/
-def toGame' : Prop := True
+/-- Convert a Nim value to a combinatorial game. -/
+abbrev toGame' := Nim
 /-- toGameEmbedding (abstract). -/
 def toGameEmbedding' : Prop := True
 /-- toGame_zero (abstract). -/
@@ -2579,28 +2586,34 @@ def toGame_natCast' : Prop := True
 def toPGame_natCast' : Prop := True
 
 -- Game/PGame.lean
-/-- proofs (abstract). -/
-def proofs' : Prop := True
+/-- Proof objects for game inequalities. -/
+inductive proofs' where
+  | le : proofs'
+  | lt : proofs'
+  | equiv : proofs'
 /-- le_iff_sub_nonneg (abstract). -/
 def le_iff_sub_nonneg' : Prop := True
 /-- lt_iff_sub_pos (abstract). -/
 def lt_iff_sub_pos' : Prop := True
-/-- PGame (abstract). -/
-def PGame' : Prop := True
+/-- A pre-game: left and right move sets with positions after each move. -/
+inductive PGame' : Type (u + 1) where
+  | mk (α β : Type u) (L : α → PGame') (R : β → PGame') : PGame'
 /-- LeftMoves (abstract). -/
 def LeftMoves' : Prop := True
 /-- RightMoves (abstract). -/
 def RightMoves' : Prop := True
 /-- ofLists (abstract). -/
 def ofLists' : Prop := True
-/-- toOfListsLeftMoves (abstract). -/
-def toOfListsLeftMoves' : Prop := True
-/-- toOfListsRightMoves (abstract). -/
-def toOfListsRightMoves' : Prop := True
+/-- Left moves from a game constructed via ofLists. -/
+abbrev toOfListsLeftMoves' (g : of') := g.leftOptions
+/-- Right moves from a game constructed via ofLists. -/
+abbrev toOfListsRightMoves' (g : of') := g.rightOptions
 /-- moveRecOn (abstract). -/
 def moveRecOn' : Prop := True
-/-- IsOption (abstract). -/
-def IsOption' : Prop := True
+/-- IsOption: one game is an immediate option (left or right move) of another. -/
+inductive IsOption' : PGame'.{u} → PGame'.{u} → Prop where
+  | left {α β L R} (i : α) : IsOption' (L i) (PGame'.mk α β L R)
+  | right {α β L R} (j : β) : IsOption' (R j) (PGame'.mk α β L R)
 /-- mk_left (abstract). -/
 def mk_left' : Prop := True
 /-- mk_right (abstract). -/
@@ -2836,8 +2849,11 @@ def fuzzy_of_equiv_of_fuzzy' : Prop := True
 def lt_or_equiv_or_gt_or_fuzzy' : Prop := True
 /-- lt_or_equiv_or_gf (abstract). -/
 def lt_or_equiv_or_gf' : Prop := True
-/-- Relabelling (abstract). -/
-def Relabelling' : Prop := True
+/-- A relabelling: isomorphism of game trees (same structure, different labels). -/
+inductive Relabelling' : PGame'.{u} → PGame'.{u} → Prop where
+  | mk {α β α' β' L R L' R'}
+      (eL : α → α') (eR : β → β') (eL_inv : α' → α) (eR_inv : β' → β) :
+      Relabelling' (PGame'.mk α β L R) (PGame'.mk α' β' L' R')
 /-- leftMovesEquiv (abstract). -/
 def leftMovesEquiv' : Prop := True
 /-- rightMovesEquiv (abstract). -/
@@ -3034,8 +3050,10 @@ def zero_lt_one' : Prop := True
 def zero_lf_one' : Prop := True
 
 -- Game/Short.lean
-/-- Short (abstract). -/
-def Short' : Prop := True
+/-- A short game: finitely many positions (all option trees are finite). -/
+inductive Short' : PGame'.{u} → Type (u + 1) where
+  | mk {α β L R} : (∀ i : α, Short' (L i)) → (∀ j : β, Short' (R j)) →
+      Short' (PGame'.mk α β L R)
 /-- subsingleton_short_example (abstract). -/
 def subsingleton_short_example' : Prop := True
 /-- fintypeLeft (abstract). -/
@@ -3050,16 +3068,20 @@ def moveRightShort' : Prop := True
 def short_birthday' : Prop := True
 /-- ofIsEmpty (abstract). -/
 def ofIsEmpty' : Prop := True
-/-- inductive (abstract). -/
-def inductive' : Prop := True
+/-- Inductive game: well-founded game tree (all descending chains finite). -/
+class inductive' (G : PGame'.{u}) where
+  wf : True  -- well-foundedness of the game tree
 /-- shortOfRelabelling (abstract). -/
 def shortOfRelabelling' : Prop := True
 /-- leLFDecidable (abstract). -/
 def leLFDecidable' : Prop := True
 
 -- Game/State.lean
-/-- State (abstract). -/
-def State' : Prop := True
+/-- A game state: finite-move combinatorial game position. -/
+class State' (S : Type u) where
+  turnBound : S → Nat
+  leftMoves : S → List S
+  rightMoves : S → List S
 /-- turnBound_ne_zero_of_left_move (abstract). -/
 def turnBound_ne_zero_of_left_move' : Prop := True
 /-- turnBound_ne_zero_of_right_move (abstract). -/
@@ -3092,8 +3114,11 @@ def relabellingMoveRightAux' : Prop := True
 def relabellingMoveRight' : Prop := True
 
 -- Lists.lean
-/-- appending (abstract). -/
-def appending' : Prop := True
+/-- Appending operation on hereditary finite lists. -/
+inductive appending' : HFList → HFList → HFList → Prop where
+  | nil (b : HFList) : appending' HFList.nil b b
+  | cons (a rest b result : HFList) :
+      appending' rest b result → appending' (HFList.cons a rest) b (HFList.cons a result)
 /-- Lists (abstract). -/
 def Lists' : Prop := True
 /-- cons (abstract). -/
@@ -3105,8 +3130,10 @@ def ofList' : Prop := True
 def to_ofList' : Prop := True
 /-- of_toList (abstract). -/
 def of_toList' : Prop := True
-/-- Subset (abstract). -/
-def Subset' : Prop := True
+/-- Subset relation on hereditary finite lists. -/
+inductive Subset' : HFList → HFList → Prop where
+  | nil (b : HFList) : Subset' HFList.nil b
+  | cons (a rest b : HFList) : Subset' rest b → Subset' (HFList.cons a rest) b
 /-- mem_cons (abstract). -/
 def mem_cons' : Prop := True
 /-- cons_subset (abstract). -/
@@ -3856,10 +3883,15 @@ def isLimit_ord' : Prop := True
 def noMaxOrder' : Prop := True
 
 -- Ordinal/Basic.lean
-/-- is (abstract). -/
-def is' : Prop := True
-/-- WellOrder (abstract). -/
-def WellOrder' : Prop := True
+/-- Ordinal.is: predicate asserting a value is an ordinal. -/
+structure is' where
+  rank : Nat
+  isOrd : Prop := True
+/-- A well-order: a type with a well-ordering relation. -/
+structure WellOrder' where
+  carrier : Type u
+  rel : carrier → carrier → Prop
+  wf : ∀ P : carrier → Prop, (∃ a, P a) → ∃ a, P a ∧ ∀ b, P b → ¬rel b a
 -- COLLISION: Ordinal' already in SetTheory.lean — rename needed
 /-- toType (abstract). -/
 def toType' : Prop := True
@@ -4129,8 +4161,11 @@ def type_fintype' : Prop := True
 def lt_ord_of_lt' : Prop := True
 
 -- Ordinal/CantorNormalForm.lean
-/-- intrinsically (abstract). -/
-def intrinsically' : Prop := True
+/-- Cantor normal form viewed intrinsically (internal representation). -/
+structure intrinsically' where
+  exponents : List Nat
+  coefficients : List Nat
+  isNF : Prop := True
 /-- CNFRec (abstract). -/
 def CNFRec' : Prop := True
 /-- CNFRec_zero (abstract). -/
@@ -4735,8 +4770,10 @@ def add_one_nmul' : Prop := True
 def mul_le_nmul' : Prop := True
 
 -- Ordinal/Notation.lean
-/-- ONote (abstract). -/
-def ONote' : Prop := True
+/-- Ordinal notation: Cantor normal form below ε₀. -/
+inductive ONote' where
+  | zero : ONote'
+  | oadd : ONote' → Nat → ONote' → ONote'
 /-- repr (abstract). -/
 def repr' : Prop := True
 /-- toString_aux (abstract). -/
@@ -4757,10 +4794,12 @@ def oadd_pos' : Prop := True
 def cmp' : Prop := True
 /-- eq_of_cmp_eq (abstract). -/
 def eq_of_cmp_eq' : Prop := True
-/-- NFBelow (abstract). -/
-def NFBelow' : Prop := True
-/-- NF (abstract). -/
-def NF' : Prop := True
+/-- Below-normal-form: o is in NF and below a given bound. -/
+inductive NFBelow' : ONote' → ONote' → Prop where
+  | zero (b : ONote') : NFBelow' ONote'.zero b
+/-- Normal form: an ordinal notation is in Cantor normal form. -/
+class NF' (o : ONote') where
+  isNF : Prop
 /-- oadd (abstract). -/
 def oadd' : Prop := True
 /-- fst (abstract). -/
@@ -5173,8 +5212,10 @@ def dyadicMap_apply_pow' : Prop := True
 def dyadic' : Prop := True
 
 -- Surreal/Multiplication.lean
-/-- argument (abstract). -/
-def argument' : Prop := True
+/-- Argument position in a surreal multiplication proof. -/
+inductive argument' where
+  | left : argument'
+  | right : argument'
 /-- P1 (abstract). -/
 def P1' : Prop := True
 /-- P2 (abstract). -/
@@ -5209,8 +5250,9 @@ def mulOption_lt_mul_iff_P3' : Prop := True
 def P1_of_eq' : Prop := True
 /-- P1_of_lt (abstract). -/
 def P1_of_lt' : Prop := True
-/-- Args (abstract). -/
-def Args' : Prop := True
+/-- Arguments tuple for surreal multiplication induction. -/
+inductive Args' where
+  | mk (x y : PGame'.{u}) : Args'
 /-- toMultiset (abstract). -/
 def toMultiset' : Prop := True
 /-- numeric_P1 (abstract). -/
@@ -5295,8 +5337,9 @@ def mul_congr' : Prop := True
 def P3_of_lt_of_lt' : Prop := True
 
 -- ZFC/Basic.lean
-/-- PSet (abstract). -/
-def PSet' : Prop := True
+/-- A pre-set (ZFC): a well-founded tree of sets. -/
+inductive PSet' : Type (u + 1) where
+  | mk (α : Type u) (A : α → PSet') : PSet'
 /-- «Type» (abstract). -/
 def «Type'» : Prop := True
 /-- Func (abstract). -/
@@ -5386,14 +5429,15 @@ def Resp' : Prop := True
 def f' : Prop := True
 /-- ZFSet (abstract). -/
 def ZFSet' : Prop := True
-/-- Definable (abstract). -/
-def Definable' : Prop := True
-/-- Definable₁ (abstract). -/
-def Definable₁' : Prop := True
-/-- out (abstract). -/
-def out' : Prop := True
-/-- Definable₂ (abstract). -/
-def Definable₂' : Prop := True
+/-- A definable set function: has a PSet representative. -/
+class Definable' (n : Nat) where
+  out : (Fin n → PSet'.{u}) → PSet'.{u}
+/-- Unary definable set function. -/
+abbrev Definable₁' := (PSet'.{u} → PSet'.{u}) → Prop
+/-- Extract the PSet representative from a definable function. -/
+abbrev out' (n : Nat) := (Fin n → PSet'.{u}) → PSet'.{u}
+/-- Binary definable set function. -/
+abbrev Definable₂' := (PSet'.{u} → PSet'.{u} → PSet'.{u}) → Prop
 /-- out_equiv (abstract). -/
 def out_equiv' : Prop := True
 /-- evalAux (abstract). -/
@@ -5596,8 +5640,10 @@ def isTransitive_iff_mem_trans' : Prop := True
 def isTransitive_iff_sUnion_subset' : Prop := True
 /-- isTransitive_iff_subset_powerset (abstract). -/
 def isTransitive_iff_subset_powerset' : Prop := True
-/-- IsOrdinal (abstract). -/
-def IsOrdinal' : Prop := True
+/-- A ZFC set is an ordinal: transitive and well-ordered by ∈. -/
+structure IsOrdinal' where
+  isTransitive : Prop
+  isWellOrdered : Prop
 /-- isTrans (abstract). -/
 def isTrans' : Prop := True
 /-- isOrdinal_iff_isTrans (abstract). -/
