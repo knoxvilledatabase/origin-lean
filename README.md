@@ -8,7 +8,7 @@ Not only is zero treated as a quantity, it's also treated as the ground the thin
 
 **The challenge:** prove the foundational laws of algebra, order, metric spaces, functors, topology, measure theory, logic, and physics without any of the 17 zero-management Mathlib typeclasses.
 
-**The theorem:**
+**What is Origin?**
 
 ```
 Step 1: Write origin as a cancellation.
