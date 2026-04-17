@@ -174,37 +174,35 @@ theorem seq_add_converges [Add α] (s t : Nat → α) (Ls Lt : α)
 -- 6. OPTION.MAP PRESERVES LIMITS
 -- ============================================================================
 
-/-- If f is continuous and s → L, then f ∘ s → f(L). -/
+/-- If f is continuous and s → L, then f ∘ s → f(L).
+    The sorry from the first pass is now closed: Core has Metric
+    with eq_of_dist_eq_zero. The honest boundary became Core. -/
 theorem map_preserves_convergence (f : α → α) (s : Nat → α) (L : α)
-    (dist : α → α → Nat) (pos : Nat → Prop)
-    (hf : IsContinuousAt f L dist pos)
-    (hs : SeqConverges s L dist pos) :
-    SeqConverges (fun n => f (s n)) (f L) dist pos := by
+    (m : Metric α) (pos : Nat → Prop)
+    (hpos : ∀ ε, pos ε → 0 < ε)
+    (hf : IsContinuousAt f L m.dist pos)
+    (hs : SeqConverges s L m.dist pos) :
+    SeqConverges (fun n => f (s n)) (f L) m.dist pos := by
   intro ε hε
   obtain ⟨δ, hδ, hf'⟩ := hf ε hε
   obtain ⟨N, hN⟩ := hs δ hδ
   exact ⟨N, fun n hn => by
     have hsn := hN n hn
-    by_cases h0 : dist (s n) L = 0
-    · -- s n is at L, so f(s n) = f(L)
-      sorry  -- needs: dist x y = 0 → x = y
+    by_cases h0 : m.dist (s n) L = 0
+    · -- s n = L by metric axiom, so f(s n) = f(L), dist = 0 < ε
+      have heq : s n = L := m.eq_of_dist_eq_zero _ _ h0
+      simp [heq, m.dist_self]; exact hpos ε hε
     · exact hf' (s n) (Nat.pos_of_ne_zero h0) hsn⟩
 
 -- ============================================================================
--- 7. HONEST BOUNDARY: what needs sorry
+-- 7. THE BOUNDARY CLOSED
 -- ============================================================================
 
--- The sorry above is real. map_preserves_convergence needs:
---   dist x y = 0 → x = y (metric space axiom)
--- This is a genuine requirement — not infrastructure. Origin
--- doesn't have a Metric typeclass, and adding one would be
--- adding infrastructure. The theorem works for the non-zero
--- case. The zero case needs the metric axiom.
---
--- This is information, not failure. It tells us exactly what
--- Origin needs to add to Core if we want full metric space
--- support: a dist function with the metric axioms. That's
--- real math, not zero-management infrastructure.
+-- The sorry is gone. Core's Metric structure provides
+-- eq_of_dist_eq_zero — the axiom the proof needed.
+-- That axiom is real math (Euclid-level postulate), not
+-- infrastructure (zero-management). The kill switch found
+-- the boundary. Core absorbed it. The proof closes.
 
 -- ============================================================================
 -- 8. CONCRETE: sequences on Option Int

@@ -275,12 +275,38 @@ def IsAdj (toHom : (α → α) → (α → α)) (fromHom : (α → α) → (α �
   (∀ f, toHom (fromHom f) = f) ∧ (∀ f, fromHom (toHom f) = f)
 
 -- ============================================================================
+-- Metric Space (for analysis — the honest boundary)
+-- ============================================================================
+
+/-- A metric: distance function satisfying the three axioms.
+    The 121st theorem found the boundary: dist x y = 0 → x = y.
+    That's a real postulate, not infrastructure. Here it is. -/
+structure Metric (α : Type u) where
+  dist : α → α → Nat
+  dist_self : ∀ a, dist a a = 0
+  dist_comm : ∀ a b, dist a b = dist b a
+  dist_triangle : ∀ a b c, dist a c ≤ dist a b + dist b c
+  eq_of_dist_eq_zero : ∀ a b, dist a b = 0 → a = b
+
+/-- Metric lifts through Option: dist on some values, none is outside. -/
+def Metric.liftDist (m : Metric α) : Option α → Option α → Option Nat
+  | some a, some b => some (m.dist a b)
+  | _, _ => none  -- distance to/from the ground is not a measurement
+
+@[simp] theorem Metric.liftDist_some (m : Metric α) (a b : α) :
+    m.liftDist (some a) (some b) = some (m.dist a b) := rfl
+@[simp] theorem Metric.liftDist_none_left (m : Metric α) (b : Option α) :
+    m.liftDist none b = none := by cases b <;> rfl
+@[simp] theorem Metric.liftDist_none_right (m : Metric α) (a : Option α) :
+    m.liftDist a none = none := by cases a <;> rfl
+
+-- ============================================================================
 -- That's it.
 -- ============================================================================
 
 -- One theorem (origin). Instances for *, +, -. A simp set. liftBin₂.
 -- liftPred. no_some_fixed_point. image'. option_map_comp. IsAdj.
--- Standard notation. Everything else follows.
+-- Metric. Standard notation. Everything else follows.
 --
 -- none is the whole. some is a part. * + - work on Option with
 -- standard notation. The ground absorbs. The parts compute.
