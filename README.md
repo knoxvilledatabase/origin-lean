@@ -47,13 +47,13 @@ lake build
 
 | Group | What it proves | Key result |
 |-------|---------------|------------|
-| Algebra | Commutativity, associativity, distributivity, identity, inverse | `none * a = none`, `none⁻¹ = none` — the ground absorbs |
-| Order | Reflexivity, transitivity, antisymmetry | `none ≤ everything`: the ground is the bottom |
-| Metric | dist_self, dist_comm, triangle inequality | Lifts through Option — distance to ground is `none` |
+| Algebra | Commutativity, associativity, distributivity, identity, inverse | `none * a = none`, `none⁻¹ = none` |
+| Order | Reflexivity, transitivity, antisymmetry | `none ≤ everything` |
+| Metric | dist_self, dist_comm, triangle inequality | Lifts through Option, distance to ground is `none` |
 | Functor | `map id = id`, `map (g ∘ f) = map g ∘ map f` | Option is a lawful functor |
-| Topology | Continuous maps preserve open sets | `map_preserves_open` — one theorem |
+| Topology | Continuous maps preserve open sets | `map_preserves_open` |
 | Measure | Predicates compose under disjunction and conjunction | `liftPred` distributes over `∨` and `∧` |
-| Logic | The Liar, Russell, and Curry paradoxes | All three are `no_some_fixed_point` |
-| Physics | 86 existence hypotheses dissolved | `some 0 ≠ none` — the distinction Mathlib can't make |
+| Logic | The Liar, Russell, and Curry paradoxes | `no_some_fixed_point` |
+| Physics | 86 existence hypotheses dissolved | `some 0 ≠ none` |
 
 ---
