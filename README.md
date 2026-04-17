@@ -4,7 +4,7 @@ If you want to see what happens when the absolute rigor of pure mathematics meet
 
 While studying Mathlib's 2.16 million lines, we noticed a pattern. Zero is confusing.  
 
-Not only is zero treated as a quantity, it's also treated as the ground the thinker about the numbers stands on.  
+Not only is zero treated as a quantity, it's also treated as the ground the thinker about the number zero stands on.  
 
 **The challenge:** prove the foundational laws of algebra, order, metric spaces, functors, topology, measure theory, logic, and physics without any of the 17 zero-management Mathlib typeclasses.
 
