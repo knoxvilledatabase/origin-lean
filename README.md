@@ -26,12 +26,10 @@ Step 4: A number minus itself cancels.
 Therefore: n × origin = origin
 ```
 
-Three premises. One derivation. Not an axiom — a consequence.
-
 Here's our proof:
 
 ```
-origin.lean     375 lines    zero sorries
+origin.lean     338 lines    zero sorries
 ```
 
 ```bash
@@ -41,14 +39,6 @@ lake build
 ```
 
 ---
-
-## What is Origin? 
-
-If we went back before mathematics we might find a shepherd standing in a field holding an apple. He eats the apple, the apple is now gone. 
-
-His hand has `some 0` apples. 
-
-In Lean4 the ground the shepherd stands on, the air he breaths and the nature he enjoys is called `none`. 
 
 
 ## The Proofs
