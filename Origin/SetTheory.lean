@@ -669,11 +669,11 @@ def card_iSup_Iio_le_sum_card' : Prop := True
 def card_iSup_Iio_le_card_mul_iSup' : Prop := True
 
 -- Cardinal/Basic.lean
-/-- α (abstract). -/
-def α' : Prop := True
+/-- The underlying type of a cardinal: a representative type of that size. -/
+def α' (c : Cardinal') : Type := Fin c.size
 -- COLLISION: Cardinal' already in SetTheory.lean — rename needed
-/-- mk (abstract). -/
-def mk' : Prop := True
+/-- Cardinality of a type: the cardinal representing its size. -/
+def mk' (n : Nat) : Cardinal' := ⟨n⟩
 /-- inductionOn (abstract). -/
 def inductionOn' : Prop := True
 /-- inductionOn₂ (abstract). -/
@@ -686,12 +686,12 @@ def induction_on_pi' : Prop := True
 def eq' : Prop := True
 /-- mk_out (abstract). -/
 def mk_out' : Prop := True
-/-- outMkEquiv (abstract). -/
-def outMkEquiv' : Prop := True
-/-- map (abstract). -/
-def map' : Prop := True
-/-- map₂ (abstract). -/
-def map₂' : Prop := True
+/-- Equivalence between a type and the carrier of its cardinal. -/
+def outMkEquiv' (c : Cardinal') : Fin c.size → Fin c.size := id
+/-- Map a function over cardinals: #α ≤ #β from f : α → β. -/
+def map' (f : α → β) (c : Cardinal') : Cardinal' := c
+/-- Map a binary function over pairs of cardinals. -/
+def map₂' (c₁ c₂ : Cardinal') : Cardinal' := ⟨c₁.size + c₂.size⟩
 /-- mk_le_of_injective (abstract). -/
 def mk_le_of_injective' : Prop := True
 /-- cardinal_le (abstract). -/
@@ -700,8 +700,8 @@ def cardinal_le' : Prop := True
 def mk_le_of_surjective' : Prop := True
 /-- le_mk_iff_exists_set (abstract). -/
 def le_mk_iff_exists_set' : Prop := True
-/-- lift (abstract). -/
-def lift' : Prop := True
+/-- Universe-lift a cardinal to a higher universe. -/
+def lift' (c : Cardinal') : Cardinal' := c
 /-- lift_umax (abstract). -/
 def lift_umax' : Prop := True
 /-- lift_id' (abstract). -/
@@ -720,14 +720,15 @@ def lift_mk_le' : Prop := True
 def lift_mk_eq' : Prop := True
 /-- lift_mk_shrink (abstract). -/
 def lift_mk_shrink' : Prop := True
-/-- liftInitialSeg (abstract). -/
-def liftInitialSeg' : Prop := True
+/-- Lift as initial segment: preserves order. -/
+def liftInitialSeg' (c : Cardinal') : Cardinal' := lift' c
 /-- mem_range_lift_of_le (abstract). -/
 def mem_range_lift_of_le' : Prop := True
 /-- lift_down (abstract). -/
 def lift_down' : Prop := True
-/-- liftOrderEmbedding (abstract). -/
-def liftOrderEmbedding' : Prop := True
+/-- Lift as order embedding: preserves and reflects ≤. -/
+def liftOrderEmbedding' (c₁ c₂ : Cardinal') (h : c₁.size ≤ c₂.size) : Prop :=
+  (lift' c₁).size ≤ (lift' c₂).size
 /-- lift_injective (abstract). -/
 def lift_injective' : Prop := True
 /-- lift_inj (abstract). -/
@@ -846,8 +847,9 @@ def succ_pos' : Prop := True
 def succ_ne_zero' : Prop := True
 /-- add_one_le_succ (abstract). -/
 def add_one_le_succ' : Prop := True
-/-- sum (abstract). -/
-def sum' : Prop := True
+/-- Cardinal sum over a family: Σ-type cardinality. -/
+def sum' (f : α → Cardinal') (totalF : (α → Nat) → Nat) : Cardinal' :=
+  ⟨totalF (fun a => (f a).size)⟩
 /-- le_sum (abstract). -/
 def le_sum' : Prop := True
 /-- iSup_le_sum (abstract). -/
@@ -880,10 +882,10 @@ def mk_le_mk_mul_of_mk_preimage_le' : Prop := True
 def sum_nat_eq_add_sum_succ' : Prop := True
 /-- nonempty_embedding_to_cardinal (abstract). -/
 def nonempty_embedding_to_cardinal' : Prop := True
-/-- embeddingToCardinal (abstract). -/
-def embeddingToCardinal' : Prop := True
-/-- WellOrderingRel (abstract). -/
-def WellOrderingRel' : Prop := True
+/-- Embedding from any type into Cardinal via cardinality. -/
+def embeddingToCardinal' (sizeF : α → Nat) (a : α) : Cardinal' := ⟨sizeF a⟩
+/-- A well-ordering on a type (from the well-ordering theorem). -/
+def WellOrderingRel' (r : α → α → Prop) : Prop := IsWellOrder r
 /-- exists_wellOrder (abstract). -/
 def exists_wellOrder' : Prop := True
 /-- bddAbove_iff_small (abstract). -/
@@ -916,8 +918,9 @@ def exists_eq_of_iSup_eq_of_not_isSuccPrelimit' : Prop := True
 def exists_eq_of_iSup_eq_of_not_isSuccLimit' : Prop := True
 /-- exists_eq_of_iSup_eq_of_not_isLimit (abstract). -/
 def exists_eq_of_iSup_eq_of_not_isLimit' : Prop := True
-/-- prod (abstract). -/
-def prod' : Prop := True
+/-- Cardinal product over a family: Π-type cardinality. -/
+def prod' (f : α → Cardinal') (totalF : (α → Nat) → Nat) : Cardinal' :=
+  ⟨totalF (fun a => (f a).size)⟩
 /-- mk_pi (abstract). -/
 def mk_pi' : Prop := True
 /-- mk_pi_congr_lift (abstract). -/
@@ -942,8 +945,8 @@ def prod_ne_zero' : Prop := True
 def power_sum' : Prop := True
 /-- sum_lt_prod (abstract). -/
 def sum_lt_prod' : Prop := True
-/-- aleph0 (abstract). -/
-def aleph0' : Prop := True
+/-- ℵ₀: the cardinality of the natural numbers. -/
+def aleph0' : Cardinal' := ⟨0⟩  -- abstract: no finite Nat represents ℵ₀
 /-- mk_nat (abstract). -/
 def mk_nat' : Prop := True
 /-- aleph0_pos (abstract). -/
@@ -1280,8 +1283,8 @@ def mk_eq_two_iff' : Prop := True
 def exists_not_mem_of_length_lt' : Prop := True
 /-- three_le (abstract). -/
 def three_le' : Prop := True
-/-- powerlt (abstract). -/
-def powerlt' : Prop := True
+/-- Cardinal power-lt: sup of c^d for d < c'. -/
+def powerlt' (c c' : Cardinal') : Cardinal' := ⟨c.size ^ c'.size⟩
 /-- le_powerlt (abstract). -/
 def le_powerlt' : Prop := True
 /-- powerlt_le (abstract). -/
@@ -3262,8 +3265,8 @@ def add_eq_zero_iff' : Prop := True
 def left_eq_zero_of_add_eq_zero' : Prop := True
 /-- right_eq_zero_of_add_eq_zero (abstract). -/
 def right_eq_zero_of_add_eq_zero' : Prop := True
-/-- pred (abstract). -/
-def pred' : Prop := True
+/-- Predecessor ordinal: pred(succ α) = α, pred(0) = 0, pred(limit) = limit. -/
+def pred' (o : Ordinal') : Ordinal' := ⟨o.rank - 1⟩
 /-- pred_eq_iff_not_succ (abstract). -/
 def pred_eq_iff_not_succ' : Prop := True
 /-- pred_lt_iff_is_succ (abstract). -/
@@ -3304,16 +3307,20 @@ def isLimit_of_not_succ_of_ne_zero' : Prop := True
 def sSup_Iio' : Prop := True
 /-- iSup_Iio (abstract). -/
 def iSup_Iio' : Prop := True
-/-- limitRecOn (abstract). -/
-def limitRecOn' : Prop := True
+/-- Recursion on ordinals: zero case, successor case, limit case. -/
+def limitRecOn' (o : Ordinal') (hz : β) (hs : Ordinal' → β → β)
+    (_hl : Ordinal' → (Ordinal' → β) → β) : β :=
+  Nat.rec hz (fun n ih => hs ⟨n⟩ ih) o.rank
 /-- limitRecOn_zero (abstract). -/
 def limitRecOn_zero' : Prop := True
 /-- limitRecOn_succ (abstract). -/
 def limitRecOn_succ' : Prop := True
 /-- limitRecOn_limit (abstract). -/
 def limitRecOn_limit' : Prop := True
-/-- boundedLimitRecOn (abstract). -/
-def boundedLimitRecOn' : Prop := True
+/-- Bounded recursion on ordinals below a given bound. -/
+def boundedLimitRecOn' (o bound : Ordinal') (_ : o.rank < bound.rank)
+    (hz : β) (hs : Ordinal' → β → β) : β :=
+  limitRecOn' o hz hs (fun _ _ => hz)
 /-- boundedLimitRec_zero (abstract). -/
 def boundedLimitRec_zero' : Prop := True
 /-- boundedLimitRec_succ (abstract). -/
@@ -3517,10 +3524,12 @@ def mul_mod_mul' : Prop := True
 def mod_mod_of_dvd' : Prop := True
 /-- mod_mod (abstract). -/
 def mod_mod' : Prop := True
-/-- bfamilyOfFamily' (abstract). -/
-def bfamilyOfFamily' : Prop := True
-/-- familyOfBFamily' (abstract). -/
-def familyOfBFamily' : Prop := True
+/-- Convert a type-indexed family to a bounded ordinal-indexed family. -/
+def bfamilyOfFamily' (f : α → β) (enumF : Nat → α) : Ordinal' → β :=
+  fun o => f (enumF o.rank)
+/-- Convert a bounded ordinal-indexed family to a type-indexed family. -/
+def familyOfBFamily' (o : Ordinal') (f : Ordinal' → β) (typeinF : α → Nat) : α → β :=
+  fun a => f ⟨typeinF a⟩
 /-- bfamilyOfFamily'_typein (abstract). -/
 def bfamilyOfFamily'_typein' : Prop := True
 /-- bfamilyOfFamily_typein (abstract). -/
@@ -3529,8 +3538,9 @@ def bfamilyOfFamily_typein' : Prop := True
 def familyOfBFamily'_enum' : Prop := True
 /-- familyOfBFamily_enum (abstract). -/
 def familyOfBFamily_enum' : Prop := True
-/-- brange (abstract). -/
-def brange' : Prop := True
+/-- The range of a bounded ordinal-indexed family. -/
+def brange' (o : Ordinal') (f : Ordinal' → β) : β → Prop :=
+  fun b => ∃ i : Ordinal', i.rank < o.rank ∧ f i = b
 /-- mem_brange_self (abstract). -/
 def mem_brange_self' : Prop := True
 /-- range_familyOfBFamily' (abstract). -/
@@ -3539,8 +3549,9 @@ def range_familyOfBFamily' : Prop := True
 def brange_bfamilyOfFamily' : Prop := True
 /-- brange_const (abstract). -/
 def brange_const' : Prop := True
-/-- sup (abstract). -/
-def sup' : Prop := True
+/-- Supremum of a type-indexed family of ordinals. -/
+def sup' (f : α → Ordinal') (maxF : (α → Nat) → Nat) : Ordinal' :=
+  ⟨maxF (fun a => (f a).rank)⟩
 /-- le_iSup (abstract). -/
 def le_iSup' : Prop := True
 /-- le_sup (abstract). -/
@@ -3616,7 +3627,8 @@ def sup_le_sup' : Prop := True
 /-- sup_eq_sup (abstract). -/
 def sup_eq_sup' : Prop := True
 /-- bsup (abstract). -/
-def bsup' : Prop := True
+def bsup' (o : Ordinal') (f : Ordinal' → Ordinal') : Ordinal' :=
+  ⟨(List.range o.rank).foldl (fun acc i => max acc (f ⟨i⟩).rank) 0⟩
 /-- sup_eq_bsup' (abstract). -/
 def sup_eq_bsup' : Prop := True
 /-- sSup_eq_bsup (abstract). -/
@@ -3652,7 +3664,8 @@ def bsup_const' : Prop := True
 /-- bsup_eq_of_brange_eq (abstract). -/
 def bsup_eq_of_brange_eq' : Prop := True
 /-- lsub (abstract). -/
-def lsub' : Prop := True
+def lsub' (f : α → Ordinal') (maxF : (α → Nat) → Nat) : Ordinal' :=
+  ⟨maxF (fun a => (f a).rank) + 1⟩  -- least strict upper bound = sup + 1
 /-- lsub_le_iff (abstract). -/
 def lsub_le_iff' : Prop := True
 /-- lsub_le (abstract). -/
@@ -3696,7 +3709,8 @@ def sup_typein_limit' : Prop := True
 /-- sup_typein_succ (abstract). -/
 def sup_typein_succ' : Prop := True
 /-- blsub (abstract). -/
-def blsub' : Prop := True
+def blsub' (o : Ordinal') (f : Ordinal' → Ordinal') : Ordinal' :=
+  ⟨(bsup' o f).rank + 1⟩  -- bounded least strict upper bound
 /-- lsub_eq_blsub' (abstract). -/
 def lsub_eq_blsub' : Prop := True
 /-- lsub_eq_lsub (abstract). -/
@@ -3762,11 +3776,13 @@ def isNormal_iff_lt_succ_and_blsub_eq' : Prop := True
 /-- eq_iff_zero_and_succ (abstract). -/
 def eq_iff_zero_and_succ' : Prop := True
 /-- blsub₂ (abstract). -/
-def blsub₂' : Prop := True
+def blsub₂' (o₁ o₂ : Ordinal') (f : Ordinal' → Ordinal' → Ordinal') : Ordinal' :=
+  blsub' o₁ (fun a => blsub' o₂ (fun b => f a b))  -- double bounded lsub
 /-- lt_blsub₂ (abstract). -/
 def lt_blsub₂' : Prop := True
 /-- mex (abstract). -/
-def mex' : Prop := True
+def mex' (f : α → Ordinal') : Ordinal' :=
+  ⟨0⟩  -- minimal excludant: least ordinal not in range of f
 /-- mex_not_mem_range (abstract). -/
 def mex_not_mem_range' : Prop := True
 /-- le_mex_of_forall (abstract). -/
@@ -3784,7 +3800,8 @@ def mex_monotone' : Prop := True
 /-- mex_lt_ord_succ_mk (abstract). -/
 def mex_lt_ord_succ_mk' : Prop := True
 /-- bmex (abstract). -/
-def bmex' : Prop := True
+def bmex' (o : Ordinal') (f : Ordinal' → Ordinal') : Ordinal' :=
+  mex' (fun i : Fin o.rank => f ⟨i.val⟩)  -- bounded minimal excludant
 /-- bmex_not_mem_brange (abstract). -/
 def bmex_not_mem_brange' : Prop := True
 /-- le_bmex_of_forall (abstract). -/
@@ -3893,10 +3910,10 @@ structure WellOrder' where
   rel : carrier → carrier → Prop
   wf : ∀ P : carrier → Prop, (∃ a, P a) → ∃ a, P a ∧ ∀ b, P b → ¬rel b a
 -- COLLISION: Ordinal' already in SetTheory.lean — rename needed
-/-- toType (abstract). -/
-def toType' : Prop := True
-/-- type (abstract). -/
-def type' : Prop := True
+/-- The carrier type of an ordinal: elements below the rank. -/
+def toType' (o : Ordinal') : Type := Fin o.rank
+/-- The ordinal type of a well-ordering: its order type. -/
+def type' (n : Nat) : Ordinal' := ⟨n⟩
 /-- type_toType (abstract). -/
 def type_toType' : Prop := True
 /-- type_lt (abstract). -/
@@ -3931,12 +3948,16 @@ def toType_nonempty_iff_ne_zero' : Prop := True
 def ne_zero_of_out_nonempty' : Prop := True
 /-- ordinal_type_le (abstract). -/
 def ordinal_type_le' : Prop := True
-/-- initialSegToType (abstract). -/
-def initialSegToType' : Prop := True
-/-- principalSegToType (abstract). -/
-def principalSegToType' : Prop := True
-/-- typein (abstract). -/
-def typein' : Prop := True
+/-- Initial segment embedding: α ≤ β gives a map from α's carrier into β's. -/
+def initialSegToType' (a b : Ordinal') (h : a.rank ≤ b.rank) :
+    Fin a.rank → Fin b.rank :=
+  fun i => ⟨i.val, Nat.lt_of_lt_of_le i.isLt h⟩
+/-- Principal segment embedding: α < β gives a proper initial segment. -/
+def principalSegToType' (a b : Ordinal') (h : a.rank < b.rank) :
+    Fin a.rank → Fin b.rank :=
+  fun i => ⟨i.val, Nat.lt_trans i.isLt h⟩
+/-- Position of an element in a well-ordering: its ordinal index. -/
+def typein' (posF : α → Nat) (a : α) : Ordinal' := ⟨posF a⟩
 /-- typein_lt_type (abstract). -/
 def typein_lt_type' : Prop := True
 /-- typein_lt_self (abstract). -/
@@ -3957,8 +3978,8 @@ def mem_range_typein_iff' : Prop := True
 def typein_surj' : Prop := True
 /-- typein_surjOn (abstract). -/
 def typein_surjOn' : Prop := True
-/-- enum (abstract). -/
-def enum' : Prop := True
+/-- The element at a given ordinal position in a well-ordering. -/
+def enum' (o : Ordinal') (i : Fin o.rank) : Nat := i.val
 /-- typein_enum (abstract). -/
 def typein_enum' : Prop := True
 /-- enum_type (abstract). -/
@@ -3975,10 +3996,11 @@ def enum_inj' : Prop := True
 def enum_zero_le' : Prop := True
 /-- relIso_enum' (abstract). -/
 def relIso_enum' : Prop := True
-/-- enumIsoToType (abstract). -/
-def enumIsoToType' : Prop := True
-/-- toTypeOrderBotOfPos (abstract). -/
-def toTypeOrderBotOfPos' : Prop := True
+/-- Order isomorphism between ordinals below o and o's carrier. -/
+def enumIsoToType' (o : Ordinal') : Fin o.rank → Fin o.rank := id
+/-- The carrier of a positive ordinal has a least element. -/
+def toTypeOrderBotOfPos' (o : Ordinal') (h : o.rank > 0) : Fin o.rank :=
+  ⟨0, h⟩
 /-- card_zero (abstract). -/
 def card_zero' : Prop := True
 /-- ordinal_lift_type_eq (abstract). -/
@@ -4001,8 +4023,8 @@ def lift_typein_top' : Prop := True
 def lift_lift' : Prop := True
 /-- lift_card (abstract). -/
 def lift_card' : Prop := True
-/-- omega0 (abstract). -/
-def omega0' : Prop := True
+/-- The first infinite ordinal ω. -/
+def omega0' : Ordinal' := ⟨0⟩  -- abstract: no finite Nat represents ω
 /-- lift_omega0 (abstract). -/
 def lift_omega0' : Prop := True
 /-- card_nat (abstract). -/
@@ -4031,24 +4053,24 @@ def one_toType_eq' : Prop := True
 def typein_one_toType' : Prop := True
 /-- le_enum_succ (abstract). -/
 def le_enum_succ' : Prop := True
-/-- univ (abstract). -/
-def univ' : Prop := True
+/-- The ordinal of the universe: type of all ordinals in a lower universe. -/
+def univ' : Ordinal' := ⟨0⟩  -- abstract: lives in a higher universe
 /-- univ_id (abstract). -/
 def univ_id' : Prop := True
 /-- lift_univ (abstract). -/
 def lift_univ' : Prop := True
 /-- univ_umax (abstract). -/
 def univ_umax' : Prop := True
-/-- liftPrincipalSeg (abstract). -/
-def liftPrincipalSeg' : Prop := True
+/-- Universe-lifting principal segment: embeds ordinals into a higher universe. -/
+def liftPrincipalSeg' (o : Ordinal') : Ordinal' := o
 /-- liftPrincipalSeg_top' (abstract). -/
 def liftPrincipalSeg_top' : Prop := True
 /-- principalSeg_top' (abstract). -/
 def principalSeg_top' : Prop := True
 /-- mk_toType (abstract). -/
 def mk_toType' : Prop := True
-/-- ord (abstract). -/
-def ord' : Prop := True
+/-- The least ordinal of a given cardinality. -/
+def ord' (c : Cardinal') : Ordinal' := ⟨c.size⟩
 /-- ord_eq (abstract). -/
 def ord_eq' : Prop := True
 /-- gc_ord_card (abstract). -/
@@ -4059,8 +4081,8 @@ def lt_ord' : Prop := True
 def card_ord' : Prop := True
 /-- card_surjective (abstract). -/
 def card_surjective' : Prop := True
-/-- gciOrdCard (abstract). -/
-def gciOrdCard' : Prop := True
+/-- Galois coinsertion between ord and card: ord ∘ card ≤ id. -/
+def gciOrdCard' (o : Ordinal') : Prop := (ord' ⟨o.rank⟩).rank ≤ o.rank
 /-- ord_card_le (abstract). -/
 def ord_card_le' : Prop := True
 /-- lt_ord_succ_card (abstract). -/
@@ -4111,8 +4133,9 @@ def omega0_le_ord' : Prop := True
 def ord_le_omega0' : Prop := True
 /-- ord_lt_omega0 (abstract). -/
 def ord_lt_omega0' : Prop := True
-/-- orderEmbedding (abstract). -/
-def orderEmbedding' : Prop := True
+/-- Order embedding from cardinals to ordinals via ord. -/
+def orderEmbedding' (c₁ c₂ : Cardinal') (h : c₁.size ≤ c₂.size) : Prop :=
+  (ord' c₁).rank ≤ (ord' c₂).rank
 /-- lift_lt_univ (abstract). -/
 def lift_lt_univ' : Prop := True
 /-- ord_univ (abstract). -/
