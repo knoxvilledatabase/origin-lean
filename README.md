@@ -1,19 +1,37 @@
-# Origin
+# Welcome to Origin!
 
 If you want to see what happens when the absolute rigor of pure mathematics meets the uncompromising logic of computer science, look no further than [Mathlib](https://github.com/leanprover-community/mathlib4). It isn't just a library; it's a monumental, community-driven effort to digitize the sum of human mathematical knowledge within the Lean theorem prover. Mathlib is widely considered the "gold standard" for formalized mathematics.
 
-While studying Mathlib's 2.16 million lines, we noticed a pattern. The same boundary appears 97 times across four fields — algebra, logic, computation, and physics — each time managed independently. The boundary: the symbol `0` carries two meanings. Emptiness (`some 0` — "we counted and got zero") and wholeness (`none` — the ground counting stands on). Every formal system since 628 CE has needed infrastructure to keep them from colliding.
+While studying Mathlib's 2.16 million lines, we noticed a pattern. Zero is confusing.  
 
-**The challenge:** prove the foundational laws of algebra, order, metric spaces, functors, topology, measure theory, logic, and physics — on one type, without `NeZero`, `GroupWithZero`, `NoZeroDivisors`, or any of the 17 zero-management typeclasses.
+Not only is zero treated as a quantity, it's also treated as the ground the thinker about the numbers stands on.  
+
+**The challenge:** prove the foundational laws of algebra, order, metric spaces, functors, topology, measure theory, logic, and physics without any of the 17 zero-management Mathlib typeclasses.
+
+**The theorem:**
+
+```
+Step 1: Write origin as a cancellation.
+        origin = b - b
+
+Step 2: Multiply both sides by n.
+        n × origin = n × (b - b)
+
+Step 3: Apply the distributive property.
+        n × (b - b) = nb - nb
+
+Step 4: A number minus itself cancels.
+        nb - nb = origin
+
+Therefore: n × origin = origin
+```
+
+Three premises. One derivation. Not an axiom — a consequence.
 
 Here's our proof:
 
 ```
-origin.lean     33 lines    the theorem — why absorption is a consequence
-core.lean      231 lines    the foundation — instances, laws, metric
-laws.lean      263 lines    the proof — eight groups of laws proved
-               ___
-               527 lines    zero sorries
+origin.lean     375 lines    zero sorries
 ```
 
 ```bash
@@ -22,17 +40,19 @@ cd origin-lean
 lake build
 ```
 
-Build it. Read it. Try to prove the same laws in Mathlib without the 17 typeclasses.
-
 ---
 
-## The three files
+## What is Origin? 
 
-**`origin.lean`** — One theorem. `n * zero = zero` derived from three premises: cancellation, distributivity, and mul_neg. Not an axiom. A consequence.
+If we went back before mathematics we might find a shepherd standing in a field holding an apple. He eats the apple, the apple is now gone. 
 
-**`core.lean`** — The foundation. `Option α`: `none` is the ground, `some` is a value. Instances for `*`, `+`, `-`. The `@[simp]` set. Algebraic laws lifted through Option. Three primitives: `liftPred`, `liftBin₂`, `Option.map`. A metric space structure. Everything else derives from this.
+His hand has `some 0` apples. 
 
-**`laws.lean`** — Eight groups of laws proved from Core:
+In Lean4 the ground the shepherd stands on, the air he breaths and the nature he enjoys is called `none`. 
+
+
+## The Proofs
+
 
 | Group | What it proves | Key result |
 |-------|---------------|------------|
@@ -46,20 +66,3 @@ Build it. Read it. Try to prove the same laws in Mathlib without the 17 typeclas
 | Physics | 86 existence hypotheses dissolved | `some 0 ≠ none` — the distinction Mathlib can't make |
 
 ---
-
-## The distinction
-
-```lean
--- The ground is below the zero measurement. One line.
--- Zero typeclasses required. Mathlib cannot state this.
-theorem ground_lt_zero : none < some 0
-```
-
-A shepherd holds an apple. He eats it. His hand is empty — `some 0`. But the ground he stands on? He can't hold that. Not because it's too heavy. Because holding is something that happens *on* the ground. That's `none`.
-
-The symbol `0` named the wrong face. Brahmagupta formalized *śūnya* (emptiness) in 628 CE. The right move. But he left *pūrṇa* (wholeness) in the philosophy. Every formal system since has needed infrastructure to manage the consequences. Origin puts the ground outside, where it always was.
-
-*"From wholeness comes wholeness. When wholeness is taken from wholeness, wholeness remains."*
-— Isha Upanishad, ~800 BCE
-
-The formal systems finally caught up.

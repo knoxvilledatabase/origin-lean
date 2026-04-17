@@ -8,9 +8,3 @@ package «origin-lean» where
 
 lean_lib «origin» where
   srcDir := "."
-
-lean_lib «core» where
-  srcDir := "."
-
-lean_lib «laws» where
-  srcDir := "."
