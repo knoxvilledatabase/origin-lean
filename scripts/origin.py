@@ -15,6 +15,7 @@ Usage:
     python3 scripts/origin.py stub <domain>         append uncovered as def stubs
     python3 scripts/origin.py quality [domain]      show stub vs real declaration counts
     python3 scripts/origin.py show <name>          show Mathlib original for a stub name
+    python3 scripts/origin.py unused               find declarations nothing references
     python3 scripts/origin.py patterns             find patterns that consolidate to Core
     python3 scripts/origin.py clean                remove stale stubs that collide with Core
 """
@@ -1424,6 +1425,120 @@ def cmd_show(name):
 
 
 # =============================================================================
+# Unused — find declarations that nothing references
+# =============================================================================
+
+def cmd_unused():
+    """Find declarations that are never referenced by any other declaration.
+
+    Scans all Origin files, collects every declaration name, then checks
+    which names never appear in any other declaration's body. These are
+    candidates for removal — they don't earn their weight.
+
+    Excludes: @[simp] declarations (used invisibly by simp),
+    Core.lean (foundation — everything references it implicitly),
+    structures/classes (used by typeclass resolution),
+    instances (used by typeclass resolution).
+    """
+    skip = {"Index", "Test"}
+
+    decl_re = ORIGIN_DECL_RE
+
+    # Pass 1: collect all declarations with their bodies
+    all_decls = {}  # name -> (kind, file, line, body_text)
+    all_bodies = []  # (file, full_text) for searching
+
+    for f in sorted(ORIGIN.glob("*.lean")):
+        if f.stem in skip:
+            continue
+        text = f.read_text(errors="replace")
+        all_bodies.append((f.stem, text))
+        lines = text.split("\n")
+        i = 0
+        while i < len(lines):
+            m = decl_re.match(lines[i])
+            if m and "private " not in lines[i]:
+                kind, name = m.group(1), m.group(2)
+                # Collect body
+                body_lines = [lines[i]]
+                j = i + 1
+                while j < len(lines):
+                    line = lines[j]
+                    if line.strip() == "" or "=====" in line:
+                        break
+                    if decl_re.match(line) and j > i + 1:
+                        break
+                    body_lines.append(line)
+                    j += 1
+                body = "\n".join(body_lines)
+                # Skip @[simp] — invisible dependencies
+                if "@[simp]" in lines[i] or (i > 0 and "@[simp]" in lines[i-1]):
+                    i = j
+                    continue
+                all_decls[name] = (kind, f.stem, i + 1, body)
+                i = j
+            else:
+                i += 1
+
+    # Pass 2: for each declaration, check if its name appears in any other body
+    unused = []
+    for name, (kind, fname, line, body) in all_decls.items():
+        # Skip kinds that are used implicitly
+        if kind in ("structure", "class", "inductive", "instance"):
+            continue
+        # Skip Core — everything depends on it implicitly
+        if fname == "Core":
+            continue
+        # Check if name appears in any other declaration's body
+        short = name.split(".")[-1]
+        found = False
+        for other_name, (_, _, _, other_body) in all_decls.items():
+            if other_name == name:
+                continue
+            if short in other_body:
+                found = True
+                break
+        if not found:
+            # Also check if it appears anywhere in any file body (theorems reference defs)
+            for _, file_text in all_bodies:
+                # Count occurrences — at least 2 means it's defined + referenced
+                count = file_text.count(short)
+                if count >= 2:
+                    found = True
+                    break
+        if not found:
+            unused.append((name, kind, fname, line))
+
+    # Display
+    ui.header("U N U S E D", f"{len(unused)} declarations with no references")
+
+    if not unused:
+        ui.ok("Every declaration is referenced by at least one other")
+        print()
+        return
+
+    # Group by file
+    from collections import defaultdict
+    by_file = defaultdict(list)
+    for name, kind, fname, line in unused:
+        by_file[fname].append((name, kind, line))
+
+    for fname in sorted(by_file.keys()):
+        items = by_file[fname]
+        print(f"  {ui.BOLD}{fname}.lean{ui.RESET} ({len(items)} unused):")
+        for name, kind, line in sorted(items, key=lambda x: x[2]):
+            print(f"    {kind:10s} {name:45s} :{line}")
+        print()
+
+    ui.separator()
+    ui.stat("Total unused", f"{ui.YELLOW}{len(unused)}{ui.RESET}")
+    ui.stat("Total declarations", f"{len(all_decls)}")
+    pct = len(unused) / max(len(all_decls), 1) * 100
+    ui.stat("Unused %", f"{pct:.0f}%")
+    print()
+
+
+# =============================================================================
 # Main
 # =============================================================================
 
@@ -1477,6 +1592,8 @@ def main():
             cmd_show(sys.argv[2])
         else:
             print("Usage: origin.py show <NAME>")
+    elif cmd == "unused":
+        cmd_unused()
     elif cmd == "patterns":
         cmd_patterns()
     elif cmd == "clean":
