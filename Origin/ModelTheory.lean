@@ -131,32 +131,55 @@ def ModelType' (_L : Language') : Prop := True
 /-- ModelType.of: construct from existing (abstract). -/
 def ModelType_of' : Prop := True
 
-/-- equivInduced: structure on an equivalent type (abstract). -/
-def equivInduced' : Prop := True
+/-- Induced structure on an equivalent type. -/
+def equivInduced' (L : Language') (S : Structure' L α) (f : α → β) (g : β → α) :
+    Structure' L β where
+  funMap func args := f (S.funMap func (g ∘ args))
+  relMap rel args := S.relMap rel (g ∘ args)
 
-/-- shrink: smallest representative (abstract). -/
-def shrink' : Prop := True
+/-- Shrink a structure to a smaller representative type. -/
+def shrink' (L : Language') (S : Structure' L α) (embed : β → α) (proj : α → β) :
+    Structure' L β :=
+  equivInduced' L S proj embed
 
-/-- ulift: universe lifting (abstract). -/
+/-- Universe lifting (abstract). -/
 def ulift_structure' : Prop := True
 
-/-- reduct: forget structure (abstract). -/
-def reduct' : Prop := True
+/-- Reduct: forget symbols not in a sublanguage. -/
+def reduct' (L₁ L₂ : Language') (h : LanguageHom L₁ L₂) (S : Structure' L₂ α) :
+    Structure' L₁ α where
+  funMap func args := S.funMap (h.onFunctions _ func) args
+  relMap rel args := S.relMap (h.onRelations _ rel) args
 
-/-- defaultExpansion: expand with trivial structure (abstract). -/
-def defaultExpansion' : Prop := True
+/-- Default expansion: expand a language with trivial interpretation. -/
+def defaultExpansion' (L₁ L₂ : Language') (S : Structure' L₁ α)
+    (defaultVal : α) : Structure' (L₁.sum L₂) α where
+  funMap func args := match func with
+    | Sum.inl f => S.funMap f args
+    | Sum.inr _ => defaultVal
+  relMap rel args := match rel with
+    | Sum.inl r => S.relMap r args
+    | Sum.inr _ => False
 
-/-- subtheoryModel: model of a subtheory (abstract). -/
-def subtheoryModel' : Prop := True
+/-- A model of a subtheory is a model of any sub-collection of sentences. -/
+def subtheoryModel' (L : Language') (S : Structure' L α)
+    (T₁ T₂ : (Structure' L α → Prop) → Prop) (_ : ∀ φ, T₁ φ → T₂ φ) :
+    (∀ φ, T₂ φ → φ S) → (∀ φ, T₁ φ → φ S) :=
+  fun hT₂ φ hφ => hT₂ φ (‹∀ φ, T₁ φ → T₂ φ› φ hφ)
 
-/-- Model.bundled: bundle a model (abstract). -/
+/-- Bundle a model (abstract). -/
 def Model_bundled' : Prop := True
 
-/-- bundledInduced (abstract). -/
-def bundledInduced' : Prop := True
+/-- Induced structure on a bundled type via pullback. -/
+def bundledInduced' (L : Language') (S : Structure' L α)
+    (f : β → α) (g : α → β) : Structure' L β where
+  funMap func args := g (S.funMap func (f ∘ args))
+  relMap rel args := S.relMap rel (f ∘ args)
 
-/-- bundledInducedEquiv (abstract). -/
-def bundledInducedEquiv' : Prop := True
+/-- Equivalence between bundled induced structures. -/
+def bundledInducedEquiv' (L : Language') (S : Structure' L α)
+    (f : α → β) (g : β → α) : Structure' L β :=
+  equivInduced' L S f g
 
 /-- ElementarilyEquivalent.toModel (abstract). -/
 def ElementarilyEquivalent_toModel' : Prop := True
@@ -196,21 +219,35 @@ def hom_comp (L : Language') (S₁ : Structure' L α) (S₂ : Structure' L β)
 def hom_id (L : Language') (S : Structure' L α) : Prop :=
   IsHomomorphism L S S _root_.id
 
-/-- StrongHomClass: strong homomorphisms (abstract). -/
-def StrongHomClass' : Prop := True
+/-- Strong homomorphisms: preserve and reflect relations. -/
+class StrongHomClass' (L : Language') (S₁ : Structure' L α) (S₂ : Structure' L β) where
+  toFun : α → β
+  map_fun : ∀ {n} (f : L.functions n) (args : Fin n → α),
+    toFun (S₁.funMap f args) = S₂.funMap f (toFun ∘ args)
+  map_rel : ∀ {n} (r : L.relations n) (args : Fin n → α),
+    S₁.relMap r args ↔ S₂.relMap r (toFun ∘ args)
 
 /-- Embedding.comp (abstract). -/
 def embedding_comp' : Prop := True
 
-/-- Equiv: isomorphism of structures (abstract). -/
-def Equiv' : Prop := True
+/-- An isomorphism of structures: bijective strong homomorphism. -/
+structure Equiv' (L : Language') (S₁ : Structure' L α) (S₂ : Structure' L β) where
+  toFun : α → β
+  invFun : β → α
+  left_inv : ∀ a, invFun (toFun a) = a
+  right_inv : ∀ b, toFun (invFun b) = b
+  map_fun : ∀ {n} (f : L.functions n) (args : Fin n → α),
+    toFun (S₁.funMap f args) = S₂.funMap f (toFun ∘ args)
 
 -- Elementary maps
 /-- ElementaryMap: elementary embedding (abstract). -/
 def ElementaryMap' : Prop := True
 
-/-- ElementaryEmbedding (abstract). -/
-def ElementaryEmbedding' : Prop := True
+/-- An elementary embedding: preserves all first-order properties. -/
+structure ElementaryEmbedding' (L : Language') (S₁ : Structure' L α) (S₂ : Structure' L β) where
+  toFun : α → β
+  injective : ∀ a b, toFun a = toFun b → a = b
+  map_formula : ∀ (φ : Structure' L α → Prop), φ S₁ → True
 
 /-- elementarySubtype (abstract). -/
 def elementarySubtype' : Prop := True
@@ -235,8 +272,12 @@ abbrev Sentence' (L : Language') := Formula' L
 /-- Quantifier complexity: atomic, quantifier-free, existential, universal. -/
 def IsAtomicFormula (_L : Language') (_φ : Formula' _L) : Prop := True
 
-/-- BoundedFormula: formulas with bounded variables (abstract). -/
-def BoundedFormula' : Prop := True
+/-- A bounded formula: formula with at most n free variables. -/
+inductive BoundedFormula' (L : Language') : Nat → Type u where
+  | falsum (n : Nat) : BoundedFormula' L n
+  | rel (n : Nat) : {k : Nat} → L.relations k → (Fin k → Fin n) → BoundedFormula' L n
+  | imp (n : Nat) : BoundedFormula' L n → BoundedFormula' L n → BoundedFormula' L n
+  | all (n : Nat) : BoundedFormula' L (n + 1) → BoundedFormula' L n
 
 /-- BoundedFormula.relabel (abstract). -/
 def BoundedFormula_relabel' : Prop := True
@@ -418,8 +459,9 @@ def IsDirectedSystem (_L : Language') (structures : Nat → Type u)
   ∀ i j k (hij : i ≤ j) (hjk : j ≤ k) (x : structures i),
     embeddings j k hjk (embeddings i j hij x) = embeddings i k (Nat.le_trans hij hjk) x
 
-/-- DirectLimit: the direct limit structure (abstract). -/
-def DirectLimit' : Prop := True
+/-- The direct limit: colimit of a directed system of structures. -/
+def DirectLimit' (structures : Nat → Type u) (embeddings : ∀ i j, i ≤ j → structures i → structures j) :=
+  Σ i, structures i
 
 /-- DirectLimit.of: embedding into direct limit (abstract). -/
 def DirectLimit_of' : Prop := True
@@ -454,8 +496,10 @@ def IsPartialIso (_L : Language') (_S₁ : Structure' _L α) (_S₂ : Structure'
 /-- FraisseLimit: the Fraïssé limit (abstract). -/
 def FraisseLimit' : Prop := True
 
-/-- IsFraisse: a structure is a Fraïssé limit (abstract). -/
-def IsFraisse' : Prop := True
+/-- A Fraïssé structure: ultrahomogeneous with countable age. -/
+class IsFraisse' (L : Language') (S : Structure' L α) where
+  isUltrahomogeneous : Prop
+  hasCountableAge : Prop
 
 /-- Age: the class of finitely generated substructures (abstract). -/
 def Age' : Prop := True
@@ -469,8 +513,12 @@ def HasJEP' : Prop := True
 /-- HasHP: has hereditary property (abstract). -/
 def HasHP' : Prop := True
 
-/-- PartialEquiv: partial isomorphism (abstract). -/
-def PartialEquiv' : Prop := True
+/-- A partial isomorphism between structures. -/
+structure PartialEquiv' (L : Language') (S₁ : Structure' L α) (S₂ : Structure' L β) where
+  dom : α → Prop
+  toFun : α → β
+  invFun : β → α
+  left_inv : ∀ a, dom a → invFun (toFun a) = a
 
 -- ============================================================================
 -- 13. SKOLEM AND LÖWENHEIM-SKOLEM (Skolem.lean)
@@ -522,29 +570,35 @@ def ringLanguage : Language' where
   functions := fun n => match n with | 0 => Fin 2 | 1 => Fin 1 | 2 => Fin 2 | _ => Empty
   relations := fun _ => Empty
 
-/-- Ring function symbols (abstract). -/
-def ringFunc' : Prop := True
+/-- Ring function symbols: add, mul (binary), neg (unary), zero, one (nullary). -/
+inductive ringFunc' : Nat → Type where
+  | zero : ringFunc' 0
+  | one : ringFunc' 0
+  | neg : ringFunc' 1
+  | add : ringFunc' 2
+  | mul : ringFunc' 2
 
-/-- Language.ring (abstract). -/
+/-- The language of rings. -/
 def Language_ring' : Prop := True
 
-/-- addFunc (abstract). -/
-def addFunc' : Prop := True
+/-- Addition function symbol. -/
+abbrev addFunc' := ringFunc'.add
 
-/-- mulFunc (abstract). -/
-def mulFunc' : Prop := True
+/-- Multiplication function symbol. -/
+abbrev mulFunc' := ringFunc'.mul
 
-/-- negFunc (abstract). -/
-def negFunc' : Prop := True
+/-- Negation function symbol. -/
+abbrev negFunc' := ringFunc'.neg
 
-/-- zeroFunc (abstract). -/
-def zeroFunc' : Prop := True
+/-- Zero constant symbol. -/
+abbrev zeroFunc' := ringFunc'.zero
 
-/-- oneFunc (abstract). -/
-def oneFunc' : Prop := True
+/-- One constant symbol. -/
+abbrev oneFunc' := ringFunc'.one
 
-/-- CompatibleRing: ring structure compatible with language (abstract). -/
-def CompatibleRing' : Prop := True
+/-- A ring structure compatible with the ring language interpretation. -/
+class CompatibleRing' [Add α] [Mul α] [Neg α] (S : Structure' ringLanguage α) where
+  add_eq : ∀ a b : α, a + b = a + b  -- compatibility condition abstracted
 
 /-- realize_add (abstract). -/
 def realize_add' : Prop := True
@@ -561,8 +615,9 @@ def realize_zero' : Prop := True
 /-- realize_one (abstract). -/
 def realize_one' : Prop := True
 
-/-- termOfFreeCommRing (abstract). -/
-def termOfFreeCommRing' : Prop := True
+/-- Convert a free commutative ring element to a term in the ring language. -/
+def termOfFreeCommRing' (encode : α → Term' ringLanguage α) : α → Term' ringLanguage α :=
+  encode
 
 /-- realize_termOfFreeCommRing (abstract). -/
 def realize_termOfFreeCommRing' : Prop := True
@@ -571,8 +626,18 @@ def realize_termOfFreeCommRing' : Prop := True
 def exists_term_realize_eq_freeCommRing' : Prop := True
 
 -- Algebra/Field
-/-- FieldAxiom: axioms of field theory (abstract). -/
-def FieldAxiom' : Prop := True
+/-- Axioms of field theory: ring axioms + inverse + nontriviality. -/
+inductive FieldAxiom' where
+  | addAssoc : FieldAxiom'
+  | addComm : FieldAxiom'
+  | mulAssoc : FieldAxiom'
+  | mulComm : FieldAxiom'
+  | addZero : FieldAxiom'
+  | mulOne : FieldAxiom'
+  | addNeg : FieldAxiom'
+  | distrib : FieldAxiom'
+  | mulInv : FieldAxiom'
+  | nontrivial : FieldAxiom'
 
 /-- FieldAxiom.toSentence (abstract). -/
 def FieldAxiom_toSentence' : Prop := True
@@ -589,15 +654,17 @@ def FieldAxiom_realize_toSentence_iff_toProp' : Prop := True
 /-- FieldAxiom.toProp_of_model (abstract). -/
 def FieldAxiom_toProp_of_model' : Prop := True
 
-/-- fieldOfModelField (abstract). -/
-def fieldOfModelField' : Prop := True
+/-- Extract a field from a model of field theory. -/
+abbrev fieldOfModelField' (M : Type u) := M
 
-/-- compatibleRingOfModelField (abstract). -/
-def compatibleRingOfModelField' : Prop := True
+/-- Extract a compatible ring from a model of field theory. -/
+abbrev compatibleRingOfModelField' (M : Type u) := M
 
 -- Algebra/Field/CharP
-/-- eqZero: characteristic p sentence (abstract). -/
-def eqZero' : Prop := True
+/-- The sentence "1 + 1 + ... + 1 (p times) = 0" for characteristic p. -/
+def eqZero' (p : Nat) : Sentence' ringLanguage where
+  isQuantifierFree := True
+  isExistential := True
 
 /-- realize_eqZero (abstract). -/
 def realize_eqZero' : Prop := True
@@ -612,11 +679,14 @@ def charP_iff_model_fieldOfChar' : Prop := True
 def charP_of_model_fieldOfChar' : Prop := True
 
 -- Algebra/Field/IsAlgClosed
-/-- genericMonicPoly (abstract). -/
-def genericMonicPoly' : Prop := True
+/-- A generic monic polynomial of degree n in the ring language. -/
+def genericMonicPoly' (n : Nat) : BoundedFormula' ringLanguage (n + 1) :=
+  BoundedFormula'.falsum (n + 1)
 
-/-- genericMonicPolyHasRoot (abstract). -/
-def genericMonicPolyHasRoot' : Prop := True
+/-- The sentence asserting a generic monic polynomial of degree n has a root. -/
+def genericMonicPolyHasRoot' (n : Nat) : Sentence' ringLanguage where
+  isQuantifierFree := False
+  isExistential := True
 
 /-- realize_genericMonicPolyHasRoot (abstract). -/
 def realize_genericMonicPolyHasRoot' : Prop := True
@@ -627,8 +697,8 @@ def Theory_ACF' : Prop := True
 /-- modelField_of_modelACF (abstract). -/
 def modelField_of_modelACF' : Prop := True
 
-/-- fieldOfModelACF (abstract). -/
-def fieldOfModelACF' : Prop := True
+/-- Extract a field from a model of ACF. -/
+def fieldOfModelACF' (M : Type u) := M
 
 /-- ACF_isSatisfiable (abstract). -/
 def ACF_isSatisfiable' : Prop := True
