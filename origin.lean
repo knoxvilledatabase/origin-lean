@@ -219,26 +219,7 @@ def Metric.liftDist (m : Metric α) : Option α → Option α → Option Nat
 -- THE LAWS: every law from which all of Mathlib's mathematics derives
 -- ============================================================================
 
--- GROUP 1: ALGEBRAIC LAWS (proven above — collected as reference)
-
-example [Mul α] (h : ∀ a b : α, a * b = b * a)
-    (a b : Option α) : a * b = b * a := option_mul_comm h a b
-example [Mul α] (h : ∀ a b c : α, a * b * c = a * (b * c))
-    (a b c : Option α) : a * b * c = a * (b * c) := option_mul_assoc h a b c
-example [Add α] (h : ∀ a b : α, a + b = b + a)
-    (a b : Option α) : a + b = b + a := option_add_comm h a b
-example [Add α] (h : ∀ a b c : α, a + b + c = a + (b + c))
-    (a b c : Option α) : a + b + c = a + (b + c) := option_add_assoc h a b c
-example [Add α] [Mul α] (h : ∀ a b c : α, a * (b + c) = a * b + a * c)
-    (a b c : Option α) : a * (b + c) = a * b + a * c := option_distrib h a b c
-example [Mul α] (a : Option α) : none * a = none := mul_none_left a
-example [Mul α] (a : Option α) : a * none = none := mul_none_right a
-example [Mul α] [One' α] (h : ∀ a : α, 𝟙 * a = a)
-    (a : Option α) : some 𝟙 * a = a := option_one_mul h a
-example [Mul α] [Inv' α] [One' α] (h : ∀ a : α, a * a⁻¹' = 𝟙) (a : α) :
-    (some a : Option α) * some (a⁻¹') = some 𝟙 := option_mul_inv h a
-
--- GROUP 2: ORDER LAWS
+-- ORDER LAWS
 
 def optLE [LE α] : Option α → Option α → Prop
   | some a, some b => a ≤ b
@@ -260,13 +241,7 @@ theorem optLE_antisymm [LE α] (h : ∀ a b : α, a ≤ b → b ≤ a → a = b)
 theorem optLE_none [LE α] (v : Option α) : optLE none v := by
   cases v <;> simp [optLE]
 
--- GROUP 3: METRIC LAWS (structure in foundation — lifted here)
-
-example (m : Metric α) (a b : α) : m.liftDist (some a) (some b) = some (m.dist a b) := rfl
-example (m : Metric α) (b : Option α) : m.liftDist none b = none := by cases b <;> rfl
-example (m : Metric α) (a : Option α) : m.liftDist a none = none := by cases a <;> rfl
-
--- GROUP 4: FUNCTOR LAWS
+-- FUNCTOR LAWS
 
 theorem functor_id (v : Option α) : Option.map id v = v := by
   cases v <;> simp
@@ -277,7 +252,7 @@ theorem functor_comp (f : α → β) (g : β → γ) (v : Option α) :
 
 theorem functor_none (f : α → β) : Option.map f none = none := rfl
 
--- GROUP 5: TOPOLOGY LAW
+-- TOPOLOGY LAW
 
 def IsOptionOpen (isOpen : (α → Prop) → Prop) : (Option α → Prop) → Prop :=
   fun S => isOpen (fun a => S (some a))
@@ -288,7 +263,7 @@ theorem map_preserves_open (f : α → α) (isOpen : (α → Prop) → Prop)
     IsOptionOpen isOpen (fun v => S (Option.map f v)) := by
   simp [IsOptionOpen] at *; exact hf _ hS
 
--- GROUP 6: MEASURE LAW
+-- MEASURE LAW
 
 theorem liftPred_disjoint (p q : α → Prop)
     (hdisj : ∀ a, p a → q a → False) (v : Option α) :
@@ -304,7 +279,7 @@ theorem liftPred_conj (p q : α → Prop) (v : Option α) :
 theorem liftPred_none_false (p : α → Prop) :
     liftPred p none ↔ False := by simp
 
--- GROUP 7: LOGIC — the paradoxes unified
+-- LOGIC — the paradoxes unified
 
 theorem liar_paradox (v : Option Bool) (hv : v.map (!·) = v) : v = none :=
   no_some_fixed_point _ (fun b => by cases b <;> simp) v hv
@@ -313,7 +288,7 @@ theorem liar_paradox (v : Option Bool) (hv : v.map (!·) = v) : v = none :=
 -- Curry: C = (C → False). Same theorem. Different f. Same conclusion: v = none.
 -- What none means: the sentence was never in the counting domain.
 
--- GROUP 8: PHYSICS — 86 existence hypotheses dissolved
+-- PHYSICS — 86 existence hypotheses dissolved
 
 theorem coulomb_absorbs [Mul α] (k q cap_q : Option α) :
     k * q * cap_q * none = none := by simp
