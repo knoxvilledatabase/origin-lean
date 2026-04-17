@@ -30,9 +30,7 @@ abbrev PFun' (α β : Type u) := α → Option β
 
 /-- Composition of partial functions. -/
 def PFun'.comp (g : PFun' β γ) (f : PFun' α β) : PFun' α γ :=
-  fun a => match f a with
-    | none => none
-    | some b => g b
+  fun a => (f a).bind g
 
 /-- The identity partial function. -/
 def PFun'.id : PFun' α α := some

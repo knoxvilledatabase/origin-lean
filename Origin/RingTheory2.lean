@@ -134,9 +134,8 @@ def isIrredPoly (isUnit : α → Prop) (factorF : α → α × α) : α → Prop
 -- ============================================================================
 
 /-- Grade of an element lifts to Option. -/
-def gradeOf (gradeF : α → Nat) : Option α → Option Nat
-  | some a => some (gradeF a)
-  | none => none
+def gradeOf (gradeF : α → Nat) : Option α → Option Nat :=
+  Option.map gradeF
 
 @[simp] theorem gradeOf_none (gradeF : α → Nat) :
     gradeOf gradeF (none : Option α) = none := rfl
@@ -210,9 +209,7 @@ def PowerSeries := Nat → α
 /-- CRT: simultaneous quotient maps lift through Option. -/
 theorem chinese_remainder (q₁ q₂ : α → α) (v : Option α) :
     Option.map (fun a => (q₁ a, q₂ a)) v =
-    match Option.map q₁ v, Option.map q₂ v with
-    | some x, some y => some (x, y)
-    | _, _ => none := by
+    liftBin₂ Prod.mk (Option.map q₁ v) (Option.map q₂ v) := by
   cases v <;> simp
 
 -- ============================================================================

@@ -59,10 +59,8 @@ theorem curry (v : Option Bool) (hv : v.map (fun b => (!b) || false) = v) :
 -- ============================================================================
 
 /-- Conjunction: both must be well-formed. -/
-def conj (p q : Option Bool) : Option Bool :=
-  match p, q with
-  | some a, some b => some (a && b)
-  | _, _ => none
+def conj : Option Bool → Option Bool → Option Bool :=
+  liftBin₂ (· && ·)
 
 @[simp] theorem conj_none_left (q : Option Bool) : conj none q = none := by
   cases q <;> rfl
@@ -73,10 +71,8 @@ def conj (p q : Option Bool) : Option Bool :=
 @[simp] theorem conj_some (a b : Bool) : conj (some a) (some b) = some (a && b) := rfl
 
 /-- Disjunction: both must be well-formed. -/
-def disj (p q : Option Bool) : Option Bool :=
-  match p, q with
-  | some a, some b => some (a || b)
-  | _, _ => none
+def disj : Option Bool → Option Bool → Option Bool :=
+  liftBin₂ (· || ·)
 
 @[simp] theorem disj_none_left (q : Option Bool) : disj none q = none := by
   cases q <;> rfl
@@ -109,10 +105,8 @@ def biconditional (p q : Option Bool) : Option Bool :=
   conj (impl p q) (impl q p)
 
 /-- Exclusive or on Option Bool. -/
-def xor' (p q : Option Bool) : Option Bool :=
-  match p, q with
-  | some a, some b => some (xor a b)
-  | _, _ => none
+def xor' : Option Bool → Option Bool → Option Bool :=
+  liftBin₂ xor
 
 -- ============================================================================
 -- 3. LAWS OF PROPOSITIONAL LOGIC ON OPTION

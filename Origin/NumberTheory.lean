@@ -35,9 +35,8 @@ def isPadicInt (vpF : α → α) (leF : α → α → Prop) (zeroV : α) : Optio
   liftPred (fun a => leF zeroV (vpF a))
 
 /-- p-adic norm: |x|_p = p^(-v_p(x)). -/
-def padicNorm (vpF : α → Nat) (p : Nat) : Option α → Option Nat
-  | some a => some (p ^ (vpF a))
-  | none => none
+def padicNorm (vpF : α → Nat) (p : Nat) : Option α → Option Nat :=
+  Option.map (fun a => p ^ (vpF a))
 
 /-- Ostrowski's theorem: every absolute value on ℚ is p-adic or real. -/
 def ostrowski (isArch isNonarchimedean : Prop) : Prop :=

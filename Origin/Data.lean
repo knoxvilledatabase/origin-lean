@@ -110,9 +110,8 @@ theorem optMsetUnion_comm [DecidableEq α] (xs ys : List α) :
     (optMsetUnion (some xs) (some ys)).map List.length =
     (optMsetUnion (some ys) (some xs)).map List.length := by
   simp [optMsetUnion, List.length_append, Nat.add_comm]
-def optMsetCard : Option (List α) → Option Nat
-  | some xs => some xs.length
-  | none => none
+def optMsetCard : Option (List α) → Option Nat :=
+  Option.map List.length
 @[simp] theorem optMsetCard_none : optMsetCard (none : Option (List α)) = none := rfl
 theorem optMsetCard_union (xs ys : List α) :
     optMsetCard (optMsetUnion (some xs) (some ys)) =
@@ -131,9 +130,8 @@ def optFinsetInter [DecidableEq α] : Option (List α) → Option (List α) → 
     optFinsetInter none b = none := by cases b <;> rfl
 @[simp] theorem optFinsetInter_none_right [DecidableEq α] (a : Option (List α)) :
     optFinsetInter a none = none := by cases a <;> rfl
-def optFinsetFilter (p : α → Bool) : Option (List α) → Option (List α)
-  | some xs => some (xs.filter p)
-  | none => none
+def optFinsetFilter (p : α → Bool) : Option (List α) → Option (List α) :=
+  Option.map (List.filter p)
 @[simp] theorem optFinsetFilter_none (p : α → Bool) :
     optFinsetFilter p (none : Option (List α)) = none := rfl
 

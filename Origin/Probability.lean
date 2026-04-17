@@ -48,9 +48,7 @@ def IsSigmaFinite (covers : Nat → α) (isFinite : α → Prop) : Prop :=
 
 /-- P(A|B) = P(A ∩ B) / P(B). If B is none, conditional is none. -/
 def condProb [Mul α] (pAB pB : Option α) (invF : α → α) : Option α :=
-  match pB with
-  | none => none
-  | some b => pAB.map (· * invF b)
+  pB.bind (fun b => pAB.map (· * invF b))
 
 theorem condProb_none_right [Mul α] (pAB : Option α) (invF : α → α) :
     condProb pAB none invF = none := rfl
