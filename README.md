@@ -6,7 +6,7 @@ While studying Mathlib's 2.16 million lines, we noticed a pattern. Zero is confu
 
 Not only is zero treated as a quantity, it's also treated as the ground the thinker about the number zero stands on.  
 
-**The challenge:** prove the foundational laws of algebra, order, metric spaces, functors, topology, measure theory, logic, and physics without any of the 17 zero-management Mathlib typeclasses.
+**The challenge:** prove the foundational laws of algebra, order, metric spaces, functors, topology, measure theory, logic, and physics without any of the Mathlib 17 zero-management typeclasses.
 
 **What is Origin?**
 
