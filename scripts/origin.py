@@ -157,73 +157,60 @@ classifier = Classifier()
 # =============================================================================
 
 def cmd_status():
-    """Show Origin vs Mathlib line counts for every domain."""
-    domains = sorted(d.name.replace("Mathlib_", "")
-                     for d in EXTRACTED.iterdir()
-                     if d.is_dir() and d.name.startswith("Mathlib_")
-                     and d.name.replace("Mathlib_", "") not in SKIP_DOMAINS)
+    """Show Origin line counts per file, sorted largest first with bar graphs."""
+    skip = {"Index", "Test"}
 
-    ui.header("O R I G I N   S T A T U S", "Origin vs Mathlib — every domain at a glance")
+    rows = []  # (stem, lines, decls, stubs, real)
+    for f in sorted(ORIGIN.glob("*.lean")):
+        if f.stem in skip:
+            continue
+        text = f.read_text(errors="replace")
+        lines = len(text.split("\n"))
+        decls = count_origin_decls(f)
+        stubs = 0
+        for line in text.split("\n"):
+            if STUB_RE.match(line):
+                stubs += 1
+        rows.append((f.stem, lines, decls, stubs, decls - stubs))
 
-    total_mathlib = 0
-    total_origin = 0
-    total_genuine = 0
-    total_origin_decls = 0
-    rows = []
+    # Sort by lines descending
+    rows.sort(key=lambda r: r[1], reverse=True)
 
-    for dom in domains:
-        # Mathlib lines and genuine count
-        mathlib_dir = EXTRACTED / f"Mathlib_{dom}"
-        mathlib_lines = 0
-        genuine = 0
-        for f in mathlib_dir.rglob("*.lean"):
-            text = f.read_text(errors="replace")
-            mathlib_lines += len(text.split("\n"))
-            for line in text.split("\n")[:5]:
-                m = re.search(r'Genuine:\s*(\d+)', line)
-                if m:
-                    genuine += int(m.group(1))
+    total_lines = sum(r[1] for r in rows)
+    total_decls = sum(r[2] for r in rows)
+    total_stubs = sum(r[3] for r in rows)
+    total_real = sum(r[4] for r in rows)
+    max_lines = max(r[1] for r in rows) if rows else 1
 
-        # Origin lines and declaration count
-        origin_lines = 0
-        origin_decls = 0
-        for name in [f"{dom}.lean", f"{dom}2.lean"]:
-            p = ORIGIN / name
-            if p.exists():
-                origin_lines = len(p.read_text().split("\n"))
-                origin_decls = count_origin_decls(p)
-                break
+    ui.header("O R I G I N   S T A T U S",
+              f"{total_lines:,} lines — {total_real:,} real / {total_decls:,} declarations")
 
-        total_mathlib += mathlib_lines
-        total_origin += origin_lines
-        total_genuine += genuine
-        total_origin_decls += origin_decls
+    bar_width = max(30, ui.W - 50)
 
-        pct = (1 - origin_lines / max(mathlib_lines, 1)) * 100 if mathlib_lines else 0
-        rows.append((dom, mathlib_lines, genuine, origin_lines, origin_decls, pct))
+    for stem, lines, decls, stubs, real in rows:
+        # Bar: real portion in green, stub portion in yellow
+        real_frac = real / max(decls, 1)
+        total_fill = int(bar_width * lines / max_lines)
+        real_fill = int(total_fill * real_frac)
+        stub_fill = total_fill - real_fill
 
-    # Print table
-    print(f"  {ui.BOLD}{'Domain':<22s} {'Mathlib':>10s} {'Genuine':>8s} {'Origin':>8s} {'Decls':>10s} {'Reduction':>10s}{ui.RESET}")
-    ui.separator()
+        bar = (f"{ui.GREEN}{'█' * real_fill}{ui.RESET}"
+               f"{ui.YELLOW}{'░' * stub_fill}{ui.RESET}"
+               f"{ui.DIM}{'·' * (bar_width - total_fill)}{ui.RESET}")
 
-    for dom, ml, gen, ol, od, pct in rows:
-        # Color code: green if deep (origin > 200), yellow if sketch, dim if minimal
-        if ol > 200:
-            color = ui.GREEN
-        elif ol > 100:
-            color = ui.YELLOW
-        else:
-            color = ui.DIM
-        decl_str = f"{od}/{gen}" if gen else f"{od}"
-        print(f"  {dom:<22s} {ml:>10,} {gen:>8,} {color}{ol:>8,}{ui.RESET} {decl_str:>10s} {pct:>9.1f}%")
+        print(f"  {stem:<24s} {lines:>6,}  {bar}")
 
     ui.separator()
-    total_pct = (1 - total_origin / max(total_mathlib, 1)) * 100
-    decl_total = f"{total_origin_decls}/{total_genuine}"
-    print(f"  {ui.BOLD}{'TOTAL':<22s} {total_mathlib:>10,} {total_genuine:>8,} {ui.CYAN}{total_origin:>8,}{ui.RESET} {decl_total:>10s} {total_pct:>9.1f}%{ui.RESET}")
+    print(f"  {ui.BOLD}{'TOTAL':<24s} {total_lines:>6,}{ui.RESET}")
     print()
-    ui.info(f"Green = deepened (>200 lines)  Yellow = sketch (100-200)  Dim = minimal (<100)")
-    ui.info(f"Decls = Origin declarations / Mathlib genuine declarations")
+    ui.stat("Declarations", f"{total_decls:,}")
+    ui.stat("Real", f"{ui.GREEN}{total_real:,}{ui.RESET}")
+    ui.stat("Stubs", f"{ui.YELLOW}{total_stubs:,}{ui.RESET}")
+    ui.stat("Files", f"{len(rows)}")
+    print()
+    ui.info(f"{ui.GREEN}█{ui.RESET} = real declarations  "
+            f"{ui.YELLOW}░{ui.RESET} = stubs  "
+            f"{ui.DIM}·{ui.RESET} = comments/whitespace")
     print()
 
 
