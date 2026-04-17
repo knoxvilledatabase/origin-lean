@@ -290,14 +290,10 @@ def Const'.mk (b : β) : Const' β α := b
 /-- Const destructor. -/
 def Const'.run (x : Const' β α) : β := x
 
-/-- Additive constant functor. -/
-def AddConst' (β : Type u) (_ : Type u) := β
-
-/-- AddConst constructor. -/
-def AddConst'.mk (b : β) : AddConst' β α := b
-
-/-- AddConst destructor. -/
-def AddConst'.run (x : AddConst' β α) : β := x
+/-- Additive constant functor (same as Const'). -/
+abbrev AddConst' := @Const'
+abbrev AddConst'.mk := @Const'.mk
+abbrev AddConst'.run := @Const'.run
 
 /-- Composition of functors. -/
 def FComp (F G : Type u → Type u) (α : Type u) := F (G α)
@@ -339,9 +335,8 @@ def foldlM' {m : Type u → Type v} [Monad m]
 structure Foldl' (α : Type u) where
   get : α → α
 
-/-- Right fold wrapper (newtype for Foldr). -/
-structure Foldr' (α : Type u) where
-  get : α → α
+/-- Right fold wrapper (same structure as Foldl'). -/
+abbrev Foldr' := @Foldl'
 
 /-- Fold left on a list. -/
 def foldl' (f : β → α → β) (init : β) : List α → β
@@ -461,7 +456,7 @@ def RandT' (m : Type u → Type v) (α : Type u) :=
 def randomNext (split : α → α × α) (gen : α) : α × α := split gen
 
 /-- Split: fork the generator into two independent generators. -/
-def randomSplit (split : α → α × α) (gen : α) : α × α := split gen
+abbrev randomSplit := @randomNext α  -- same operation
 
 /-- Random value in a range. -/
 def randomRange (randBound : α → α → α → α × α) (lo hi gen : α) : α × α :=
@@ -705,8 +700,7 @@ def IsULiftable (up : α → β) (down : β → α) : Prop :=
   ∀ a, down (up a) = a
 
 /-- ULift round-trip: down ∘ up = id. -/
-def ulift_up_down (up : α → β) (down : β → α) : Prop :=
-  ∀ a, down (up a) = a
+abbrev ulift_up_down := @IsULiftable α β  -- same round-trip test
 
 /-- ULift reverse round-trip: up ∘ down = id. -/
 def ulift_down_up (up : α → β) (down : β → α) : Prop :=

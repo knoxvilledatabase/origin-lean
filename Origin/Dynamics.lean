@@ -322,42 +322,6 @@ def birkhoffAverage_congr_ring (f : α → α) (g : α → α) [Add α] [Mul α]
     (zero : α) (invN : Nat → α) : Prop :=
   True  -- abstracted
 
-/-- dist(birkhoffSum(x), birkhoffSum(y)) bound (abstract, normed). -/
-def dist_birkhoffSum_apply_birkhoffSum (f : α → α) (g : α → β) : Prop :=
-  True  -- abstracted; involves norms
-
-/-- dist bound for birkhoff sums (abstract, normed). -/
-def dist_birkhoffSum_birkhoffSum_le (f : α → α) (g : α → β) : Prop :=
-  True  -- abstracted
-
-/-- dist(birkhoffAvg(x), birkhoffAvg(y)) bound (abstract, normed). -/
-def dist_birkhoffAverage_birkhoffAverage (f : α → α) (g : α → α) : Prop :=
-  True  -- abstracted
-
-/-- dist bound for birkhoff averages (abstract, normed). -/
-def dist_birkhoffAverage_birkhoffAverage_le (f : α → α) (g : α → α) : Prop :=
-  True  -- abstracted
-
-/-- dist(birkhoffAvg(f x), birkhoffAvg(x)) (abstract, normed). -/
-def dist_birkhoffAverage_apply_birkhoffAverage (f : α → α) (g : α → α) : Prop :=
-  True  -- abstracted
-
-/-- Convergence of birkhoff average at shifted point (abstract). -/
-def tendsto_birkhoffAverage_apply_sub (f : α → α) (g : α → α) : Prop :=
-  True  -- abstracted
-
-/-- Uniform equicontinuity of birkhoff averages (abstract). -/
-def uniformEquicontinuous_birkhoffAverage (f : α → α) (g : α → α) : Prop :=
-  True  -- abstracted
-
-/-- The set of convergent birkhoff averages is closed (abstract). -/
-def isClosed_setOf_tendsto_birkhoffAverage (f : α → α) (g : α → α) : Prop :=
-  True  -- abstracted
-
-/-- Fixed point implies convergence of birkhoff average (abstract). -/
-def tendsto_birkhoffAverage_fixedPt (f : α → α) (g : α → α) : Prop :=
-  True  -- abstracted
-
 -- ============================================================================
 -- 7. CIRCLE MAPS (Circle/RotationNumber/)
 -- ============================================================================
@@ -366,17 +330,9 @@ def tendsto_birkhoffAverage_fixedPt (f : α → α) (g : α → α) : Prop :=
 structure CircleDeg1Lift where
   toFun : α → α
 
-/-- Monotonicity of circle lift (abstract). -/
-def CircleDeg1Lift.monotone' (f : CircleDeg1Lift (α := α)) : Prop := True
-
-/-- Strict monotonicity iff injectivity (abstract). -/
-def CircleDeg1Lift.strictMono_iff_injective' (f : CircleDeg1Lift (α := α)) : Prop := True
-
-/-- Circle lift as order isomorphism when bijective (abstract). -/
-def CircleDeg1Lift.toOrderIso' (f : CircleDeg1Lift (α := α)) : Prop := True
-
-/-- isUnit iff bijective (abstract). -/
-def CircleDeg1Lift.isUnit_iff_bijective' (f : CircleDeg1Lift (α := α)) : Prop := True
+/-- Circle lift monotonicity: preserved by the lift. -/
+def CircleDeg1Lift.monotone' (f : CircleDeg1Lift (α := α)) (leF : α → α → Prop) : Prop :=
+  ∀ a b, leF a b → leF (f.toFun a) (f.toFun b)
 
 /-- Power of a circle lift (abstract). -/
 def CircleDeg1Lift.pow' (f : CircleDeg1Lift (α := α)) (n : Nat) : CircleDeg1Lift (α := α) where
@@ -416,10 +372,6 @@ structure MeasurePreserving' (f : α → α)
     (μ : (α → Prop) → α) where
   measurable : Prop
   map_eq : ∀ S, μ (fun x => S (f x)) = μ S
-
-/-- MeasurePreserving from a measurable function (abstract). -/
-def MeasurePreserving'.ofMeasurable (f : α → α) (μ : (α → Prop) → α) : Prop :=
-  True  -- abstracted
 
 /-- MeasurePreserving id. -/
 def MeasurePreserving'.id' (μ : (α → Prop) → α) : Prop :=

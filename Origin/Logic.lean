@@ -253,8 +253,7 @@ theorem em'_logic (p : Prop) : ¬p ∨ p := Or.symm (Classical.em p)
 /-- Double negation elimination (Prop). -/
 theorem not_not_logic {p : Prop} (h : ¬¬p) : p := Classical.byContradiction h
 
-/-- Or-not: p ∨ ¬p restated. -/
-theorem or_not_logic (p : Prop) : p ∨ ¬p := Classical.em p
+-- or_not_logic = em_logic (duplicate removed)
 
 /-- Modus tollens: ¬q → (p → q) → ¬p. -/
 theorem mt_logic {p q : Prop} (hpq : p → q) (hnq : ¬q) : ¬p :=
@@ -1132,7 +1131,7 @@ theorem wf_no_infinite_desc (r : α → α → Prop) (hwf : IsWellFoundedL r)
 -- ============================================================================
 
 /-- Flip: flip argument order. -/
-def flipL (f : α → β → γ) : β → α → γ := fun b a => f a b
+abbrev flipL := @swap₂_logic α β γ  -- same as swap₂_logic
 
 /-- Const: constant function. -/
 def constL (a : α) : β → α := fun _ => a

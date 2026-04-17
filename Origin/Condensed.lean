@@ -37,10 +37,8 @@ abbrev CondensedSet := Condensed (Type u)
 -- 2. LIGHT CONDENSED (Light/Basic.lean)
 -- ============================================================================
 
-/-- Light condensed: sheaves on countable profinite spaces. -/
-structure LightCondensed (α : Type u) where
-  val : α
-  isSheaf : Prop
+/-- Light condensed: sheaves on countable profinite spaces (same structure). -/
+abbrev LightCondensed := @Condensed
 
 /-- Light condensed sets. -/
 abbrev LightCondSet := LightCondensed (Type u)
@@ -389,7 +387,7 @@ abbrev topCatToCondensedSet' (embed : α → Condensed α) := embed
 def ofSheafLightProfinite' (val : α) (h : Prop) : LightCondensed α := ⟨val, h⟩
 
 /-- Forget the light profinite sheaf structure. -/
-def ofSheafForgetLightProfinite' (X : LightCondensed α) : α := X.val  -- LightCondensed has separate type
+abbrev ofSheafForgetLightProfinite' := @underlying α
 
 /-- Functor from light profinite to light condensed sets. -/
 def lightProfiniteToLightCondSet' (embed : α → LightCondensed α) : α → LightCondensed α := embed
@@ -399,11 +397,9 @@ abbrev lightProfiniteToLightCondSetFullyFaithful' (embed : α → LightCondensed
 
 -- Light TopCatAdjunction
 
-/-- Functor from light condensed sets to topological spaces. -/
-def lightCondSetToTopCat' (X : LightCondensed α) : α := X.val
-
-/-- Functor from light condensed sets to sequential spaces. -/
-def lightCondSetToSequential' (X : LightCondensed α) : α := X.val
+/-- Light forgetful functors: all extract the underlying value. -/
+abbrev lightCondSetToTopCat' := @underlying α
+abbrev lightCondSetToSequential' := @underlying α
 
 /-- Functor from sequential spaces to light condensed sets. -/
 def sequentialToLightCondSet' (a : α) (h : Prop) : LightCondensed α := ⟨a, h⟩

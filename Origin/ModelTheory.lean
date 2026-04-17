@@ -460,7 +460,5 @@ def graphLanguage : Language' where
 -- 16. ORDER AND GRAPH (Order.lean, Graph.lean)
 -- ============================================================================
 
-/-- The language of orders: one binary relation. -/
-def orderLanguage : Language' where
-  functions := fun _ => Empty
-  relations := fun n => match n with | 2 => Unit | _ => Empty
+/-- The language of orders: one binary relation (same as graphLanguage). -/
+abbrev orderLanguage := graphLanguage

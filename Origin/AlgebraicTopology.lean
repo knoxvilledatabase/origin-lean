@@ -273,7 +273,7 @@ def mapAugmentedCechNerve' (g : α → α) (f : α → β)
   mapCechNerve' g f hg n
 
 /-- Equivalence characterizing the Čech nerve. -/
-def cechNerveEquiv' (f : α → β) (n : Nat) := cechNerve' f n
+abbrev cechNerveEquiv' := @cechNerve' α β
 
 /-- The Čech nerve adjunction. -/
 abbrev cechNerveAdjunction' (f : α → β) := cechNerve' f
@@ -538,21 +538,11 @@ theorem DoldKan_P_idem (n : Nat) (a : α) :
     DoldKan_P n (DoldKan_P n a) = DoldKan_P n a := rfl
 theorem DoldKan_Q_idem (n : Nat) (a : α) :
     DoldKan_Q n (DoldKan_Q n a) = DoldKan_Q n a := rfl
-theorem DoldKan_P_f_idem (n : Nat) (a : α) :
-    DoldKan_P n (DoldKan_P n a) = DoldKan_P n a := rfl
-theorem DoldKan_Q_f_idem (n : Nat) (a : α) :
-    DoldKan_Q n (DoldKan_Q n a) = DoldKan_Q n a := rfl
-theorem DoldKan_comp_P_eq_self (n : Nat) (a : α) :
-    DoldKan_P n a = DoldKan_P n a := rfl
 def DoldKan_PInfty : α → α := id
 def DoldKan_QInfty : α → α := id
 theorem DoldKan_PInfty_idem (a : α) :
     DoldKan_PInfty (DoldKan_PInfty a) = DoldKan_PInfty a := rfl
-theorem DoldKan_PInfty_f_idem (a : α) :
-    DoldKan_PInfty (DoldKan_PInfty a) = DoldKan_PInfty a := rfl
 theorem DoldKan_QInfty_idem (a : α) :
-    DoldKan_QInfty (DoldKan_QInfty a) = DoldKan_QInfty a := rfl
-theorem DoldKan_QInfty_f_idem (a : α) :
     DoldKan_QInfty (DoldKan_QInfty a) = DoldKan_QInfty a := rfl
 def DoldKan_hσ (_n : Nat) : α → α := id
 def DoldKan_hσ' (_n _q : Nat) : α → α := id
@@ -587,8 +577,7 @@ def DoldKan_Split_d (_n : Nat) : α → α := id
 
 def cechNerve (_f : α → β) : SimplicialObject α where
   face := fun _ => id; degen := fun _ => id
-def cechConerve (_f : α → β) : SimplicialObject α where
-  face := fun _ => id; degen := fun _ => id
+abbrev cechConerve := @cechNerve α β  -- same trivial simplicial object
 
 -- ============================================================================
 -- 34. TOPOLOGICAL SIMPLEX / SINGULAR
@@ -667,12 +656,6 @@ theorem IndexSet''_ext {n : Nat} (i j : IndexSet'' n) (h : i.val = j.val) :
 def IndexSet''.id' (n : Nat) : IndexSet'' n := ⟨n, Nat.le_refl n⟩
 def IndexSet''.EqId {n : Nat} (i : IndexSet'' n) : Prop := i.val = n
 theorem IndexSet''_eqId_iff {n : Nat} (i : IndexSet'' n) :
-    i.EqId ↔ i.val = n := Iff.rfl
-theorem IndexSet''_eqId_iff_len_eq {n : Nat} (i : IndexSet'' n) :
-    i.EqId ↔ i.val = n := Iff.rfl
-theorem IndexSet''_eqId_iff_len_le {n : Nat} (i : IndexSet'' n) :
-    i.EqId ↔ i.val = n := Iff.rfl
-theorem IndexSet''_eqId_iff_mono {n : Nat} (i : IndexSet'' n) :
     i.EqId ↔ i.val = n := Iff.rfl
 def IndexSet''.epiComp {n : Nat} (i : IndexSet'' n) (f : Nat → Nat)
     (hf : f i.val ≤ n) : IndexSet'' n := ⟨f i.val, hf⟩

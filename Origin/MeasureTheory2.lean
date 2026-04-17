@@ -89,10 +89,6 @@ def simpleIntegral [Mul α] [Add α] : List α → List α → Option α
   | v :: vs, w :: ws =>
     some (v * w) + simpleIntegral vs ws
 
-/-- Bochner integral (abstract). -/
-def IsBochnerIntegrable (_f : α → α) (_μ : Measure' α) : Prop :=
-  True  -- abstracted
-
 /-- Dominated convergence theorem. -/
 def DominatedConvergence (_fn : Nat → α → α) (_f : α → α)
     (_bound : α → α) (converges : Prop) : Prop :=
@@ -120,10 +116,6 @@ def condExpect (_f : α → α) (_subSigma : Prop) : Prop :=
 
 /-- Convergence in measure. -/
 def ConvergesInMeasure (_fn : Nat → α → α) (_f : α → α) : Prop :=
-  True  -- abstracted
-
-/-- Essential supremum. -/
-def essSupF (_f : α → α) (_μ : Measure' α) : Prop :=
   True  -- abstracted
 
 -- ============================================================================

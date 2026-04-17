@@ -82,7 +82,7 @@ def GodelCode (encode : (Nat → Option Nat) → Nat)
 -- ============================================================================
 
 /-- A partial function halts on an input. -/
-def Halts (f : PFun' α β) (a : α) : Prop := (f a).isSome = true
+abbrev Halts := @PFun'.dom α β  -- halting = being in the domain
 
 /-- A predicate is decidable if there exists a total decision procedure. -/
 def IsComputableDecision (P : α → Prop) (decide : α → Bool) : Prop :=
