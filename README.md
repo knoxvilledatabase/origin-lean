@@ -24,12 +24,13 @@ Step 4: A number minus itself cancels.
         nb - nb = origin
 
 Therefore: n × origin = origin
+           1 / origin = origin
 ```
 
 Here's our proof:
 
 ```
-origin.lean     338 lines    zero sorries
+origin.lean     329 lines    zero sorries
 ```
 
 ```bash
@@ -46,7 +47,7 @@ lake build
 
 | Group | What it proves | Key result |
 |-------|---------------|------------|
-| Algebra | Commutativity, associativity, distributivity, identity, inverse | `option_mul_eq_none`: no zero divisors — structural, no typeclass |
+| Algebra | Commutativity, associativity, distributivity, identity, inverse | `none * a = none`, `none⁻¹ = none` — the ground absorbs |
 | Order | Reflexivity, transitivity, antisymmetry | `none ≤ everything`: the ground is the bottom |
 | Metric | dist_self, dist_comm, triangle inequality | Lifts through Option — distance to ground is `none` |
 | Functor | `map id = id`, `map (g ∘ f) = map g ∘ map f` | Option is a lawful functor |

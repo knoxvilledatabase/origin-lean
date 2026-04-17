@@ -137,13 +137,6 @@ theorem option_neg_mul_neg [Mul α] [Neg α]
     (a b : Option α) : (-a) * (-b) = a * b := by
   cases a <;> cases b <;> simp [h]
 
-theorem option_mul_eq_none [Mul α] {a b : Option α}
-    (h : a * b = none) : a = none ∨ b = none := by
-  cases a with
-  | none => left; rfl
-  | some x => cases b with
-    | none => right; rfl
-    | some y => simp at h
 
 theorem option_one_mul [Mul α] [One' α]
     (h : ∀ a : α, 𝟙 * a = a) (a : Option α) :
@@ -240,8 +233,6 @@ example [Add α] [Mul α] (h : ∀ a b c : α, a * (b + c) = a * b + a * c)
     (a b c : Option α) : a * (b + c) = a * b + a * c := option_distrib h a b c
 example [Mul α] (a : Option α) : none * a = none := mul_none_left a
 example [Mul α] (a : Option α) : a * none = none := mul_none_right a
-example [Mul α] {a b : Option α} (h : a * b = none) :
-    a = none ∨ b = none := option_mul_eq_none h
 example [Mul α] [One' α] (h : ∀ a : α, 𝟙 * a = a)
     (a : Option α) : some 𝟙 * a = a := option_one_mul h a
 example [Mul α] [Inv' α] [One' α] (h : ∀ a : α, a * a⁻¹' = 𝟙) (a : α) :
