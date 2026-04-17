@@ -27,8 +27,6 @@ Therefore: n × origin = origin
            1 / origin = origin
 ```
 
-Here's our proof:
-
 ```
 origin.lean     312 lines    zero sorries
 ```
