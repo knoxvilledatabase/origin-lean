@@ -247,6 +247,13 @@ python3 scripts/origin.py quality
 
 # 3. Pick a domain. Use quality to find one with stubs to upgrade:
 python3 scripts/origin.py quality <domain>
+#    Single-domain quality now shows EVERY T1 stub with:
+#      - Mathlib kind (structure, class, inductive, def, abbrev)
+#      - Mathlib source file (so you can read the original)
+#      - Origin line number (so you can jump to the stub)
+#    Grouped by kind: structures/classes/inductives first (load-bearing),
+#    then defs. This is your work list.
+#
 # Or suggest to find uncovered declarations:
 python3 scripts/origin.py suggest <domain>
 # ⚠ warnings show names that would collide with other Origin files
@@ -257,12 +264,19 @@ python3 scripts/origin.py stub <domain>
 # Skips collisions automatically.
 
 # 5. Upgrade stubs to real code:
-#    - Replace `def foo' : Prop := True` with real structures, defs
-#    - Use Core primitives: liftPred, liftBin₂, Option.map
-#    - NEVER pattern-match on some/none in a domain file
-#    - NEVER prove algebraic laws — they're in Core
-#    - Key structures/inductives first, then theorems that use them
-#    - Import only Origin.Core
+#    a. Start with structures/classes/inductives — they're load-bearing.
+#       Other defs reference these types. Get them right first.
+#    b. For each stub, read its Mathlib source (quality tells you the file).
+#       Understand the real type shape: fields, constructors, parameters.
+#    c. Write the Origin version: real fields, real constructors, real
+#       parameters. Use Core primitives: liftPred, liftBin₂, Option.map.
+#    d. NEVER pattern-match on some/none in a domain file.
+#    e. NEVER prove algebraic laws — they're in Core.
+#    f. Import only Origin.Core.
+#    g. Watch for forward references — stubs are ordered by Mathlib file,
+#       not dependency. If your structure references a type defined later
+#       in the file, make it standalone or move the dependency up.
+#    h. After load-bearing types build, upgrade defs that reference them.
 #
 #    "Upgraded" means: a model can use the definition without reading
 #    Mathlib. A structure needs real fields. A def needs meaningful
@@ -280,6 +294,13 @@ lake build Origin.Index
 
 # 8. Commit and push (only after build + index both pass)
 ```
+
+**Answer:**
+- Run `quality <domain>` on a domain with T1 stubs. What are the
+  first three types you'd upgrade? Why those first?
+- What's the difference between a real upgrade and a disguised stub?
+- If a structure references a type defined later in the file, what
+  do you do?
 
 ---
 
