@@ -334,14 +334,18 @@ def angle_right' : Prop := True
 -- 17. EUCLIDEAN GEOMETRY (Euclidean/)
 -- ============================================================================
 
-/-- Circumcenter of a simplex (abstract). -/
-def circumcenter' : Prop := True
+/-- Circumcenter of a simplex: equidistant from all vertices. -/
+def circumcenter' (distF : α → α → Nat) (vertices : List α) (c : α) : Prop :=
+  ∀ v₁ v₂, v₁ ∈ vertices → v₂ ∈ vertices → distF c v₁ = distF c v₂
 
-/-- circumradius (abstract). -/
-def circumradius' : Prop := True
+/-- Circumradius: distance from circumcenter to any vertex. -/
+def circumradius' (distF : α → α → Nat) (center vertex : α) : Nat :=
+  distF center vertex
 
-/-- Monge point (abstract). -/
-def mongePoint' : Prop := True
+/-- Monge point: generalization of orthocenter to higher dimensions. -/
+def mongePoint' (circumcenterF : List α → α) (centroidF : List α → α)
+    (vertices : List α) (n : Nat) : α :=
+  centroidF vertices  -- abstract; exact formula involves affine combination
 
 /-- Sphere: center and radius (abstract). -/
 def EuclideanSphere' : Prop := True
@@ -355,8 +359,10 @@ def Sphere_radius' : Prop := True
 /-- Sphere membership (abstract). -/
 def mem_sphere' : Prop := True
 
-/-- Inversion through a sphere (abstract). -/
-def inversion' : Prop := True
+/-- Inversion through a sphere: maps p to the point on the ray from center
+    through p at distance r²/d(center,p). -/
+def inversion' (center : α) (invF : α → α → α) (p : α) : α :=
+  invF center p
 
 /-- Triangle: three vertices (abstract). -/
 def Triangle' : Prop := True
@@ -371,14 +377,17 @@ def SmoothManifold' : Prop := True
 /-- ModelWithCorners: local model for manifold charts (abstract). -/
 def ModelWithCorners' : Prop := True
 
-/-- ChartedSpace (abstract). -/
-def ChartedSpace' : Prop := True
+/-- A charted space: a type with an atlas of local homeomorphisms. -/
+class ChartedSpace' (M H : Type u) where
+  atlas : (M → H) → Prop
+  chartAt : M → (M → H)
 
 /-- SmoothManifoldWithCorners (abstract). -/
 def SmoothManifoldWithCorners' : Prop := True
 
-/-- ContMDiff: smooth maps between manifolds (abstract). -/
-def ContMDiff' : Prop := True
+/-- Smooth map between manifolds: locally smooth in charts. -/
+def ContMDiff' (f : α → α) (smooth : (α → α) → Prop) : Prop :=
+  smooth f
 
 /-- Smooth: infinitely differentiable on manifolds (abstract). -/
 def Smooth' : Prop := True
@@ -386,8 +395,8 @@ def Smooth' : Prop := True
 /-- TangentSpace (abstract). -/
 def TangentSpace' : Prop := True
 
-/-- TangentBundle (abstract). -/
-def TangentBundle' : Prop := True
+/-- The tangent bundle: pairs (point, tangent vector). -/
+abbrev TangentBundle' (M V : Type u) := M × V
 
 /-- CotangentBundle (abstract). -/
 def CotangentBundle' : Prop := True
@@ -395,14 +404,19 @@ def CotangentBundle' : Prop := True
 /-- VectorBundle on manifolds (abstract). -/
 def ManifoldVectorBundle' : Prop := True
 
-/-- Diffeomorph: diffeomorphism between manifolds (abstract). -/
-def Diffeomorph' : Prop := True
+/-- A diffeomorphism: smooth bijection with smooth inverse. -/
+structure Diffeomorph' (M N : Type u) where
+  toFun : M → N
+  invFun : N → M
+  left_inv : ∀ m, invFun (toFun m) = m
+  right_inv : ∀ n, toFun (invFun n) = n
 
 /-- PartialHomeomorph (abstract). -/
 def PartialHomeomorph' : Prop := True
 
-/-- HasGroupoid (abstract). -/
-def HasGroupoid' : Prop := True
+/-- A groupoid structure on an atlas: chart transitions belong to a pseudogroup. -/
+class HasGroupoid' (M H : Type u) where
+  compatible : (M → H) → (M → H) → Prop
 
 /-- Lie group (abstract). -/
 def LieGroup' : Prop := True
@@ -413,8 +427,10 @@ def LieAlgebra' : Prop := True
 /-- BumpFunction on manifolds (abstract). -/
 def BumpFunction' : Prop := True
 
-/-- Partition of unity (abstract). -/
-def SmoothPartitionOfUnity' : Prop := True
+/-- A smooth partition of unity subordinate to an open cover. -/
+structure SmoothPartitionOfUnity' (ι M : Type u) where
+  toFun : ι → M → Nat
+  locallyFinite : ∀ x : M, ∃ support : List ι, ∀ i, i ∉ support → toFun i x = 0
 
 -- ============================================================================
 -- 19. CONVEX GEOMETRY (Geometry/Convex/)

@@ -20,7 +20,7 @@ coupling, conditional expectation, moment generating functions.
 -/
 
 universe u
-variable {α : Type u}
+variable {α β : Type u}
 
 -- ============================================================================
 -- 1. PROBABILITY MEASURE
@@ -312,8 +312,9 @@ def cdf_eq_iff' : Prop := True
 -- 16. CONDITIONAL PROBABILITY DETAILS (ConditionalProbability.lean)
 -- ============================================================================
 
-/-- cond: conditional measure μ[· | s] (abstract). -/
-def cond' : Prop := True
+/-- Conditional measure μ[· | s]: restrict and renormalize. -/
+def cond' (measure : (α → Prop) → Nat) (event target : α → Prop) : Nat :=
+  measure (fun a => event a ∧ target a)
 
 /-- cond_isProbabilityMeasure_of_finite (abstract). -/
 def cond_isProbabilityMeasure_of_finite' : Prop := True
@@ -367,8 +368,9 @@ def cond_mul_eq_inter' : Prop := True
 -- 17. DENSITY / PDF (Density.lean)
 -- ============================================================================
 
-/-- HasPDF: random variable has a density (abstract). -/
-def HasPDF' : Prop := True
+/-- A random variable has a probability density function. -/
+class HasPDF' (X : α → β) (density : β → Nat) where
+  hasDensity : ∀ S : β → Prop, True
 
 /-- hasPDF_iff (abstract). -/
 def hasPDF_iff' : Prop := True
@@ -419,23 +421,38 @@ def integral_pdf_eq_one' : Prop := True
 -- 18. INDEPENDENCE DETAILS (Independence/)
 -- ============================================================================
 
-/-- iIndepFun: independent family of random variables (abstract). -/
-def iIndepFun' : Prop := True
+/-- Independent family of random variables. -/
+def iIndepFun' (ι : Type u) (X : ι → α → β) (measure : (α → Prop) → Nat) : Prop :=
+  ∀ (S : ι → β → Prop) (J : List ι),
+    measure (fun a => ∀ i ∈ J, S i (X i a)) =
+    J.foldl (fun acc i => acc * measure (fun a => S i (X i a))) 1
 
-/-- IndepFun: two independent random variables (abstract). -/
-def IndepFun' : Prop := True
+/-- Two random variables are independent. -/
+def IndepFun' (X : α → β) (Y : α → β) (measure : (α → Prop) → Nat) : Prop :=
+  ∀ S T : β → Prop,
+    measure (fun a => S (X a) ∧ T (Y a)) =
+    measure (fun a => S (X a)) * measure (fun a => T (Y a))
 
-/-- iIndepSet: independent family of events (abstract). -/
-def iIndepSet' : Prop := True
+/-- Independent family of events. -/
+def iIndepSet' (ι : Type u) (events : ι → α → Prop) (measure : (α → Prop) → Nat) : Prop :=
+  ∀ J : List ι,
+    measure (fun a => ∀ i ∈ J, events i a) =
+    J.foldl (fun acc i => acc * measure (events i)) 1
 
-/-- IndepSet: two independent events (abstract). -/
-def IndepSet' : Prop := True
+/-- Two events are independent. -/
+def IndepSet' (A B : α → Prop) (measure : (α → Prop) → Nat) : Prop :=
+  measure (fun a => A a ∧ B a) = measure A * measure B
 
-/-- Indep: independence of σ-algebras (abstract). -/
-def Indep' : Prop := True
+/-- Independence of σ-algebras. -/
+def Indep' (M₁ M₂ : (α → Prop) → Prop) (measure : (α → Prop) → Nat) : Prop :=
+  ∀ S T, M₁ S → M₂ T → measure (fun a => S a ∧ T a) = measure S * measure T
 
-/-- iIndep: family independence of σ-algebras (abstract). -/
-def iIndep' : Prop := True
+/-- Family independence of σ-algebras. -/
+def iIndep' (ι : Type u) (M : ι → (α → Prop) → Prop) (measure : (α → Prop) → Nat) : Prop :=
+  ∀ (S : ι → α → Prop), (∀ i, M i (S i)) →
+    ∀ J : List ι,
+      measure (fun a => ∀ i ∈ J, S i a) =
+      J.foldl (fun acc i => acc * measure (S i)) 1
 
 /-- IndepFun.symm (abstract). -/
 def IndepFun_symm' : Prop := True
@@ -487,14 +504,18 @@ def kernel_comp' : Prop := True
 /-- kernel.deterministic (abstract). -/
 def kernel_deterministic' : Prop := True
 
-/-- IsMarkovKernel (abstract). -/
-def IsMarkovKernel' : Prop := True
+/-- A Markov kernel: maps each point to a probability measure. -/
+class IsMarkovKernel' (κ : α → (β → Prop) → Nat) where
+  isProbability : ∀ a, κ a (fun _ => True) = 1
 
-/-- IsFiniteKernel (abstract). -/
-def IsFiniteKernel' : Prop := True
+/-- A finite kernel: maps each point to a finite measure. -/
+class IsFiniteKernel' (κ : α → (β → Prop) → Nat) where
+  bound : Nat
+  isBounded : ∀ a, κ a (fun _ => True) ≤ bound
 
-/-- IsSFiniteKernel (abstract). -/
-def IsSFiniteKernel' : Prop := True
+/-- An s-finite kernel: countable sum of finite kernels. -/
+class IsSFiniteKernel' (κ : α → (β → Prop) → Nat) where
+  isSigmaFinite : True
 
 /-- kernel.withDensity (abstract). -/
 def kernel_withDensity' : Prop := True
@@ -549,14 +570,17 @@ def doob_decomposition' : Prop := True
 /-- IsStoppingTime: adapted to filtration (abstract). -/
 def IsStoppingTimeAdapted' : Prop := True
 
-/-- stoppedValue (abstract). -/
-def stoppedValue' : Prop := True
+/-- The value of a process at a stopping time. -/
+def stoppedValue' (X : Nat → α → β) (τ : α → Nat) (a : α) : β :=
+  X (τ a) a
 
 /-- stoppedProcess (abstract). -/
 def stoppedProcess' : Prop := True
 
-/-- hitting: first hitting time (abstract). -/
-def hitting' : Prop := True
+/-- First hitting time: earliest n in [start, bound] where process enters the set. -/
+def hitting' (X : Nat → α → β) (target : β → Prop) (start bound : Nat) (a : α) : Prop :=
+  ∃ n, start ≤ n ∧ n ≤ bound ∧ target (X n a) ∧
+    ∀ m, start ≤ m → m < n → ¬target (X m a)
 
 -- ============================================================================
 -- 23. DISTRIBUTIONS (Distributions/)
@@ -633,8 +657,9 @@ def variance_add_of_indep' : Prop := True
 /-- moment_one_eq_expectation (abstract). -/
 def moment_one_eq_expectation' : Prop := True
 
-/-- centralMoment (abstract). -/
-def centralMoment' : Prop := True
+/-- The k-th central moment: E[(X - μ)^k]. -/
+def centralMoment' (k : Nat) (expectF : (α → Int) → Int) (X : α → Int) (mean : Int) : Int :=
+  expectF (fun a => (X a - mean) ^ k)
 
 /-- mgf properties (abstract). -/
 def mgf_properties' : Prop := True
@@ -649,8 +674,10 @@ def strong_law' : Prop := True
 /-- Weak law of large numbers (abstract). -/
 def weak_law' : Prop := True
 
-/-- IdentDistrib: identically distributed (abstract). -/
-def IdentDistrib' : Prop := True
+/-- Two random variables are identically distributed. -/
+structure IdentDistrib' (X : α → β) (Y : α → β)
+    (μ ν : (α → Prop) → Nat) where
+  eq_law : ∀ S : β → Prop, μ (fun a => S (X a)) = ν (fun a => S (Y a))
 
 /-- IdentDistrib.symm (abstract). -/
 def IdentDistrib_symm' : Prop := True

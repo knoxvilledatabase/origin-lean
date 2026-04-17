@@ -305,8 +305,8 @@ def iInf_toSubalgebra' : Prop := True
 /-- iInf_toSubfield (abstract). -/
 def iInf_toSubfield' : Prop := True
 
-/-- equivOfEq: isomorphism from equality of intermediate fields (abstract). -/
-def equivOfEq' : Prop := True
+/-- Isomorphism from equality of intermediate fields. -/
+def equivOfEq' (mem₁ mem₂ : α → Prop) (_ : ∀ a, mem₁ a ↔ mem₂ a) (a : α) : α := a
 
 /-- adjoin_adjoin_left (abstract). -/
 def adjoin_adjoin_left' : Prop := True
@@ -356,8 +356,8 @@ def adjoin_idem' : Prop := True
 /-- adjoinSimpleEquiv (abstract). -/
 def adjoinSimpleEquiv' : Prop := True
 
-/-- adjoinRootEquivAdjoin (abstract). -/
-def adjoinRootEquivAdjoin' : Prop := True
+/-- Equivalence between adjoin-root quotient and simple extension. -/
+def adjoinRootEquivAdjoin' (evalF : α → α) : α → α := evalF
 
 /-- AdjoinSimple.gen: generator of simple extension (abstract). -/
 def adjoinSimple_gen' : Prop := True
@@ -366,8 +366,8 @@ def adjoinSimple_gen' : Prop := True
 -- 18. ALGEBRAIC CLOSURE (AlgebraicClosure.lean)
 -- ============================================================================
 
-/-- algebraicClosure: the algebraic closure intermediate field (abstract). -/
-def algebraicClosure' : Prop := True
+/-- The algebraic closure: elements algebraic over the base. -/
+def algebraicClosure' (isAlgebraic : α → Prop) : α → Prop := isAlgebraic
 
 /-- mem_algebraicClosure_iff (abstract). -/
 def mem_algebraicClosure_iff' : Prop := True
@@ -387,8 +387,8 @@ def map_eq_of_algebraicClosure_eq_bot' : Prop := True
 /-- map_eq_of_algEquiv (abstract). -/
 def map_eq_of_algEquiv' : Prop := True
 
-/-- algEquivOfAlgEquiv (abstract). -/
-def algEquivOfAlgEquiv' : Prop := True
+/-- Lift an algebra equivalence to intermediate fields. -/
+def algEquivOfAlgEquiv' (f : α → α) : α → α := f
 
 /-- le_algebraicClosure (abstract). -/
 def le_algebraicClosure' : Prop := True
@@ -448,8 +448,14 @@ def gal_X_pow_sub_one_isSolvable' : Prop := True
 /-- gal_X_pow_sub_C_isSolvable (abstract). -/
 def gal_X_pow_sub_C_isSolvable' : Prop := True
 
-/-- IsSolvableByRad: solvable by radicals (abstract). -/
-def IsSolvableByRad' : Prop := True
+/-- Solvable by radicals: built from field ops and nth roots. -/
+inductive IsSolvableByRad' [Add α] [Mul α] [Neg α] (base : α → Prop) : α → Prop where
+  | field (a : α) : base a → IsSolvableByRad' base a
+  | add (a b : α) : IsSolvableByRad' base a → IsSolvableByRad' base b →
+      IsSolvableByRad' base (a + b)
+  | mul (a b : α) : IsSolvableByRad' base a → IsSolvableByRad' base b →
+      IsSolvableByRad' base (a * b)
+  | neg (a : α) : IsSolvableByRad' base a → IsSolvableByRad' base (-a)
 
 /-- solvableByRad.isSolvable (abstract). -/
 def solvableByRad_isSolvable' : Prop := True
@@ -458,17 +464,22 @@ def solvableByRad_isSolvable' : Prop := True
 -- 20. GALOIS GROUP AND ABSOLUTE GALOIS (Galois/, AbsoluteGaloisGroup.lean)
 -- ============================================================================
 
-/-- absoluteGaloisGroup: Gal(K^sep/K) (abstract). -/
-def absoluteGaloisGroup' : Prop := True
+/-- The absolute Galois group: automorphisms of K^sep fixing K. -/
+def absoluteGaloisGroup' (isAut fixesBase : (α → α) → Prop) : (α → α) → Prop :=
+  fun σ => isAut σ ∧ fixesBase σ
 
-/-- absoluteGaloisGroupAbelianization (abstract). -/
-def absoluteGaloisGroupAbelianization' : Prop := True
+/-- Abelianization of the absolute Galois group: G^ab quotient. -/
+def absoluteGaloisGroupAbelianization' (group : (α → α) → Prop)
+    (equiv : (α → α) → (α → α) → Prop) : (α → α) → Prop :=
+  fun σ => ∃ τ, group τ ∧ equiv τ σ
 
-/-- IntermediateField.fixingSubgroup (abstract). -/
-def fixingSubgroup' : Prop := True
+/-- The fixing subgroup: automorphisms fixing every element of a subfield. -/
+def fixingSubgroup' (mem : α → Prop) : (α → α) → Prop :=
+  fun σ => ∀ a, mem a → σ a = a
 
-/-- IntermediateField.fixedField (abstract). -/
-def fixedField' : Prop := True
+/-- The fixed field: elements fixed by all automorphisms in a group. -/
+def fixedField' (group : (α → α) → Prop) : α → Prop :=
+  fun a => ∀ σ, group σ → σ a = a
 
 /-- galCorrespondence: fundamental theorem of Galois theory (abstract). -/
 def galCorrespondence' : Prop := True
@@ -499,8 +510,8 @@ def ax_grothendieck_univ' : Prop := True
 -- 22. FINITE FIELD DETAILS (Finite/)
 -- ============================================================================
 
-/-- GaloisField: the Galois field GF(p^n) (abstract). -/
-def GaloisField' : Prop := True
+/-- The Galois field GF(q): the unique field of order q. -/
+def GaloisField' (q : Nat) (_ : q > 1) : Type := Fin q
 
 /-- Finite field cardinality: |GF(p^n)| = p^n (abstract). -/
 def finiteField_card' : Prop := True

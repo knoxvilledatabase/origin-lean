@@ -437,11 +437,18 @@ def RegExp.pumpingLemma' : Prop := True
 -- 19. CONTEXT-FREE GRAMMAR DETAILS (ContextFreeGrammar.lean)
 -- ============================================================================
 
-/-- ContextFreeRule: a production rule (abstract). -/
-def ContextFreeRule' : Prop := True
+/-- A context-free production rule: nonterminal → list of symbols. -/
+structure ContextFreeRule' (T N : Type u) where
+  input : N
+  output : List (T ⊕ N)
 
-/-- Rewrites: one-step derivation (abstract). -/
-def Rewrites' : Prop := True
+/-- One-step rewrite: apply a rule at some position in a sentential form. -/
+inductive Rewrites' {T N : Type u} (r : ContextFreeRule' T N) :
+    List (T ⊕ N) → List (T ⊕ N) → Prop where
+  | head (s : List (T ⊕ N)) :
+      Rewrites' r (Sum.inr r.input :: s) (r.output ++ s)
+  | cons (x : T ⊕ N) {s₁ s₂ : List (T ⊕ N)} :
+      Rewrites' r s₁ s₂ → Rewrites' r (x :: s₁) (x :: s₂)
 
 /-- Rewrites.exists_parts (abstract). -/
 def Rewrites_exists_parts' : Prop := True
@@ -461,11 +468,16 @@ def Rewrites_append_left' : Prop := True
 /-- Rewrites.append_right (abstract). -/
 def Rewrites_append_right' : Prop := True
 
-/-- Produces: one-step derivation from start (abstract). -/
-def Produces' : Prop := True
+/-- Produces: some rule in the list rewrites u to v. -/
+def Produces' {T N : Type u} (rules : List (ContextFreeRule' T N))
+    (u v : List (T ⊕ N)) : Prop :=
+  ∃ r ∈ rules, Rewrites' r u v
 
-/-- Derives: multi-step derivation (abstract). -/
-def Derives' : Prop := True
+/-- Derives: zero or more production steps (reflexive-transitive closure). -/
+inductive Derives' {T N : Type u} (rules : List (ContextFreeRule' T N)) :
+    List (T ⊕ N) → List (T ⊕ N) → Prop where
+  | refl (w : List (T ⊕ N)) : Derives' rules w w
+  | step {u v w} : Produces' rules u v → Derives' rules v w → Derives' rules u w
 
 /-- CFG.language (abstract). -/
 def CFG_language' : Prop := True
@@ -483,14 +495,22 @@ def Derives_trans' : Prop := True
 -- 20. AKRA-BAZZI DETAILS (AkraBazzi/)
 -- ============================================================================
 
-/-- AkraBazziRecurrence structure (abstract). -/
-def AkraBazziRecurrence' : Prop := True
+/-- An Akra-Bazzi divide-and-conquer recurrence. -/
+structure AkraBazziRecurrence' where
+  /-- Base case threshold. -/
+  n₀ : Nat
+  /-- n₀ is positive. -/
+  n₀_pos : 0 < n₀
+  /-- Number of subproblems. -/
+  numTerms : Nat
 
-/-- min_bi: minimum branching factor (abstract). -/
-def min_bi' : Prop := True
+/-- Predicate: i achieves the minimum of b over all indices. -/
+def min_bi' (b : α → Nat) (i : α) : Prop :=
+  ∀ j : α, b i ≤ b j
 
-/-- max_bi: maximum branching factor (abstract). -/
-def max_bi' : Prop := True
+/-- Predicate: i achieves the maximum of b over all indices. -/
+def max_bi' (b : α → Nat) (i : α) : Prop :=
+  ∀ j : α, b j ≤ b i
 
 /-- isLittleO_self_div_log_id (abstract). -/
 def isLittleO_self_div_log_id' : Prop := True

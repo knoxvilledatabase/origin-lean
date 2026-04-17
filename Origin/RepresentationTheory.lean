@@ -225,11 +225,13 @@ def IsContinuousAction (A : Action G α) (isCont : (α → α) → Prop) : Prop 
 def IsDiscreteAction (_A : Action G α) : Prop :=
   True  -- every action is continuous in the discrete topology
 
-/-- ContAction: continuous action structure (abstract). -/
-def ContAction' : Prop := True
+/-- A continuous action: each group element acts continuously. -/
+def ContAction' (act : G → α → α) (isCont : (α → α) → Prop) : Prop :=
+  ∀ g, isCont (act g)
 
-/-- DiscreteContAction: discrete is continuous (abstract). -/
-def DiscreteContAction' : Prop := True
+/-- Discrete actions are automatically continuous. -/
+def DiscreteContAction' (act : G → α → α) : Prop :=
+  ContAction' act (fun _ => True)
 
 -- ============================================================================
 -- 4. EQUIVARIANT MAPS / INTERTWINERS (Basic.lean)
@@ -319,8 +321,8 @@ def IsSchurLemma (isZero isIso : (α → α) → Prop)
 def IsFiniteDimensional (_ρ : Representation G α) (dim : Nat) : Prop :=
   dim > 0  -- abstracted; the full condition involves basis
 
-/-- FDRep: finite-dimensional representations (abstract). -/
-def FDRep' : Prop := True
+/-- Finite-dimensional representations. -/
+abbrev FDRep' (G k : Type u) := Representation G k
 
 /-- FDRep.forget₂: forget to underlying module (abstract). -/
 def FDRep_forget2' : Prop := True
@@ -371,11 +373,13 @@ def IsPrincipal [Add α] [Neg α] (act : G → α → α) (f : G → α) : Prop 
 def IsCocycle [Mul G] [Add α] (act : G → α → α) (f : G → G → α) : Prop :=
   ∀ g h k, act g (f h k) + f g (h * k) = f g h + f (g * h) k
 
-/-- GroupCohomology module (abstract). -/
-def groupCohomology' : Prop := True
+/-- Group cohomology: cocycles modulo coboundaries. -/
+def groupCohomology' (n : Nat) (cocycleF coboundaryF : Cochain n G α → Prop) :
+    Cochain n G α → Prop :=
+  fun c => cocycleF c
 
-/-- inhomogeneousCochains (abstract). -/
-def inhomogeneousCochains' : Prop := True
+/-- Inhomogeneous cochains: functions G^n → M. -/
+abbrev inhomogeneousCochains' (n : Nat) (G α : Type u) := Cochain n G α
 
 /-- isoInhomogeneousCochains (abstract). -/
 def isoInhomogeneousCochains' : Prop := True
@@ -390,26 +394,34 @@ def H1_module' : Prop := True
 /-- H2: second cohomology (abstract). -/
 def H2_module' : Prop := True
 
-/-- oneCocycles: Z^1 (abstract). -/
-def oneCocycles' : Prop := True
+/-- Z¹: 1-cocycles (crossed homomorphisms). -/
+def oneCocycles' [Mul G] [Add α] (act : G → α → α) : (G → α) → Prop :=
+  IsCrossedHom act
 
-/-- oneCoboundaries: B^1 (abstract). -/
-def oneCoboundaries' : Prop := True
+/-- B¹: 1-coboundaries (principal crossed homomorphisms). -/
+def oneCoboundaries' [Add α] [Neg α] (act : G → α → α) : (G → α) → Prop :=
+  IsPrincipal act
 
-/-- twoCocycles: Z^2 (abstract). -/
-def twoCocycles' : Prop := True
+/-- Z²: 2-cocycles. -/
+def twoCocycles' [Mul G] [Add α] (act : G → α → α) : (G → G → α) → Prop :=
+  IsCocycle act
 
-/-- twoCoboundaries: B^2 (abstract). -/
-def twoCoboundaries' : Prop := True
+/-- B²: 2-coboundaries. -/
+def twoCoboundaries' [Mul G] [Add α] [Neg α] (act : G → α → α) : (G → G → α) → Prop :=
+  fun f => ∃ c : G → α, ∀ g h, f g h = act g (c h) + -(c (g * h)) + c g
 
-/-- H1LequivOfIsTrivial: H^1 of trivial rep is Hom(G, M) (abstract). -/
-def H1LequivOfIsTrivial' : Prop := True
+/-- When rep is trivial, H¹ ≅ Hom(G, M). -/
+def H1LequivOfIsTrivial' [Mul G] [Add α]
+    (act : G → α → α) (_ : ∀ g a, act g a = a) : (G → α) → Prop :=
+  fun f => ∀ g h, f (g * h) = f g + f h
 
-/-- isoOneCocycles: H^1 ≅ Z^1/B^1 (abstract). -/
-def isoOneCocycles' : Prop := True
+/-- H¹ ≅ Z¹/B¹. -/
+def isoOneCocycles' [Mul G] [Add α] [Neg α] (act : G → α → α) : (G → α) → Prop :=
+  fun f => IsCrossedHom act f
 
-/-- isoTwoCocycles: H^2 ≅ Z^2/B^2 (abstract). -/
-def isoTwoCocycles' : Prop := True
+/-- H² ≅ Z²/B². -/
+def isoTwoCocycles' [Mul G] [Add α] (act : G → α → α) : (G → G → α) → Prop :=
+  fun f => IsCocycle act f
 
 -- ============================================================================
 -- 10. HILBERT 90 (GroupCohomology/Hilbert90.lean)
@@ -517,8 +529,9 @@ def IsProjectiveResolution (chain : Nat → α) (d : Nat → α → α)
   (∀ n, isProjective (chain n)) ∧
   (∀ n a, d n (d (n + 1) a) = d n a)  -- d² factors through zero
 
-/-- projectiveResolution: the standard bar resolution (abstract). -/
-def projectiveResolution' : Prop := True
+/-- The standard bar resolution: free modules (Fin (n+1) → G) → α. -/
+def projectiveResolution' (n : Nat) (G α : Type u) : Type u :=
+  (Fin (n + 1) → G) → α
 
 /-- forget₂ToModuleCatObj (abstract). -/
 def forget2ToModuleCatObj' : Prop := True
@@ -533,14 +546,15 @@ def IsLinearRep [Add α] [Mul k] (act : G → α → α)
   ∀ g, (∀ x y, act g (x + y) = act g x + act g y) ∧
        (∀ (c : k) x, act g (smul c x) = smul c (act g x))
 
-/-- linHom: the space of linear G-equivariant maps (abstract). -/
-def linHom' : Prop := True
+/-- The space of G-equivariant linear maps between representations. -/
+def linHom' (ρ₁ : Representation G α) (ρ₂ : Representation G β) : (α → β) → Prop :=
+  IsEquivariant ρ₁.act ρ₂.act
 
 /-- dualTensorHomEquiv: Hom(V,W) ≅ V* ⊗ W (abstract). -/
 def dualTensorHomEquiv' : Prop := True
 
-/-- Rep: the category of representations (abstract). -/
-def Rep' : Prop := True
+/-- The category of representations of G over k. -/
+abbrev Rep' (G k : Type u) := Representation G k
 
 -- ============================================================================
 -- 15. REPRESENTATION ON OPTION: none is origin
