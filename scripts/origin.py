@@ -14,6 +14,7 @@ Usage:
     python3 scripts/origin.py suggest <domain>      show uncovered genuine declarations
     python3 scripts/origin.py stub <domain>         append uncovered as def stubs
     python3 scripts/origin.py quality [domain]      show stub vs real declaration counts
+    python3 scripts/origin.py show <name>          show Mathlib original for a stub name
     python3 scripts/origin.py patterns             find patterns that consolidate to Core
     python3 scripts/origin.py clean                remove stale stubs that collide with Core
 """
@@ -1354,6 +1355,88 @@ def cmd_index():
 
 
 # =============================================================================
+# Show — display the Mathlib original for a stub name
+# =============================================================================
+
+def cmd_show(name):
+    """Show the Mathlib original declaration for a given Origin stub name.
+
+    Searches all extracted domains for the Mathlib declaration that
+    corresponds to the stub. Prints the full declaration with surrounding
+    context so the session can see exactly what the Origin version needs.
+    """
+    # Strip trailing ' to get the Mathlib name stem
+    stem = name.rstrip("'")
+    if name.startswith('«') and name.endswith('»'):
+        stem = name[1:-1].rstrip("'")
+
+    mathlib_decl_re = re.compile(
+        r'^(?:.*?)?(private\s+|protected\s+)?(noncomputable\s+)?'
+        r'(theorem|lemma|def|structure|class|instance|abbrev|inductive)\s+(\S+)')
+
+    found = []
+
+    for domain_dir in sorted(EXTRACTED.iterdir()):
+        if not domain_dir.is_dir() or not domain_dir.name.startswith("Mathlib_"):
+            continue
+        for f in sorted(domain_dir.rglob("*.lean")):
+            text = f.read_text(errors="replace")
+            lines = text.split("\n")
+            for i, line in enumerate(lines):
+                m = mathlib_decl_re.match(line.strip())
+                if m:
+                    decl_name = m.group(4)
+                    # Match: the last component of the Mathlib name equals our stem
+                    mathlib_stem = decl_name.split(".")[-1]
+                    if mathlib_stem == stem:
+                        kind = m.group(3)
+                        fname = str(f.relative_to(EXTRACTED))
+                        # Collect the declaration body (up to next blank line or next decl)
+                        body_lines = []
+                        j = i
+                        while j < len(lines):
+                            body_lines.append(lines[j])
+                            j += 1
+                            if j < len(lines):
+                                next_line = lines[j].strip()
+                                # Stop at blank line after we have some content
+                                if next_line == "" and j > i + 1:
+                                    break
+                                # Stop at next top-level declaration
+                                if j > i + 1 and mathlib_decl_re.match(next_line):
+                                    break
+                                # Stop at section markers
+                                if next_line.startswith("end ") or next_line.startswith("section"):
+                                    break
+                            # Cap at 30 lines
+                            if j - i > 30:
+                                body_lines.append("  ...")
+                                break
+                        found.append((kind, decl_name, fname, i + 1, "\n".join(body_lines)))
+
+    if not found:
+        ui.fail(f"No Mathlib declaration found matching '{stem}'")
+        ui.info(f"Searched for last component == '{stem}' across all extracted domains")
+        return
+
+    ui.header("S H O W", f"Mathlib original for '{name}'")
+
+    for kind, decl_name, fname, line_num, body in found:
+        short_file = fname.split("/", 1)[-1] if "/" in fname else fname
+        print(f"  {ui.BOLD}{kind}{ui.RESET} {ui.CYAN}{decl_name}{ui.RESET}")
+        print(f"  {ui.DIM}{short_file}:{line_num}{ui.RESET}")
+        print()
+        for bline in body.split("\n"):
+            print(f"    {bline}")
+        print()
+        ui.separator()
+
+    if len(found) > 1:
+        ui.info(f"{len(found)} matches found — the stub may correspond to any of these")
+    print()
+
+
+# =============================================================================
 # Main
 # =============================================================================
 
@@ -1402,6 +1485,11 @@ def main():
             cmd_quality(sys.argv[2])
         else:
             cmd_quality()
+    elif cmd == "show":
+        if len(sys.argv) > 2:
+            cmd_show(sys.argv[2])
+        else:
+            print("Usage: origin.py show <NAME>")
     elif cmd == "patterns":
         cmd_patterns()
     elif cmd == "clean":
