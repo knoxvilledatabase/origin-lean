@@ -209,9 +209,6 @@ def Flow'.map_zero [Add τ] (ϕ : Flow' τ α) (zero : τ) : Prop :=
 def Flow'.map_add [Add τ] (ϕ : Flow' τ α) : Prop :=
   ∀ s t x, ϕ.toFun (s + t) x = ϕ.toFun s (ϕ.toFun t x)
 
-/-- Flow continuity (abstract, topology). -/
-def Flow'.continuous' (ϕ : Flow' τ α) : Prop := True
-
 /-- Flow map_zero_apply: ϕ(0, x) = x. -/
 def Flow'.map_zero_apply [Add τ] (ϕ : Flow' τ α) (zero : τ) (x : α) : Prop :=
   ϕ.toFun zero x = x
@@ -390,9 +387,6 @@ def CircleDeg1Lift.pow' (f : CircleDeg1Lift (α := α)) (n : Nat) : CircleDeg1Li
 def CircleDeg1Lift.translate' [Add α] (c : α) : CircleDeg1Lift (α := α) where
   toFun x := x + c
 
-/-- Translation power: translate(c)^n = translate(n*c) (abstract). -/
-def CircleDeg1Lift.translate_pow' [Add α] [Mul α] (c : α) (n : Nat) : Prop := True
-
 /-- The translation number of a circle map. -/
 def translationNumber (_f : α → α) (invN : Nat → α) [Mul α]
     (n : Nat) (x : α) : α :=
@@ -436,39 +430,6 @@ def MeasurePreserving'.id' (μ : (α → Prop) → α) : Prop :=
 def MeasurePreserving'.aemeasurable' (f : α → α) (μ : (α → Prop) → α) : Prop :=
   True  -- abstracted
 
-/-- MeasurePreserving of_isEmpty (abstract). -/
-def MeasurePreserving'.of_isEmpty' (f : α → α) : Prop := True
-
-/-- MeasurePreserving symm (abstract). -/
-def MeasurePreserving'.symm' (f : α → α) : Prop := True
-
-/-- MeasurePreserving restrict_preimage (abstract). -/
-def MeasurePreserving'.restrict_preimage' (f : α → α) : Prop := True
-
-/-- MeasurePreserving restrict_preimage_emb (abstract). -/
-def MeasurePreserving'.restrict_preimage_emb' (f : α → α) : Prop := True
-
-/-- MeasurePreserving restrict_image_emb (abstract). -/
-def MeasurePreserving'.restrict_image_emb' (f : α → α) : Prop := True
-
-/-- MeasurePreserving aemeasurable_comp_iff (abstract). -/
-def MeasurePreserving'.aemeasurable_comp_iff' (f : α → α) : Prop := True
-
-/-- MeasurePreserving quasiMeasurePreserving (abstract). -/
-def MeasurePreserving'.quasiMeasurePreserving' (f : α → α) : Prop := True
-
-/-- MeasurePreserving comp_left_iff (abstract). -/
-def MeasurePreserving'.comp_left_iff' (f g : α → α) : Prop := True
-
-/-- MeasurePreserving comp_right_iff (abstract). -/
-def MeasurePreserving'.comp_right_iff' (f g : α → α) : Prop := True
-
-/-- MeasurePreserving sigmaFinite (abstract). -/
-def MeasurePreserving'.sigmaFinite' (f : α → α) : Prop := True
-
-/-- MeasurePreserving measure_preimage (abstract). -/
-def MeasurePreserving'.measure_preimage' (f : α → α) : Prop := True
-
 /-- Pre-ergodic: every invariant set is ae-trivial. -/
 structure PreErgodic' (f : α → α) where
   ae_trivial : ∀ s : α → Prop, (∀ x, s x ↔ s (f x)) → True
@@ -486,42 +447,6 @@ structure QuasiErgodic' (f : α → α) where
 def Ergodic'.ae_empty_or_univ (f : α → α) : Prop :=
   True  -- every invariant set is empty or full ae
 
-/-- measure_self_or_compl_eq_zero (abstract). -/
-def Ergodic'.measure_self_or_compl_eq_zero (f : α → α) : Prop := True
-
-/-- ae_mem_or_ae_nmem (abstract). -/
-def Ergodic'.ae_mem_or_ae_nmem (f : α → α) : Prop := True
-
-/-- prob_eq_zero_or_one (abstract). -/
-def Ergodic'.prob_eq_zero_or_one (f : α → α) : Prop := True
-
-/-- Ergodic of iterate (abstract). -/
-def Ergodic'.of_iterate (f : α → α) (n : Nat) : Prop := True
-
-/-- Ergodic smul_measure (abstract). -/
-def Ergodic'.smul_measure' (f : α → α) : Prop := True
-
-/-- preErgodic_of_preErgodic_conjugate (abstract). -/
-def preErgodic_of_preErgodic_conjugate' (f g h : α → α) : Prop := True
-
-/-- preErgodic_conjugate_iff (abstract). -/
-def preErgodic_conjugate_iff' (f g h : α → α) : Prop := True
-
-/-- Ergodic aeconst on sets (abstract). -/
-def Ergodic'.aeconst_set (f : α → α) : Prop := True
-
-/-- Ergodic ae_empty_or_univ₀ (abstract). -/
-def Ergodic'.ae_empty_or_univ₀ (f : α → α) : Prop := True
-
-/-- Ergodic ae_mem_or_ae_nmem₀ (abstract). -/
-def Ergodic'.ae_mem_or_ae_nmem₀ (f : α → α) : Prop := True
-
-/-- QuasiErgodic ae_eq_const of ae_eq_comp (abstract). -/
-def QuasiErgodic'.ae_eq_const (f : α → α) (g : α → β) : Prop := True
-
-/-- ae_eq_const_of_ae_eq_comp_ae (abstract). -/
-def ae_eq_const_of_ae_eq_comp_ae' (f : α → α) (g : α → β) : Prop := True
-
 /-- Ergodic functions are almost everywhere constant on invariant functions. -/
 def ergodic_ae_constant (_f : α → α) (g : α → β) : Prop :=
   ∃ c, ∀ x, g x = c  -- modulo null sets, abstracted
@@ -534,48 +459,9 @@ def ergodic_ae_constant (_f : α → α) (g : α → β) : Prop :=
 structure Conservative' (f : α → α) where
   recurrence : ∀ s : α → Prop, True
 
-/-- MeasurePreserving implies conservative (abstract). -/
-def MeasurePreserving'_conservative (f : α → α) : Prop := True
-
-/-- Conservative id. -/
-def Conservative'.id' : Prop := True
-
-/-- Conservative of_absolutelyContinuous (abstract). -/
-def Conservative'.of_absolutelyContinuous' (f : α → α) : Prop := True
-
-/-- Conservative measureRestrict (abstract). -/
-def Conservative'.measureRestrict' (f : α → α) : Prop := True
-
 /-- Poincaré recurrence: exists_mem_iterate_mem. -/
 def Conservative'.exists_mem_iterate_mem (f : α → α) : Prop :=
   ∀ (s : α → Prop) (x : α), s x → ∃ n, n > 0 ∧ s (iter f n x)
-
-/-- frequently_measure_inter_ne_zero (abstract). -/
-def Conservative'.frequently_measure_inter_ne_zero (f : α → α) : Prop := True
-
-/-- exists_gt_measure_inter_ne_zero (abstract). -/
-def Conservative'.exists_gt_measure_inter_ne_zero (f : α → α) : Prop := True
-
-/-- measure_mem_forall_ge_image_not_mem_eq_zero (abstract). -/
-def Conservative'.measure_mem_forall_ge (f : α → α) : Prop := True
-
-/-- ae_mem_imp_frequently_image_mem (abstract). -/
-def Conservative'.ae_mem_imp_frequently_image_mem (f : α → α) : Prop := True
-
-/-- inter_frequently_image_mem_ae_eq (abstract). -/
-def Conservative'.inter_frequently_image_mem_ae_eq (f : α → α) : Prop := True
-
-/-- measure_inter_frequently_image_mem_eq (abstract). -/
-def Conservative'.measure_inter_frequently_image_mem_eq (f : α → α) : Prop := True
-
-/-- ae_forall_image_mem_imp_frequently_image_mem (abstract). -/
-def Conservative'.ae_forall_image_mem (f : α → α) : Prop := True
-
-/-- frequently_ae_mem_and_frequently_image_mem (abstract). -/
-def Conservative'.frequently_ae_mem (f : α → α) : Prop := True
-
-/-- ae_frequently_mem_of_mem_nhds (abstract). -/
-def Conservative'.ae_frequently_mem_of_mem_nhds (f : α → α) : Prop := True
 
 /-- Poincaré recurrence: a conservative map returns to any positive-measure set. -/
 def IsPoincare (f : α → α) (mem : α → Prop) : Prop :=
@@ -594,67 +480,9 @@ def IsErgodicAction (act : G → α → α)
 def regularIsErgodic [Mul G] (_isDense : (G → Prop) → Prop) : Prop :=
   True  -- IsMinimalAction (fun g x => g * x) isDense, defined below
 
-/-- aeconst_of_forall_preimage_smul_ae_eq (abstract). -/
-def aeconst_of_forall_preimage_smul_ae_eq' (act : G → α → α) : Prop := True
-
-/-- aeconst_of_forall_smul_ae_eq (abstract). -/
-def aeconst_of_forall_smul_ae_eq' (act : G → α → α) : Prop := True
-
-/-- MulAction.aeconst_of_aestabilizer_eq_top (abstract). -/
-def aeconst_of_aestabilizer_eq_top' (act : G → α → α) : Prop := True
-
-/-- ErgodicSMul.of_aestabilizer (abstract). -/
-def ergodicSMul_of_aestabilizer' (act : G → α → α) : Prop := True
-
-/-- ergodicSMul_iterateMulAct (abstract). -/
-def ergodicSMul_iterateMulAct' (act : G → α → α) : Prop := True
-
 -- Action/OfMinimal.lean
-/-- aeconst_of_dense_setOf_preimage_smul_ae (abstract). -/
-def aeconst_of_dense_setOf_preimage_smul_ae' (act : G → α → α) : Prop := True
-
-/-- aeconst_of_dense_setOf_preimage_smul_eq (abstract). -/
-def aeconst_of_dense_setOf_preimage_smul_eq' (act : G → α → α) : Prop := True
-
-/-- ergodic_smul_of_denseRange_pow (abstract). -/
-def ergodic_smul_of_denseRange_pow' (act : G → α → α) : Prop := True
-
-/-- ErgodicSMul.trans_isMinimal (abstract). -/
-def ergodicSMul_trans_isMinimal' (act : G → α → α) : Prop := True
-
-/-- aeconst_of_dense_aestabilizer_smul (abstract). -/
-def aeconst_of_dense_aestabilizer_smul' (act : G → α → α) : Prop := True
-
-/-- ergodic_smul_of_denseRange_zpow (abstract). -/
-def ergodic_smul_of_denseRange_zpow' (act : G → α → α) : Prop := True
-
-/-- ergodic_mul_left_of_denseRange_pow (abstract). -/
-def ergodic_mul_left_of_denseRange_pow' (act : G → α → α) : Prop := True
-
-/-- ergodic_mul_left_of_denseRange_zpow (abstract). -/
-def ergodic_mul_left_of_denseRange_zpow' (act : G → α → α) : Prop := True
-
-/-- preErgodic_of_dense_iUnion_preimage_one (abstract). -/
-def preErgodic_of_dense_iUnion_preimage_one' (act : G → α → α) : Prop := True
-
-/-- ergodic_of_dense_iUnion_preimage_one (abstract). -/
-def ergodic_of_dense_iUnion_preimage_one' (act : G → α → α) : Prop := True
 
 -- Ergodic/AddCircle.lean
-/-- ae_empty_or_univ_of_forall_vadd_ae_eq_self (abstract). -/
-def ae_empty_or_univ_of_forall_vadd_ae_eq_self' : Prop := True
-
-/-- ergodic_zsmul on add circle (abstract). -/
-def ergodic_zsmul' : Prop := True
-
-/-- ergodic_nsmul on add circle (abstract). -/
-def ergodic_nsmul' : Prop := True
-
-/-- ergodic_zsmul_add on add circle (abstract). -/
-def ergodic_zsmul_add' : Prop := True
-
-/-- ergodic_nsmul_add on add circle (abstract). -/
-def ergodic_nsmul_add' : Prop := True
 
 -- ============================================================================
 -- 11. TOPOLOGICAL ENTROPY (TopologicalEntropy/)
@@ -669,43 +497,19 @@ def IsDynCover (f : α → α) (covered : α → Prop) (n : Nat) (center : α �
 def IsDynCover.of_le (f : α → α) (s : α → Prop) (m n : Nat) (c : α → Prop) : Prop :=
   m ≤ n → IsDynCover f s n c → IsDynCover f s m c
 
-/-- IsDynCoverOf of_entourage_subset (abstract). -/
-def IsDynCover.of_entourage_subset (f : α → α) : Prop := True
-
 /-- isDynCoverOf_empty. -/
 def isDynCover_empty (f : α → α) (n : Nat) (c : α → Prop) :
     IsDynCover f (fun _ => False) n c :=
   fun x hx => absurd hx id
-
-/-- IsDynCoverOf.nonempty (abstract). -/
-def IsDynCover.nonempty' (f : α → α) : Prop := True
 
 /-- isDynCoverOf_zero: any cover works at depth 0. -/
 theorem isDynCover_zero (f : α → α) (s c : α → Prop)
     (h : ∀ x, s x → ∃ y, c y) : IsDynCover f s 0 c :=
   fun x hx => by obtain ⟨y, hy⟩ := h x hx; exact ⟨y, hy, fun _ hk => absurd hk (Nat.not_lt_zero _)⟩
 
-/-- isDynCoverOf_univ (abstract). -/
-def isDynCover_univ (f : α → α) : Prop := True
-
-/-- IsDynCoverOf.nonempty_inter (abstract). -/
-def IsDynCover.nonempty_inter' (f : α → α) : Prop := True
-
-/-- exists_isDynCoverOf_of_isCompact_uniformContinuous (abstract). -/
-def exists_isDynCover_of_isCompact (f : α → α) : Prop := True
-
-/-- exists_isDynCoverOf_of_isCompact_invariant (abstract). -/
-def exists_isDynCover_of_isCompact_invariant (f : α → α) : Prop := True
-
 /-- Minimum cover cardinality. -/
 def coverMincard' (f : α → α) (s : α → Prop) (n : Nat) : Prop :=
   ∃ k, ∀ c, IsDynCover f s n c → k ≤ 1  -- abstracted
-
-/-- IsDynCoverOf.coverMincard_le_card (abstract). -/
-def IsDynCover.coverMincard_le_card (f : α → α) : Prop := True
-
-/-- coverMincard_monotone_time (abstract). -/
-def coverMincard_monotone_time' (f : α → α) : Prop := True
 
 /-- A dynamical entourage: the set of pairs that stay close for n steps. -/
 def isDynEntourage (f : α → α) (close : α → α → Prop) (n : Nat)
@@ -721,29 +525,11 @@ def dynEntourage_eq_inter' (f : α → α) (close : α → α → Prop) (n : Nat
 def mem_dynEntourage' (f : α → α) (close : α → α → Prop) (n : Nat) (x y : α) : Prop :=
   isDynEntourage f close n x y
 
-/-- dynEntourage_mem_uniformity (abstract). -/
-def dynEntourage_mem_uniformity' (f : α → α) : Prop := True
-
 /-- idRel_subset_dynEntourage. -/
 theorem idRel_subset_dynEntourage (f : α → α) (close : α → α → Prop)
     (hrefl : ∀ x, close x x) (n : Nat) (x : α) :
     isDynEntourage f close n x x :=
   fun k _ => hrefl (iter f k x)
-
-/-- SymmetricRel.dynEntourage (abstract). -/
-def symmetric_dynEntourage' (f : α → α) : Prop := True
-
-/-- dynEntourage_comp_subset (abstract). -/
-def dynEntourage_comp_subset' (f : α → α) : Prop := True
-
-/-- isOpen.dynEntourage (abstract). -/
-def isOpen_dynEntourage' (f : α → α) : Prop := True
-
-/-- dynEntourage_monotone in entourage (abstract). -/
-def dynEntourage_monotone' (f : α → α) : Prop := True
-
-/-- dynEntourage_antitone in n (abstract). -/
-def dynEntourage_antitone' (f : α → α) : Prop := True
 
 /-- dynEntourage_zero: 0-entourage is just closeness at step 0. -/
 theorem dynEntourage_zero (f : α → α) (close : α → α → Prop)
@@ -755,18 +541,6 @@ theorem dynEntourage_zero (f : α → α) (close : α → α → Prop)
 def dynEntourage_one' (f : α → α) (close : α → α → Prop) : Prop :=
   ∀ x y, isDynEntourage f close 1 x y ↔ close x x
 
-/-- dynEntourage_univ (abstract). -/
-def dynEntourage_univ' (f : α → α) : Prop := True
-
-/-- mem_ball_dynEntourage_comp (abstract). -/
-def mem_ball_dynEntourage_comp' (f : α → α) : Prop := True
-
-/-- Topological entropy of a map (abstract). -/
-def topologicalEntropy' (_f : α → α) : Prop := True
-
-/-- Entropy is non-increasing under semiconjugacy. -/
-def entropy_semiconj (_f _g _h : α → α) : Prop := True
-
 -- NetEntropy.lean
 /-- A dynamical net: separated set at depth n. -/
 def IsDynNet (f : α → α) (s : α → Prop) (close : α → α → Prop) (n : Nat)
@@ -774,74 +548,12 @@ def IsDynNet (f : α → α) (s : α → Prop) (close : α → α → Prop) (n :
   (∀ x, net x → s x) ∧
   ∀ x y, net x → net y → x ≠ y → ¬isDynEntourage f close n x y
 
-/-- IsDynNetIn.of_le (abstract). -/
-def IsDynNet.of_le (f : α → α) : Prop := True
-
-/-- IsDynNetIn.of_entourage_subset (abstract). -/
-def IsDynNet.of_entourage_subset (f : α → α) : Prop := True
-
 /-- isDynNetIn_empty. -/
 def isDynNet_empty (f : α → α) (close : α → α → Prop) (n : Nat) :
     IsDynNet f (fun _ => False) close n (fun _ => False) :=
   ⟨fun _ h => absurd h id, fun _ _ h => absurd h id⟩
 
-/-- isDynNetIn_singleton (abstract). -/
-def isDynNet_singleton (f : α → α) : Prop := True
-
-/-- IsDynNetIn.card_le_card_of_isDynCoverOf (abstract). -/
-def IsDynNet.card_le_card_of_isDynCover (f : α → α) : Prop := True
-
-/-- Maximum net cardinality (abstract). -/
-def netMaxcard' (f : α → α) : Prop := True
-
-/-- IsDynNetIn.card_le_netMaxcard (abstract). -/
-def IsDynNet.card_le_netMaxcard (f : α → α) : Prop := True
-
-/-- netMaxcard_monotone_time (abstract). -/
-def netMaxcard_monotone_time' (f : α → α) : Prop := True
-
-/-- netMaxcard_antitone (abstract). -/
-def netMaxcard_antitone' (f : α → α) : Prop := True
-
-/-- netMaxcard_finite_iff (abstract). -/
-def netMaxcard_finite_iff' (f : α → α) : Prop := True
-
-/-- netMaxcard_empty (abstract). -/
-def netMaxcard_empty' (f : α → α) : Prop := True
-
-/-- netMaxcard_eq_zero_iff (abstract). -/
-def netMaxcard_eq_zero_iff' (f : α → α) : Prop := True
-
-/-- one_le_netMaxcard_iff (abstract). -/
-def one_le_netMaxcard_iff' (f : α → α) : Prop := True
-
-/-- netMaxcard_zero (abstract). -/
-def netMaxcard_zero' (f : α → α) : Prop := True
-
 -- Semiconj.lean
-/-- IsDynCoverOf.image (abstract). -/
-def IsDynCover_image' (f : α → α) : Prop := True
-
-/-- IsDynCoverOf.preimage (abstract). -/
-def IsDynCover_preimage' (f : α → α) : Prop := True
-
-/-- le_coverMincard_image (abstract). -/
-def le_coverMincard_image' (f : α → α) : Prop := True
-
-/-- coverMincard_image_le (abstract). -/
-def coverMincard_image_le' (f : α → α) : Prop := True
-
-/-- coverEntropy_image_of_comap (abstract). -/
-def coverEntropy_image_of_comap' (f : α → α) : Prop := True
-
-/-- coverEntropyInf_image_of_comap (abstract). -/
-def coverEntropyInf_image_of_comap' (f : α → α) : Prop := True
-
-/-- coverEntropy_restrict_subset (abstract). -/
-def coverEntropy_restrict_subset' (f : α → α) : Prop := True
-
-/-- coverEntropyInf_restrict_subset (abstract). -/
-def coverEntropyInf_restrict_subset' (f : α → α) : Prop := True
 
 -- ============================================================================
 -- 12. OMEGA-LIMIT SETS (OmegaLimit.lean)
@@ -852,45 +564,6 @@ def omegaLimit (ϕ : τ → α → α) (s : α → Prop)
     (isAccum : (α → Prop) → α → Prop) : α → Prop :=
   fun y => ∀ x, s x → isAccum (fun z => ∃ t, ϕ t x = z) y
 
-/-- omegaLimit_subset_of_tendsto (abstract). -/
-def omegaLimit_subset_of_tendsto' (ϕ : τ → α → α) : Prop := True
-
-/-- omegaLimit_mono_left (abstract). -/
-def omegaLimit_mono_left' (ϕ : τ → α → α) : Prop := True
-
-/-- omegaLimit_mono_right (abstract). -/
-def omegaLimit_mono_right' (ϕ : τ → α → α) : Prop := True
-
-/-- isClosed_omegaLimit (abstract). -/
-def isClosed_omegaLimit' (ϕ : τ → α → α) : Prop := True
-
-/-- mapsTo_omegaLimit (abstract). -/
-def mapsTo_omegaLimit' (ϕ : τ → α → α) : Prop := True
-
-/-- omegaLimit_image_eq (abstract). -/
-def omegaLimit_image_eq' (ϕ : τ → α → α) : Prop := True
-
-/-- mem_omegaLimit_iff_frequently (abstract). -/
-def mem_omegaLimit_iff_frequently' (ϕ : τ → α → α) : Prop := True
-
-/-- mem_omegaLimit_singleton_iff_map_cluster_point (abstract). -/
-def mem_omegaLimit_singleton' (ϕ : τ → α → α) : Prop := True
-
-/-- omegaLimit_inter (abstract). -/
-def omegaLimit_inter' (ϕ : τ → α → α) : Prop := True
-
-/-- omegaLimit_iInter (abstract). -/
-def omegaLimit_iInter' (ϕ : τ → α → α) : Prop := True
-
-/-- omegaLimit_union (abstract). -/
-def omegaLimit_union' (ϕ : τ → α → α) : Prop := True
-
-/-- omegaLimit_iUnion (abstract). -/
-def omegaLimit_iUnion' (ϕ : τ → α → α) : Prop := True
-
-/-- omegaLimit_eq_iInter (abstract). -/
-def omegaLimit_eq_iInter' (ϕ : τ → α → α) : Prop := True
-
 -- ============================================================================
 -- 13. MINIMAL ACTIONS (Minimal.lean)
 -- ============================================================================
@@ -898,33 +571,6 @@ def omegaLimit_eq_iInter' (ϕ : τ → α → α) : Prop := True
 /-- An action is minimal if every orbit is dense. -/
 def IsMinimalAction (act : G → α → α) (isDense : (α → Prop) → Prop) : Prop :=
   ∀ x, isDense (fun y => ∃ g, act g x = y)
-
-/-- MulAction.dense_orbit (abstract). -/
-def dense_orbit' (act : G → α → α) : Prop := True
-
-/-- denseRange_smul (abstract). -/
-def denseRange_smul' (act : G → α → α) : Prop := True
-
-/-- IsOpen.exists_smul_mem (abstract). -/
-def exists_smul_mem' (act : G → α → α) : Prop := True
-
-/-- IsOpen.iUnion_preimage_smul (abstract). -/
-def iUnion_preimage_smul' (act : G → α → α) : Prop := True
-
-/-- IsOpen.iUnion_smul (abstract). -/
-def iUnion_smul' (act : G → α → α) : Prop := True
-
-/-- IsCompact.exists_finite_cover_smul (abstract). -/
-def exists_finite_cover_smul' (act : G → α → α) : Prop := True
-
-/-- dense_of_nonempty_smul_invariant (abstract). -/
-def dense_of_nonempty_smul_invariant' (act : G → α → α) : Prop := True
-
-/-- eq_empty_or_univ_of_smul_invariant_closed (abstract). -/
-def eq_empty_or_univ_of_smul_invariant_closed' (act : G → α → α) : Prop := True
-
-/-- isMinimal_iff_isClosed_smul_invariant (abstract). -/
-def isMinimal_iff_isClosed_smul_invariant' (act : G → α → α) : Prop := True
 
 /-- Minimal implies ergodic (for invariant measures). -/
 def minimal_implies_ergodic (_act : G → α → α) (_isDense : (α → Prop) → Prop) : Prop :=
@@ -937,27 +583,6 @@ def minimal_implies_ergodic (_act : G → α → α) (_isDense : (α → Prop) �
 /-- Newton map: x - f(x)/f'(x). -/
 def newtonMap' (f derivF : α → α) (divF : α → α → α) (x : α) [Sub α] : α :=
   x - divF (f x) (derivF x)
-
-/-- newtonMap_apply_of_isUnit (abstract). -/
-def newtonMap_apply_of_isUnit' (f derivF : α → α) : Prop := True
-
-/-- newtonMap_apply_of_not_isUnit (abstract). -/
-def newtonMap_apply_of_not_isUnit' (f derivF : α → α) : Prop := True
-
-/-- isNilpotent_iterate_newtonMap_sub_of_isNilpotent (abstract). -/
-def isNilpotent_iterate_newtonMap_sub' (f derivF : α → α) : Prop := True
-
-/-- isFixedPt_newtonMap_of_aeval_eq_zero: roots are fixed points. -/
-def isFixedPt_newtonMap_of_aeval_eq_zero' (f derivF : α → α) : Prop := True
-
-/-- isFixedPt_newtonMap_of_isUnit_iff (abstract). -/
-def isFixedPt_newtonMap_of_isUnit_iff' (f derivF : α → α) : Prop := True
-
-/-- aeval_pow_two_pow_dvd_aeval_iterate_newtonMap (abstract). -/
-def aeval_pow_two_pow_dvd' (f derivF : α → α) : Prop := True
-
-/-- exists_unique_nilpotent_sub_and_aeval_eq_zero (abstract). -/
-def exists_unique_nilpotent_sub' (f derivF : α → α) : Prop := True
 
 /-- One step of Newton-Raphson iteration (legacy). -/
 def newtonStep (f derivF : α → α) (divF : α → α → α) (x : α) : α :=

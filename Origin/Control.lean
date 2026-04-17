@@ -447,12 +447,6 @@ def mapEquiv_injective_prop (F : Type u → Type u)
 -- 10. RANDOM (Random.lean)
 -- ============================================================================
 
-/-- A random value generator for a type. -/
-def IsRandom (_generate : Unit → α) : Prop := True
-
-/-- Bounded random generation within a range. -/
-def IsBoundedRandom (_generate : α → α → α) : Prop := True
-
 /-- Random generator monad transformer. -/
 def RandGT' (g : Type u) (m : Type u → Type v) (α : Type u) := g → m (α × g)
 

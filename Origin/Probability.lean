@@ -267,44 +267,9 @@ def IsCoupling (joint : α → α → Option α)
 theorem expect_mul_absorbs [Mul α] (w : α) (v : Option α) :
     expectation w v = v.map (w * ·) := rfl
 
-
-
 -- ============================================================================
 -- 15. CDF PROPERTIES (CDF.lean)
 -- ============================================================================
-
-/-- CDF is nonneg (abstract). -/
-def cdf_nonneg' : Prop := True
-
-/-- CDF ≤ 1 (abstract). -/
-def cdf_le_one' : Prop := True
-
-/-- CDF is monotone (abstract). -/
-def cdf_monotone' : Prop := True
-
-/-- CDF tends to 0 at -∞ (abstract). -/
-def cdf_tendsto_atBot' : Prop := True
-
-/-- CDF tends to 1 at +∞ (abstract). -/
-def cdf_tendsto_atTop' : Prop := True
-
-/-- ofReal_cdf (abstract). -/
-def ofReal_cdf' : Prop := True
-
-/-- cdf_eq_toReal (abstract). -/
-def cdf_eq_toReal' : Prop := True
-
-/-- measure_cdf (abstract). -/
-def measure_cdf' : Prop := True
-
-/-- cdf_measure_stieltjesFunction (abstract). -/
-def cdf_measure_stieltjesFunction' : Prop := True
-
-/-- Measures equal iff CDFs equal (abstract). -/
-def measure_eq_of_cdf' : Prop := True
-
-/-- cdf_eq_iff (abstract). -/
-def cdf_eq_iff' : Prop := True
 
 -- ============================================================================
 -- 16. CONDITIONAL PROBABILITY DETAILS (ConditionalProbability.lean)
@@ -314,54 +279,6 @@ def cdf_eq_iff' : Prop := True
 def cond' (measure : (α → Prop) → Nat) (event target : α → Prop) : Nat :=
   measure (fun a => event a ∧ target a)
 
-/-- cond_isProbabilityMeasure_of_finite (abstract). -/
-def cond_isProbabilityMeasure_of_finite' : Prop := True
-
-/-- cond_isProbabilityMeasure (abstract). -/
-def cond_isProbabilityMeasure' : Prop := True
-
-/-- cond_toMeasurable_eq (abstract). -/
-def cond_toMeasurable_eq' : Prop := True
-
-/-- cond_absolutelyContinuous (abstract). -/
-def cond_absolutelyContinuous' : Prop := True
-
-/-- absolutelyContinuous_cond_univ (abstract). -/
-def absolutelyContinuous_cond_univ' : Prop := True
-
-/-- cond_empty (abstract). -/
-def cond_empty' : Prop := True
-
-/-- cond_univ (abstract). -/
-def cond_univ' : Prop := True
-
-/-- cond_eq_zero (abstract). -/
-def cond_eq_zero' : Prop := True
-
-/-- cond_eq_zero_of_meas_eq_zero (abstract). -/
-def cond_eq_zero_of_meas_eq_zero' : Prop := True
-
-/-- cond_apply (abstract). -/
-def cond_apply' : Prop := True
-
-/-- cond_apply' (abstract). -/
-def cond_apply_alt' : Prop := True
-
-/-- cond_apply_self (abstract). -/
-def cond_apply_self' : Prop := True
-
-/-- cond_inter_self (abstract). -/
-def cond_inter_self' : Prop := True
-
-/-- inter_pos_of_cond_ne_zero (abstract). -/
-def inter_pos_of_cond_ne_zero' : Prop := True
-
-/-- cond_cond_eq_cond_inter' (abstract). -/
-def cond_cond_eq_cond_inter' : Prop := True
-
-/-- cond_mul_eq_inter' (abstract). -/
-def cond_mul_eq_inter' : Prop := True
-
 -- ============================================================================
 -- 17. DENSITY / PDF (Density.lean)
 -- ============================================================================
@@ -369,51 +286,6 @@ def cond_mul_eq_inter' : Prop := True
 /-- A random variable has a probability density function. -/
 class HasPDF' (X : α → β) (density : β → Nat) where
   hasDensity : ∀ S : β → Prop, True
-
-/-- hasPDF_iff (abstract). -/
-def hasPDF_iff' : Prop := True
-
-/-- hasPDF_iff_of_aemeasurable (abstract). -/
-def hasPDF_iff_of_aemeasurable' : Prop := True
-
-/-- HasPDF.aemeasurable (abstract). -/
-def HasPDF_aemeasurable' : Prop := True
-
-/-- HasPDF.congr (abstract). -/
-def HasPDF_congr' : Prop := True
-
-/-- HasPDF.congr_iff (abstract). -/
-def HasPDF_congr_iff' : Prop := True
-
-/-- hasPDF_of_map_eq_withDensity (abstract). -/
-def hasPDF_of_map_eq_withDensity' : Prop := True
-
-/-- pdf_of_not_aemeasurable (abstract). -/
-def pdf_of_not_aemeasurable' : Prop := True
-
-/-- pdf_of_not_haveLebesgueDecomposition (abstract). -/
-def pdf_of_not_haveLebesgueDecomposition' : Prop := True
-
-/-- aemeasurable_of_pdf_ne_zero (abstract). -/
-def aemeasurable_of_pdf_ne_zero' : Prop := True
-
-/-- pdf_nonneg (abstract). -/
-def pdf_nonneg' : Prop := True
-
-/-- pdf_undef (abstract). -/
-def pdf_undef' : Prop := True
-
-/-- pdf_eq (abstract). -/
-def pdf_eq' : Prop := True
-
-/-- pdf_toReal_ae_nonneg (abstract). -/
-def pdf_toReal_ae_nonneg' : Prop := True
-
-/-- setIntegral_pdf_eq_measure (abstract). -/
-def setIntegral_pdf_eq_measure' : Prop := True
-
-/-- integral_pdf_eq_one (abstract). -/
-def integral_pdf_eq_one' : Prop := True
 
 -- ============================================================================
 -- 18. INDEPENDENCE DETAILS (Independence/)
@@ -452,55 +324,13 @@ def iIndep' (ι : Type u) (M : ι → (α → Prop) → Prop) (measure : (α →
       measure (fun a => ∀ i ∈ J, S i a) =
       J.foldl (fun acc i => acc * measure (S i)) 1
 
-/-- IndepFun.symm (abstract). -/
-def IndepFun_symm' : Prop := True
-
-/-- IndepFun.comp (abstract). -/
-def IndepFun_comp' : Prop := True
-
-/-- IndepFun.mul (abstract). -/
-def IndepFun_mul' : Prop := True
-
-/-- IndepFun.add (abstract). -/
-def IndepFun_add' : Prop := True
-
-/-- IndepFun.variance_add (abstract). -/
-def IndepFun_variance_add' : Prop := True
-
-/-- iIndepFun.indep_comap_natural_of_lt (abstract). -/
-def iIndepFun_indep_comap_natural' : Prop := True
-
-/-- iIndepFun.condexp_natural_ae_eq_of_lt (abstract). -/
-def iIndepFun_condexp_natural' : Prop := True
-
-/-- iIndepSet.condexp_indicator_filtrationOfSet_ae_eq (abstract). -/
-def iIndepSet_condexp_indicator' : Prop := True
-
-/-- Borel-Cantelli: measure_limsup_eq_one (abstract). -/
-def measure_limsup_eq_one' : Prop := True
-
 -- ============================================================================
 -- 19. CONDITIONAL EXPECTATION (ConditionalExpectation.lean)
 -- ============================================================================
 
-/-- condexp_indep_eq (abstract). -/
-def condexp_indep_eq' : Prop := True
-
 -- ============================================================================
 -- 20. KERNEL (Kernel/)
 -- ============================================================================
-
-/-- Probability kernel: transition from one space to another (abstract). -/
-def ProbKernel' : Prop := True
-
-/-- kernel.const (abstract). -/
-def kernel_const' : Prop := True
-
-/-- kernel.comp (abstract). -/
-def kernel_comp' : Prop := True
-
-/-- kernel.deterministic (abstract). -/
-def kernel_deterministic' : Prop := True
 
 /-- A Markov kernel: maps each point to a probability measure. -/
 class IsMarkovKernel' (κ : α → (β → Prop) → Nat) where
@@ -515,65 +345,17 @@ class IsFiniteKernel' (κ : α → (β → Prop) → Nat) where
 class IsSFiniteKernel' (κ : α → (β → Prop) → Nat) where
   isSigmaFinite : True
 
-/-- kernel.withDensity (abstract). -/
-def kernel_withDensity' : Prop := True
-
-/-- kernel.prod (abstract). -/
-def kernel_prod' : Prop := True
-
-/-- kernel.condDistrib (abstract). -/
-def kernel_condDistrib' : Prop := True
-
 -- ============================================================================
 -- 21. MARTINGALE DETAILS (Martingale/)
 -- ============================================================================
-
-/-- Martingale.condexp (abstract). -/
-def Martingale_condexp' : Prop := True
-
-/-- Submartingale.condexp (abstract). -/
-def Submartingale_condexp' : Prop := True
-
-/-- Martingale.add (abstract). -/
-def Martingale_add' : Prop := True
-
-/-- Martingale.neg (abstract). -/
-def Martingale_neg' : Prop := True
-
-/-- Martingale.sub (abstract). -/
-def Martingale_sub' : Prop := True
-
-/-- Submartingale of abs (abstract). -/
-def submartingale_of_abs' : Prop := True
-
-/-- maximal inequality (abstract). -/
-def maximal_inequality' : Prop := True
-
-/-- upcrossing bound (abstract). -/
-def upcrossing_bound' : Prop := True
-
-/-- Martingale convergence theorem (abstract). -/
-def martingale_convergence' : Prop := True
-
-/-- Optional stopping for martingales (abstract). -/
-def optional_stopping_martingale' : Prop := True
-
-/-- Doob decomposition (abstract). -/
-def doob_decomposition' : Prop := True
 
 -- ============================================================================
 -- 22. STOPPING TIME DETAILS (StoppingTime.lean)
 -- ============================================================================
 
-/-- IsStoppingTime: adapted to filtration (abstract). -/
-def IsStoppingTimeAdapted' : Prop := True
-
 /-- The value of a process at a stopping time. -/
 def stoppedValue' (X : Nat → α → β) (τ : α → Nat) (a : α) : β :=
   X (τ a) a
-
-/-- stoppedProcess (abstract). -/
-def stoppedProcess' : Prop := True
 
 /-- First hitting time: earliest n in [start, bound] where process enters the set. -/
 def hitting' (X : Nat → α → β) (target : β → Prop) (start bound : Nat) (a : α) : Prop :=
@@ -584,107 +366,23 @@ def hitting' (X : Nat → α → β) (target : β → Prop) (start bound : Nat) 
 -- 23. DISTRIBUTIONS (Distributions/)
 -- ============================================================================
 
-/-- Gaussian distribution (abstract). -/
-def gaussian_dist' : Prop := True
-
-/-- Gaussian PDF (abstract). -/
-def gaussian_pdf' : Prop := True
-
-/-- Gaussian hasPDF (abstract). -/
-def gaussian_hasPDF' : Prop := True
-
-/-- Uniform distribution on interval (abstract). -/
-def uniform_dist' : Prop := True
-
-/-- Uniform PDF (abstract). -/
-def uniform_pdf' : Prop := True
-
-/-- Uniform hasPDF (abstract). -/
-def uniform_hasPDF' : Prop := True
-
-/-- Exponential distribution (abstract). -/
-def exponential_dist' : Prop := True
-
 -- ============================================================================
 -- 24. PROBABILITY THEORY (ProbabilityMassFunction/)
 -- ============================================================================
-
-/-- PMF: probability mass function (abstract). -/
-def PMF' : Prop := True
-
-/-- PMF.pure (abstract). -/
-def PMF_pure' : Prop := True
-
-/-- PMF.bind (abstract). -/
-def PMF_bind' : Prop := True
-
-/-- PMF.map (abstract). -/
-def PMF_map' : Prop := True
-
-/-- PMF.support (abstract). -/
-def PMF_support' : Prop := True
-
-/-- PMF.toMeasure (abstract). -/
-def PMF_toMeasure' : Prop := True
-
-/-- PMF.bernoulli (abstract). -/
-def PMF_bernoulli' : Prop := True
-
-/-- PMF.uniform (abstract). -/
-def PMF_uniform' : Prop := True
-
-/-- PMF.ofFintype (abstract). -/
-def PMF_ofFintype' : Prop := True
 
 -- ============================================================================
 -- 25. VARIANCE AND MOMENT DETAILS (Variance.lean, Moments.lean)
 -- ============================================================================
 
-/-- variance_def: Var(X) = E[X²] - E[X]² (abstract). -/
-def variance_def' : Prop := True
-
-/-- variance_nonneg (abstract). -/
-def variance_nonneg' : Prop := True
-
-/-- variance_const_zero (abstract). -/
-def variance_const_zero' : Prop := True
-
-/-- variance_add_of_indep (abstract). -/
-def variance_add_of_indep' : Prop := True
-
-/-- moment_one_eq_expectation (abstract). -/
-def moment_one_eq_expectation' : Prop := True
-
 /-- The k-th central moment: E[(X - μ)^k]. -/
 def centralMoment' (k : Nat) (expectF : (α → Int) → Int) (X : α → Int) (mean : Int) : Int :=
   expectF (fun a => (X a - mean) ^ k)
-
-/-- mgf properties (abstract). -/
-def mgf_properties' : Prop := True
 
 -- ============================================================================
 -- 26. STRONG LAW / LIMIT THEOREMS (StrongLaw.lean, IdentDistrib.lean)
 -- ============================================================================
 
-/-- Strong law of large numbers (abstract). -/
-def strong_law' : Prop := True
-
-/-- Weak law of large numbers (abstract). -/
-def weak_law' : Prop := True
-
 /-- Two random variables are identically distributed. -/
 structure IdentDistrib' (X : α → β) (Y : α → β)
     (μ ν : (α → Prop) → Nat) where
   eq_law : ∀ S : β → Prop, μ (fun a => S (X a)) = ν (fun a => S (Y a))
-
-/-- IdentDistrib.symm (abstract). -/
-def IdentDistrib_symm' : Prop := True
-
-/-- IdentDistrib.refl (abstract). -/
-def IdentDistrib_refl' : Prop := True
-
-/-- IdentDistrib.comp (abstract). -/
-def IdentDistrib_comp' : Prop := True
-
-/-- IdentDistrib.variance_eq (abstract). -/
-def IdentDistrib_variance_eq' : Prop := True

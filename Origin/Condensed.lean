@@ -101,15 +101,6 @@ def isDiscrete_iff_locallyConstant (X : Condensed α)
     (isLocallyConst : α → Prop) : Prop :=
   IsDiscrete X isLocallyConst
 
-/-- isDiscrete_iff_isDiscrete_forget: discreteness passes through forget (abstract). -/
-def isDiscrete_iff_isDiscrete_forget (_X : Condensed α) : Prop := True
-
-/-- isDiscrete_tfae: the following are equivalent (abstract). -/
-def isDiscrete_tfae' (_X : Condensed α) : Prop := True
-
-/-- LightCondSet.discreteUnderlyingAdj (abstract). -/
-def lightDiscrete_adj : Prop := True
-
 -- ============================================================================
 -- 5. LOCALLY CONSTANT (Discrete/LocallyConstant.lean, Colimit.lean)
 -- ============================================================================
@@ -146,21 +137,12 @@ def sigmaIso' (fib : α → Type u) (total : Type u) (toSigma : total → Σ a, 
     (fromSigma : (Σ a, fib a) → total) : Prop :=
   (∀ t, fromSigma (toSigma t) = t) ∧ (∀ s, toSigma (fromSigma s) = s)
 
-/-- sigmaComparison_comp_sigmaIso (abstract). -/
-def sigmaComparison_comp_sigmaIso' : Prop := True
-
 /-- Image of the counit map at a component. -/
 def counitAppAppImage' (X : Condensed α) (reconstF : α → α) (a : α) : α := reconstF a
 
 /-- The counit map applied at a component. -/
 def counitAppApp' (X : Condensed α) (reconstF : α → α) : Condensed α :=
   ⟨reconstF X.val, X.isSheaf⟩
-
-/-- presheaf_ext: presheaves are determined by components (abstract). -/
-def presheaf_ext' : Prop := True
-
-/-- incl_of_counitAppApp (abstract). -/
-def incl_of_counitAppApp' : Prop := True
 
 /-- Homomorphism at a component of a presheaf. -/
 def componentHom' (F : Condensed α → α) (mapF : α → α) (X : Condensed α) : α :=
@@ -170,38 +152,14 @@ def componentHom' (F : Condensed α → α) (mapF : α → α) (X : Condensed α
 def functorToPresheavesIso' (F G : Condensed α → α) (to_ from_ : α → α) : Prop :=
   (∀ X, from_ (to_ (F X)) = F X) ∧ (∀ X, to_ (from_ (G X)) = G X)
 
-/-- LocallyConstant functor (abstract). -/
-def locallyConstant_functor' : Prop := True
-
-/-- LocallyConstant functorIso (abstract). -/
-def locallyConstant_functorIso' : Prop := True
-
-/-- LocallyConstant counit (abstract). -/
-def locallyConstant_counit' : Prop := True
-
-/-- LocallyConstant unit (abstract). -/
-def locallyConstant_unit' : Prop := True
-
-/-- LocallyConstant unitIso (abstract). -/
-def locallyConstant_unitIso' : Prop := True
-
-/-- LocallyConstant.adjunction (abstract). -/
-def locallyConstant_adjunction' : Prop := True
-
 -- Colimit declarations
 /-- The locally constant presheaf is a colimit of representables. -/
 def isColimitLocallyConstantPresheaf' (cocone : Nat → α) (desc : α) : Prop :=
   ∀ n, cocone n = desc
 
-/-- Colimit presheaf descent application. -/
-def isColimitLocallyConstantPresheaf_desc_apply' : Prop := True
-
 /-- The locally constant presheaf diagram forms a colimit. -/
 def isColimitLocallyConstantPresheafDiagram' (diagram : Nat → Condensed α) (colim : Condensed α) : Prop :=
   ∀ n, ∃ inj : α → α, inj (diagram n).val = colim.val
-
-/-- isColimitLocallyConstantPresheafDiagram_desc_apply (abstract). -/
-def isColimitLocallyConstantPresheafDiagram_desc_apply' : Prop := True
 
 /-- Left Kan extension presheaf: left adjoint to restriction. -/
 abbrev lanPresheaf' (F : α → Condensed α) := F
@@ -209,23 +167,11 @@ abbrev lanPresheaf' (F : α → Condensed α) := F
 /-- Extension of the Kan presheaf to a larger site. -/
 def lanPresheafExt' (F : α → Condensed α) (extF : α → Condensed α) : α → Condensed α := extF
 
-/-- lanPresheafExt_hom (abstract). -/
-def lanPresheafExt_hom' : Prop := True
-
-/-- lanPresheafExt_inv (abstract). -/
-def lanPresheafExt_inv' : Prop := True
-
 /-- Isomorphism involving the Kan presheaf. -/
 def lanPresheafIso' (F G : α → Condensed α) (iso : ∀ a, F a = G a) : Prop := ∀ a, F a = G a
 
-/-- lanPresheafIso_hom (abstract). -/
-def lanPresheafIso_hom' : Prop := True
-
 /-- Natural isomorphism of Kan presheaf functors. -/
 def lanPresheafNatIso' (F G : α → Condensed α) (η : ∀ a, F a = G a) : Prop := ∀ a, F a = G a
-
-/-- lanPresheafNatIso_hom_app (abstract). -/
-def lanPresheafNatIso_hom_app' : Prop := True
 
 /-- Left Kan extension sheaf on profinite spaces. -/
 def lanSheafProfinite' (F : α → Condensed α) : α → Condensed α := F
@@ -249,29 +195,14 @@ def yonedaPresheaf (embed : α → Condensed α) :
 def yonedaIsSheaf (embed : α → Condensed α) : Prop :=
   ∀ a, (embed a).isSheaf
 
-/-- Condensed.ulift: universe lifting (abstract). -/
-def condensed_ulift' : Prop := True
-
-/-- compHausToCondensed': intermediate functor (abstract). -/
-def compHausToCondensed'' : Prop := True
-
 /-- Functor from compact Hausdorff spaces to condensed sets. -/
 def compHausToCondensed' (embed : α → Condensed α) : α → Condensed α := embed
-
-/-- CompHaus.toCondensed: abbrev (abstract). -/
-def compHaus_toCondensed' : Prop := True
 
 /-- Functor from profinite spaces to condensed sets. -/
 def profiniteToCondensed' (embed : α → Condensed α) : α → Condensed α := embed
 
-/-- Profinite.toCondensed: abbrev (abstract). -/
-def profinite_toCondensed' : Prop := True
-
 /-- Functor from Stonean spaces to condensed sets. -/
 def stoneanToCondensed' (embed : α → Condensed α) : α → Condensed α := embed
-
-/-- Stonean.toCondensed: abbrev (abstract). -/
-def stonean_toCondensed' : Prop := True
 
 -- ============================================================================
 -- 7. LIMITS AND COLIMITS (Limits.lean)
@@ -295,12 +226,6 @@ def HasColimits (colimitF : (Nat → Condensed α) → Condensed α) : Prop :=
 def IsCondensedEpi (X Y : Condensed α) (f : CondensedHom X Y)
     (isSurj : (α → α) → Prop) : Prop :=
   isSurj f.map
-
-/-- epi_iff_locallySurjective_on_compHaus (abstract). -/
-def epi_iff_locallySurjective_on_compHaus' : Prop := True
-
-/-- epi_iff_surjective_on_stonean (abstract). -/
-def epi_iff_surjective_on_stonean' : Prop := True
 
 -- ============================================================================
 -- 9. CARTESIAN CLOSED (CartesianClosed.lean)
@@ -343,12 +268,6 @@ def ofSheafCompHaus' (val : α) (h : Prop) : Condensed α := ⟨val, h⟩
 /-- Forget the CompHaus sheaf structure. -/
 def ofSheafForgetCompHaus' (X : Condensed α) : α := X.val
 
-/-- equalizerCondition: the sheaf equalizer condition (abstract). -/
-def equalizerCondition' : Prop := True
-
-/-- equalizerCondition_profinite (abstract). -/
-def equalizerCondition_profinite' : Prop := True
-
 -- ============================================================================
 -- 11. EQUIVALENCES (Equivalence.lean)
 -- ============================================================================
@@ -358,17 +277,8 @@ def IsSiteEquivalence (F : Condensed α → Condensed α)
     (G : Condensed α → Condensed α) : Prop :=
   (∀ X, F (G X) = X) ∧ (∀ X, G (F X) = X)
 
-/-- equivalence: Stonean ≃ CompHaus condensed (abstract). -/
-def stonean_compHaus_equiv' : Prop := True
-
 /-- Stonean spaces give effective presentations of profinite spaces. -/
 def stoneanToProfiniteEffectivePresentation' (present : α → α → Prop) : α → α → Prop := present
-
-/-- isSheafProfinite (abstract). -/
-def isSheafProfinite' : Prop := True
-
-/-- isSheafStonean (abstract). -/
-def isSheafStonean' : Prop := True
 
 -- ============================================================================
 -- 12. SOLID MODULES (Solid.lean)
@@ -424,30 +334,6 @@ def freeForgetAdj (freeF : Condensed α → CondensedMod β α)
 def IsAbelian (kernelF cokernelF : CondensedMod β α → CondensedMod β α) : Prop :=
   (∀ M, ∃ k, kernelF M = k) ∧ (∀ M, ∃ c, cokernelF M = c)
 
-/-- Condensed.forget: forgetful functor (abstract). -/
-def condensed_forget' : Prop := True
-
-/-- Condensed.free: free functor (abstract). -/
-def condensed_free' : Prop := True
-
-/-- Condensed.freeForgetAdjunction (abstract). -/
-def condensed_freeForgetAdjunction' : Prop := True
-
-/-- CondensedAb: condensed abelian groups (abstract). -/
-def condensedAb' : Prop := True
-
-/-- Condensed.abForget (abstract). -/
-def condensed_abForget' : Prop := True
-
-/-- Condensed.freeAb (abstract). -/
-def condensed_freeAb' : Prop := True
-
-/-- Condensed.setAbAdjunction (abstract). -/
-def condensed_setAbAdjunction' : Prop := True
-
-/-- Module hom_naturality_apply (abstract). -/
-def condensedMod_hom_naturality_apply' : Prop := True
-
 -- ============================================================================
 -- 14. TOPOLOGICAL COMPARISON (TopCatAdjunction.lean, TopComparison.lean)
 -- ============================================================================
@@ -460,15 +346,6 @@ def IsTopCondensedAdj (toTop : Condensed α → α) (fromTop : α → Condensed 
 def IsCompactlyGeneratedEquiv (toTop : Condensed α → α)
     (fromTop : α → Condensed α) : Prop :=
   (∀ a, toTop (fromTop a) = a) ∧ (∀ X, fromTop (toTop X) = X)
-
-/-- CondensedSet.coinducingCoprod (abstract). -/
-def condensedSet_coinducingCoprod' : Prop := True
-
-/-- CondensedSet.toTopCat (abstract). -/
-def condensedSet_toTopCat' : Prop := True
-
-/-- continuous_coinducingCoprod (abstract). -/
-def continuous_coinducingCoprod' : Prop := True
 
 /-- Map between topological spaces induced by a condensed morphism. -/
 def toTopCatMap' (X Y : Condensed α) (f : CondensedHom X Y) : α → α := f.map
@@ -484,9 +361,6 @@ def topCatAdjunctionCounit' (X : Condensed α) (reconst : α → α) : Condensed
 def topCatAdjunctionCounitEquiv' (X : Condensed α) (f g : α → α)
     (hfg : ∀ a, f (g a) = a) (hgf : ∀ a, g (f a) = a) : Prop :=
   ∀ a, f (g a) = a
-
-/-- topCatAdjunctionCounit_bijective (abstract). -/
-def topCatAdjunctionCounit_bijective' : Prop := True
 
 /-- Unit of the Top-Condensed adjunction. -/
 def topCatAdjunctionUnit' (a : α) (embed : α → Condensed α) : Condensed α := embed a
@@ -513,20 +387,8 @@ def compactlyGeneratedAdjunctionCounitHomeo' (f g : α → α) (hfg : ∀ a, f (
 def compactlyGeneratedAdjunctionCounitIso' (X : Condensed α) (reconst : Condensed α → Condensed α) : Prop :=
   reconst X = X
 
-/-- factorsThrough_of_pullbackCondition (abstract). -/
-def factorsThrough_of_pullbackCondition' : Prop := True
-
-/-- equalizerCondition_yonedaPresheaf (abstract). -/
-def equalizerCondition_yonedaPresheaf' : Prop := True
-
-/-- TopCat.toSheafCompHausLike (abstract). -/
-def topCat_toSheafCompHausLike' : Prop := True
-
 /-- Functor from Top to sheaves on CompHaus-like sites. -/
 def topCatToSheafCompHausLike' (embed : α → Condensed α) : α → Condensed α := embed
-
-/-- TopCat.toCondensedSet (abstract). -/
-def topCat_toCondensedSet' : Prop := True
 
 /-- Functor from Top to condensed sets. -/
 abbrev topCatToCondensedSet' (embed : α → Condensed α) := embed
@@ -535,87 +397,22 @@ abbrev topCatToCondensedSet' (embed : α → Condensed α) := embed
 -- 15. LIGHT CONDENSED EXTRAS (Light/)
 -- ============================================================================
 
-/-- Light condensed hom_ext (abstract). -/
-def lightCondensed_hom_ext' : Prop := True
-
-/-- Light condensed hom_naturality_apply (abstract). -/
-def lightCondensed_hom_naturality_apply' : Prop := True
-
-/-- Light epi: isLocallySurjective_iff_locallySurjective_on_lightProfinite (abstract). -/
-def isLocallySurjective_iff_lightProfinite' : Prop := True
-
-/-- epi_iff_locallySurjective_on_lightProfinite (abstract). -/
-def epi_iff_locallySurjective_on_lightProfinite' : Prop := True
-
-/-- epi_π_app_zero_of_epi (abstract). -/
-def epi_pi_app_zero_of_epi' : Prop := True
-
 /-- Construct a light condensed object from a light profinite sheaf. -/
 def ofSheafLightProfinite' (val : α) (h : Prop) : LightCondensed α := ⟨val, h⟩
 
 /-- Forget the light profinite sheaf structure. -/
 def ofSheafForgetLightProfinite' (X : LightCondensed α) : α := X.val
 
-/-- Light equalizerCondition (abstract). -/
-def light_equalizerCondition' : Prop := True
-
 /-- Functor from light profinite to light condensed sets. -/
 def lightProfiniteToLightCondSet' (embed : α → LightCondensed α) : α → LightCondensed α := embed
-
-/-- LightProfinite.toCondensed (abstract). -/
-def lightProfinite_toCondensed' : Prop := True
 
 /-- The light profinite embedding is fully faithful. -/
 abbrev lightProfiniteToLightCondSetFullyFaithful' (embed : α → LightCondensed α) := embed
 
-/-- LightCondMod (abstract). -/
-def lightCondMod' : Prop := True
-
-/-- LightCondensed.forget (abstract). -/
-def lightCondensed_forget' : Prop := True
-
-/-- LightCondensed.free (abstract). -/
-def lightCondensed_free' : Prop := True
-
-/-- LightCondensed.freeForgetAdjunction (abstract). -/
-def lightCondensed_freeForgetAdjunction' : Prop := True
-
-/-- LightCondAb (abstract). -/
-def lightCondAb' : Prop := True
-
-/-- Light module hom_naturality_apply (abstract). -/
-def lightCondMod_hom_naturality_apply' : Prop := True
-
 -- Light TopCatAdjunction
-/-- Light coinducingCoprod (abstract). -/
-def light_coinducingCoprod' : Prop := True
-
-/-- Light toTopCat (abstract). -/
-def light_toTopCat' : Prop := True
-
-/-- Light continuous_coinducingCoprod (abstract). -/
-def light_continuous_coinducingCoprod' : Prop := True
-
-/-- Light toTopCatMap (abstract). -/
-def light_toTopCatMap' : Prop := True
 
 /-- Functor from light condensed sets to topological spaces. -/
 def lightCondSetToTopCat' (X : LightCondensed α) : α := X.val
-
-/-- Light topCatAdjunctionCounit (abstract). -/
-def light_topCatAdjunctionCounit' : Prop := True
-
-/-- Light topCatAdjunctionCounitEquiv (abstract). -/
-def light_topCatAdjunctionCounitEquiv' : Prop := True
-
-/-- Light topCatAdjunctionCounit_bijective (abstract). -/
-def light_topCatAdjunctionCounit_bijective' : Prop := True
-
-/-- Light topCatAdjunctionUnit (abstract). -/
-def light_topCatAdjunctionUnit' : Prop := True
-
-/-- Light topCatAdjunction (abstract). -/
-def light_topCatAdjunction' : Prop := True
 
 /-- Functor from light condensed sets to sequential spaces. -/
 def lightCondSetToSequential' (X : LightCondensed α) : α := X.val
@@ -634,21 +431,10 @@ def sequentialAdjunctionHomeo' (f g : α → α) (hfg : ∀ a, f (g a) = a) : Pr
 def sequentialAdjunctionCounitIso' (X : LightCondensed α) (reconst : LightCondensed α → LightCondensed α) : Prop :=
   reconst X = X
 
-/-- Light TopComparison: TopCat.toLightCondSet (abstract). -/
-def topCat_toLightCondSet' : Prop := True
-
 /-- Functor from Top to light condensed sets. -/
 abbrev topCatToLightCondSet' (embed : α → LightCondensed α) := embed
 
 -- Discrete/Module.lean
-/-- Discrete module functor (abstract). -/
-def discreteModule_functor' : Prop := True
-
-/-- functorIsoDiscreteAux₁ (abstract). -/
-def functorIsoDiscreteAux1' : Prop := True
-
-/-- functorIsoDiscreteAux₂ (abstract). -/
-def functorIsoDiscreteAux2' : Prop := True
 
 /-- Components of the discrete functor isomorphism. -/
 def functorIsoDiscreteComponents' (F G : α → Condensed α) (η : ∀ a, F a = G a) : Prop := ∀ a, F a = G a
@@ -656,9 +442,6 @@ def functorIsoDiscreteComponents' (F G : α → Condensed α) (η : ∀ a, F a =
 /-- Isomorphism between functor and discrete. -/
 def functorIsoDiscrete' (F : α → Condensed α) (disc : α → Condensed α)
     (iso : ∀ a, F a = disc a) : Prop := ∀ a, F a = disc a
-
-/-- Discrete module adjunction (abstract). -/
-def discreteModule_adjunction' : Prop := True
 
 /-- A fully faithful functor: injective and surjective on morphisms. -/
 def fullyFaithfulFunctor' (F : α → β) (injective : ∀ a b, F a = F b → a = b)

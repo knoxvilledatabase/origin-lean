@@ -270,12 +270,10 @@ def IsAkraBazziSolution (_T : Nat → Nat) (_g : Nat → Nat)
     (_p : Nat) : Prop :=
   True  -- abstracted; full statement involves integral condition
 
-
 /-- Partial function composition preserves undefinedness. -/
 theorem pfun_comp_none (g : PFun' β γ) :
     PFun'.comp g (fun (_ : α) => none) = fun _ => (none : Option γ) := by
   funext a; simp [PFun'.comp]
-
 
 -- ============================================================================
 -- 14. ACKERMANN PROPERTIES (Ackermann.lean)
@@ -302,12 +300,6 @@ def ack_three' : Prop := True  -- abstracted
 /-- ack is always positive. -/
 def ack_pos' : Prop := ∀ m n, ack m n > 0
 
-/-- 1 < ack (m+1) n (abstract). -/
-def one_lt_ack_succ_left' : Prop := True
-
-/-- 1 < ack m (n+1) (abstract). -/
-def one_lt_ack_succ_right' : Prop := True
-
 /-- ack is strictly monotone in the right argument (abstract). -/
 def ack_strictMono_right' : Prop := ∀ m, ∀ n₁ n₂, n₁ < n₂ → ack m n₁ < ack m n₂
 
@@ -317,35 +309,8 @@ def ack_mono_right' : Prop := ∀ m, ∀ n₁ n₂, n₁ ≤ n₂ → ack m n₁
 /-- ack is injective in the right argument (abstract). -/
 def ack_injective_right' : Prop := ∀ m n₁ n₂, ack m n₁ = ack m n₂ → n₁ = n₂
 
-/-- ack m n < ack m n' ↔ n < n' (abstract). -/
-def ack_lt_iff_right' : Prop := True
-
-/-- ack m n ≤ ack m n' ↔ n ≤ n' (abstract). -/
-def ack_le_iff_right' : Prop := True
-
-/-- ack m n < ack (m+1) n (abstract). -/
-def ack_lt_ack_succ_left' : Prop := True
-
 /-- n < ack m n (abstract). -/
 def lt_ack_right' : Prop := ∀ m n, n < ack m n
-
-/-- ack strictly monotone in left argument (abstract). -/
-def ack_strictMono_left' : Prop := True
-
-/-- ack m n ≤ ack (m+k) n (abstract). -/
-def ack_mono_left' : Prop := True
-
-/-- add is bounded by ack (abstract). -/
-def add_lt_ack' : Prop := True
-
-/-- mul is bounded by ack (abstract). -/
-def mul_lt_ack' : Prop := True
-
-/-- pow is bounded by ack (abstract). -/
-def pow_lt_ack' : Prop := True
-
-/-- ack bounds all primitive recursive functions (abstract). -/
-def ack_bounds_primrec' : Prop := True
 
 -- ============================================================================
 -- 15. DFA OPERATIONS (DFA.lean)
@@ -377,12 +342,6 @@ def DFA.toNFA (M : DFA α σ) : NFA α σ where
   start s := s = M.start
   accept := M.accept
 
-/-- DFA.map: remap alphabet (abstract). -/
-def DFA.map' : Prop := True
-
-/-- DFA.comap: pullback along alphabet map (abstract). -/
-def DFA.comap' : Prop := True
-
 -- ============================================================================
 -- 16. NFA OPERATIONS (NFA.lean)
 -- ============================================================================
@@ -395,12 +354,6 @@ def NFA.stepSet (M : NFA α σ) (states : σ → Prop) (a : α) : σ → Prop :=
 def NFA.accepts' (M : NFA α σ) (w : List α) : Prop :=
   ∃ s, M.accept s ∧ (w.foldl (fun acc a => NFA.stepSet M acc a) M.start) s
 
-/-- NFA.toDFA: subset construction (abstract). -/
-def NFA.toDFA' : Prop := True
-
-/-- NFA.map: remap alphabet (abstract). -/
-def NFA.map' : Prop := True
-
 -- ============================================================================
 -- 17. EPSILON NFA OPERATIONS (EpsilonNFA.lean)
 -- ============================================================================
@@ -409,27 +362,9 @@ def NFA.map' : Prop := True
 def EpsilonNFA.eClosure (M : EpsilonNFA α σ) (states : σ → Prop) : σ → Prop :=
   fun s' => states s' ∨ ∃ s, states s ∧ M.epsilon s s'
 
-/-- εNFA to NFA: eliminate epsilon transitions (abstract). -/
-def EpsilonNFA.toNFA' : Prop := True
-
-/-- εNFA.toDFA (abstract). -/
-def EpsilonNFA.toDFA' : Prop := True
-
-/-- εNFA.map (abstract). -/
-def EpsilonNFA.map' : Prop := True
-
 -- ============================================================================
 -- 18. REGULAR EXPRESSION OPERATIONS (RegularExpressions.lean)
 -- ============================================================================
-
-/-- RegExp to εNFA (abstract). -/
-def RegExp.toEpsilonNFA' : Prop := True
-
-/-- RegExp.matches' = εNFA.accepts (abstract). -/
-def RegExp.correctness' : Prop := True
-
-/-- RegExp pumping lemma (abstract). -/
-def RegExp.pumpingLemma' : Prop := True
 
 -- ============================================================================
 -- 19. CONTEXT-FREE GRAMMAR DETAILS (ContextFreeGrammar.lean)
@@ -448,24 +383,6 @@ inductive Rewrites' {T N : Type u} (r : ContextFreeRule' T N) :
   | cons (x : T ⊕ N) {s₁ s₂ : List (T ⊕ N)} :
       Rewrites' r s₁ s₂ → Rewrites' r (x :: s₁) (x :: s₂)
 
-/-- Rewrites.exists_parts (abstract). -/
-def Rewrites_exists_parts' : Prop := True
-
-/-- Rewrites.input_output (abstract). -/
-def Rewrites_input_output' : Prop := True
-
-/-- rewrites_of_exists_parts (abstract). -/
-def rewrites_of_exists_parts' : Prop := True
-
-/-- rewrites_iff (abstract). -/
-def rewrites_iff' : Prop := True
-
-/-- Rewrites.append_left (abstract). -/
-def Rewrites_append_left' : Prop := True
-
-/-- Rewrites.append_right (abstract). -/
-def Rewrites_append_right' : Prop := True
-
 /-- Produces: some rule in the list rewrites u to v. -/
 def Produces' {T N : Type u} (rules : List (ContextFreeRule' T N))
     (u v : List (T ⊕ N)) : Prop :=
@@ -477,29 +394,14 @@ inductive Derives' {T N : Type u} (rules : List (ContextFreeRule' T N)) :
   | refl (w : List (T ⊕ N)) : Derives' rules w w
   | step {u v w} : Produces' rules u v → Derives' rules v w → Derives' rules u w
 
-/-- CFG.language (abstract). -/
-def CFG_language' : Prop := True
-
-/-- Derives.refl (abstract). -/
-def Derives_refl' : Prop := True
-
-/-- Produces.single (abstract). -/
-def Produces_single' : Prop := True
-
-/-- Derives.trans (abstract). -/
-def Derives_trans' : Prop := True
-
 -- ============================================================================
 -- 20. AKRA-BAZZI DETAILS (AkraBazzi/)
 -- ============================================================================
 
 /-- An Akra-Bazzi divide-and-conquer recurrence. -/
 structure AkraBazziRecurrence' where
-  /-- Base case threshold. -/
   n₀ : Nat
-  /-- n₀ is positive. -/
   n₀_pos : 0 < n₀
-  /-- Number of subproblems. -/
   numTerms : Nat
 
 /-- Predicate: i achieves the minimum of b over all indices. -/
@@ -510,76 +412,10 @@ def min_bi' (b : α → Nat) (i : α) : Prop :=
 def max_bi' (b : α → Nat) (i : α) : Prop :=
   ∀ j : α, b j ≤ b i
 
-/-- isLittleO_self_div_log_id (abstract). -/
-def isLittleO_self_div_log_id' : Prop := True
-
-/-- GrowsPolynomially properties (abstract). -/
-def growsPolynomially_congr' : Prop := True
-
-/-- growsPolynomially_const (abstract). -/
-def growsPolynomially_const' : Prop := True
-
-/-- growsPolynomially_neg (abstract). -/
-def growsPolynomially_neg' : Prop := True
-
-/-- growsPolynomially_abs (abstract). -/
-def growsPolynomially_abs' : Prop := True
-
-/-- growsPolynomially_norm (abstract). -/
-def growsPolynomially_norm' : Prop := True
-
-/-- growsPolynomially_sum (abstract). -/
-def growsPolynomially_sum' : Prop := True
-
-/-- growsPolynomially_mul (abstract). -/
-def growsPolynomially_mul' : Prop := True
-
-/-- growsPolynomially_pow (abstract). -/
-def growsPolynomially_pow' : Prop := True
-
 -- ============================================================================
 -- 21. ENCODING DETAILS (Encoding.lean)
 -- ============================================================================
 
-/-- Encoding.ofLeft: encode sum via left injection (abstract). -/
-def Encoding_ofLeft' : Prop := True
-
-/-- Encoding.ofRight: encode sum via right injection (abstract). -/
-def Encoding_ofRight' : Prop := True
-
-/-- Encoding.finEncoding: encoding with a finite alphabet (abstract). -/
-def Encoding_finEncoding' : Prop := True
-
 -- ============================================================================
 -- 22. PRIMREC DETAILS (Primrec.lean)
 -- ============================================================================
-
-/-- Primrec.add (abstract). -/
-def primrec_add' : Prop := True
-
-/-- Primrec.mul (abstract). -/
-def primrec_mul' : Prop := True
-
-/-- Primrec.pair (abstract). -/
-def primrec_pair' : Prop := True
-
-/-- Primrec.fst (abstract). -/
-def primrec_fst' : Prop := True
-
-/-- Primrec.snd (abstract). -/
-def primrec_snd' : Prop := True
-
-/-- Primrec.pred (abstract). -/
-def primrec_pred' : Prop := True
-
-/-- Primrec.sub (abstract). -/
-def primrec_sub' : Prop := True
-
-/-- Primrec.pow (abstract). -/
-def primrec_pow' : Prop := True
-
-/-- Primrec.ite (abstract). -/
-def primrec_ite' : Prop := True
-
-/-- Primrec.list_length (abstract). -/
-def primrec_list_length' : Prop := True

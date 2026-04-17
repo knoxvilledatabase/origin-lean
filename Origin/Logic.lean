@@ -753,7 +753,6 @@ theorem nonempty_sum_logic :
   ⟨fun ⟨x⟩ => match x with | .inl a => Or.inl ⟨a⟩ | .inr b => Or.inr ⟨b⟩,
    fun h => h.elim (fun ⟨a⟩ => ⟨.inl a⟩) (fun ⟨b⟩ => ⟨.inr b⟩)⟩
 
-/-- Classical.arbitrary: any nonempty type has an element. -/
 noncomputable def arbitrary_logic [Nonempty α] : α :=
   Classical.choice ‹_›
 
@@ -1027,7 +1026,6 @@ def EncodableL.option (e : EncodableL α) : EncodableL (Option α) where
 structure DenumerableL (α : Type u) extends EncodableL α where
   decode_inv : ∀ n, ∃ a, toEncodableL.decode n = some a
 
-/-- ofNat: get the n-th element of a denumerable type. -/
 noncomputable def DenumerableL.ofNat (d : DenumerableL α) (n : Nat) : α :=
   (d.decode_inv n).choose
 

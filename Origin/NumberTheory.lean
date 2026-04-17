@@ -252,8 +252,6 @@ theorem nt_val_option [Mul α] [Add α] (vpF : α → α)
     Option.map vpF (some a * some b) =
     Option.map vpF (some a) + Option.map vpF (some b) := by simp [h]
 
-
-
 -- ============================================================================
 -- 15. ARITHMETIC FUNCTIONS (ArithmeticFunction.lean)
 -- ============================================================================
@@ -261,50 +259,14 @@ theorem nt_val_option [Mul α] [Add α] (vpF : α → α)
 /-- An arithmetic function: a function from ℕ. -/
 def ArithmeticFunction' (α : Type u) := Nat → α
 
-/-- map_zero for arithmetic functions (abstract). -/
-def arithFunc_map_zero' : Prop := True
-
-/-- one_apply_ne (abstract). -/
-def arithFunc_one_apply_ne' : Prop := True
-
 /-- Embed a Nat function as an arithmetic function. -/
 def natToArithmeticFunction' (f : Nat → Nat) : ArithmeticFunction' Nat := f
-
-/-- zeta function: ζ(n) = 1 for n > 0 (abstract). -/
-def arithFunc_zeta' : Prop := True
-
-/-- zeta_apply_ne (abstract). -/
-def arithFunc_zeta_apply_ne' : Prop := True
-
-/-- Dirichlet convolution: (f * g)(n) = Σ_{d|n} f(d)g(n/d) (abstract). -/
-def dirichletConvolution' : Prop := True
-
-/-- pmul: pointwise multiplication (abstract). -/
-def arithFunc_pmul' : Prop := True
-
-/-- ppow: pointwise power (abstract). -/
-def arithFunc_ppow' : Prop := True
-
-/-- Möbius function μ (abstract). -/
-def mobiusFunction' : Prop := True
-
-/-- Möbius inversion (abstract). -/
-def mobiusInversion' : Prop := True
-
-/-- Euler's totient φ (abstract). -/
-def eulerTotient' : Prop := True
-
-/-- σ_k: divisor sum function (abstract). -/
-def divisorSumFunction' : Prop := True
 
 /-- Von Mangoldt function Λ(n): log p if n = p^k, else 0. -/
 def vonMangoldt' (isPrimePower : Nat → Option Nat) (logF : Nat → Nat) : Nat → Nat :=
   fun n => match isPrimePower n with
   | some p => logF p
   | none => 0
-
-/-- isMultiplicative (abstract). -/
-def isMultiplicative' : Prop := True
 
 /-- Ω(n): number of prime factors with multiplicity. -/
 def cardFactors' (factorize : Nat → List Nat) (n : Nat) : Nat :=
@@ -322,39 +284,9 @@ def cardDistinctFactors' (factorize : Nat → List Nat) (n : Nat) : Nat :=
 def Admissible_ADE (p q r : Nat) : Prop :=
   p > 0 ∧ q > 0 ∧ r > 0
 
-/-- sumInv for ADE classification. -/
-def sumInv_ADE (_p _q _r : Nat) : Prop := True
-
-/-- A' type (abstract). -/
-def ADE_A' : Prop := True
-
-/-- D' type (abstract). -/
-def ADE_D' : Prop := True
-
-/-- E6 type (abstract). -/
-def ADE_E6' : Prop := True
-
-/-- E7 type (abstract). -/
-def ADE_E7' : Prop := True
-
-/-- E8 type (abstract). -/
-def ADE_E8' : Prop := True
-
-/-- classification: only A, D, E types are admissible (abstract). -/
-def ADE_classification' : Prop := True
-
 -- ============================================================================
 -- 17. ABEL SUMMATION (AbelSummation.lean)
 -- ============================================================================
-
-/-- Abel summation formula (abstract). -/
-def abelSummation' : Prop := True
-
-/-- sum_mul_eq_sub_sub_integral_mul (abstract). -/
-def sum_mul_eq_sub_integral' : Prop := True
-
-/-- sum_mul_eq_sub_integral_mul (abstract). -/
-def sum_mul_eq_sub_integral_mul' : Prop := True
 
 -- ============================================================================
 -- 18. L-SERIES (LSeries/)
@@ -364,64 +296,13 @@ def sum_mul_eq_sub_integral_mul' : Prop := True
 def LSeries' (termF : Nat → α) (sumF : (Nat → α) → α) : α :=
   sumF termF
 
-/-- LSeries.term (abstract). -/
-def LSeries_term' : Prop := True
-
-/-- LSeries.hasSum (abstract). -/
-def LSeries_hasSum' : Prop := True
-
-/-- LSeries.abscissaOfAbsConv (abstract). -/
-def LSeries_abscissaOfAbsConv' : Prop := True
-
-/-- Riemann zeta as L-series (abstract). -/
-def riemannZeta_LSeries' : Prop := True
-
-/-- DirichletCharacter L-series (abstract). -/
-def dirichletCharacter_LSeries' : Prop := True
-
-/-- LSeries product formula (abstract). -/
-def LSeries_product' : Prop := True
-
-/-- LSeries convergence (abstract). -/
-def LSeries_convergence' : Prop := True
-
 -- ============================================================================
 -- 19. BERNOULLI NUMBERS (Bernoulli.lean)
 -- ============================================================================
 
-/-- Bernoulli numbers B_n (abstract). -/
-def bernoulliNumber' : Prop := True
-
-/-- bernoulli_spec (abstract). -/
-def bernoulli_spec' : Prop := True
-
-/-- bernoulli_zero (abstract). -/
-def bernoulli_zero' : Prop := True
-
-/-- bernoulli_one (abstract). -/
-def bernoulli_one' : Prop := True
-
-/-- sum_bernoulli (abstract). -/
-def sum_bernoulli' : Prop := True
-
-/-- Bernoulli polynomials (abstract). -/
-def bernoulliPoly' : Prop := True
-
 -- ============================================================================
 -- 20. LEGENDRE SYMBOL (LegendreSymbol/)
 -- ============================================================================
-
-/-- Legendre symbol (a/p) (abstract). -/
-def legendreSymbol' : Prop := True
-
-/-- legendreSym.quadReciprocity (abstract). -/
-def quadReciprocity' : Prop := True
-
-/-- Jacobi symbol (abstract). -/
-def jacobiSymbol' : Prop := True
-
-/-- jacobiSym.quadReciprocity (abstract). -/
-def jacobiSym_quadReciprocity' : Prop := True
 
 /-- Gauss sum τ(χ) = Σ χ(a) · ζ^a. -/
 def gaussSum' [Mul α] (chi rootOfUnity : Nat → α) (sumF : List α → α) (q : Nat) : α :=
@@ -441,31 +322,13 @@ structure ModularForm' (k : Int) where
 class SlashAction' (γ : Type u) (α : Type u) where
   slash : γ → α → α
 
-/-- ModularForm.add (abstract). -/
-def ModularForm_add' : Prop := True
-
-/-- ModularForm.mul (abstract). -/
-def ModularForm_mul' : Prop := True
-
 /-- A cusp form: modular form vanishing at all cusps. -/
 structure CuspForm' (k : Int) extends ModularForm' k where
   vanishesAtCusps : Prop
 
-/-- EisensteinSeries (abstract). -/
-def EisensteinSeries' : Prop := True
-
-/-- ModularForm.isBounded (abstract). -/
-def ModularForm_isBounded' : Prop := True
-
 -- ============================================================================
 -- 22. CYCLOTOMIC (Cyclotomic/)
 -- ============================================================================
-
-/-- Cyclotomic polynomial Φ_n (abstract). -/
-def cyclotomic' : Prop := True
-
-/-- cyclotomic.irreducible (abstract). -/
-def cyclotomic_irreducible' : Prop := True
 
 /-- A cyclotomic extension: contains a primitive n-th root of unity. -/
 class IsCyclotomicExtension' (n : Nat) (K : Type u) where
@@ -473,12 +336,6 @@ class IsCyclotomicExtension' (n : Nat) (K : Type u) where
 
 /-- The n-th cyclotomic field: ℚ adjoined a primitive n-th root. -/
 def CyclotomicField' (n : Nat) (K : Type u) := K
-
-/-- zeta: primitive root of unity (abstract). -/
-def cyclotomic_zeta' : Prop := True
-
-/-- discr: discriminant of cyclotomic field (abstract). -/
-def cyclotomic_discr' : Prop := True
 
 -- ============================================================================
 -- 23. NUMBER FIELD (NumberField/)
@@ -498,15 +355,6 @@ def classNumber' (cn : Nat) : Prop := cn > 0
 /-- The regulator: covolume of the unit group in log-embedding space. -/
 def regulator' (reg : Nat) : Prop := reg > 0
 
-/-- discriminant (abstract). -/
-def numberField_discriminant' : Prop := True
-
-/-- Dirichlet's unit theorem (abstract). -/
-def dirichlet_unit_theorem' : Prop := True
-
-/-- Minkowski bound (abstract). -/
-def minkowski_bound' : Prop := True
-
 -- ============================================================================
 -- 24. DIRICHLET CHARACTERS (DirichletCharacter/)
 -- ============================================================================
@@ -514,24 +362,9 @@ def minkowski_bound' : Prop := True
 /-- A Dirichlet character mod q: a multiplicative function (ℤ/qℤ)× → α. -/
 abbrev DirichletCharacter' (q : Nat) := Nat → Int
 
-/-- isPrimitive (abstract). -/
-def DirichletCharacter_isPrimitive' : Prop := True
-
-/-- conductor (abstract). -/
-def DirichletCharacter_conductor' : Prop := True
-
-/-- DirichletCharacter.mul (abstract). -/
-def DirichletCharacter_mul' : Prop := True
-
 -- ============================================================================
 -- 25. SUM OF SQUARES (SumOfSquares/)
 -- ============================================================================
-
-/-- Sum of two squares theorem (abstract). -/
-def sumTwoSquares' : Prop := True
-
-/-- Sum of four squares (Lagrange) (abstract). -/
-def sumFourSquares' : Prop := True
 
 -- ============================================================================
 -- 26. PADIC (Padics/)
@@ -547,40 +380,13 @@ def Padic' (p : Nat) := Int
 def padicNorm' (p : Nat) (vpF : Int → Int) (x : Int) : Nat :=
   p ^ (vpF x).toNat
 
-/-- padic valuation (abstract). -/
-def padicValuation' : Prop := True
-
-/-- Hensel's lemma (abstract). -/
-def hensel' : Prop := True
-
 -- ============================================================================
 -- 27. CONTINUED FRACTIONS (ContinuedFractions/)
 -- ============================================================================
 
-/-- Generalized continued fraction (abstract). -/
-def GenContFract' : Prop := True
-
-/-- convergents (abstract). -/
-def convergents' : Prop := True
-
-/-- convergents_eq (abstract). -/
-def convergents_eq' : Prop := True
-
-/-- GenContFract.of: from a real number (abstract). -/
-def GenContFract_of' : Prop := True
-
 -- ============================================================================
 -- 28. PRIMALITY (Primality/)
 -- ============================================================================
-
-/-- MinFac: smallest prime factor (abstract). -/
-def MinFac' : Prop := True
-
-/-- Lucas primality test (abstract). -/
-def lucasPrimality' : Prop := True
-
-/-- Fermat primality (abstract). -/
-def fermatPrimality' : Prop := True
 
 -- ============================================================================
 -- 29. FLT AND CLASSICAL RESULTS
@@ -590,15 +396,3 @@ def fermatPrimality' : Prop := True
 def FermatLastTheorem' : Prop :=
   ∀ n : Nat, n ≥ 3 → ∀ x y z : Nat, x > 0 → y > 0 → z > 0 →
     x ^ n + y ^ n ≠ z ^ n
-
-/-- Wilson's theorem: (p-1)! ≡ -1 mod p (abstract). -/
-def wilsonTheorem' : Prop := True
-
-/-- Chinese Remainder Theorem (abstract). -/
-def chineseRemainder' : Prop := True
-
-/-- Chevalley-Warning theorem (abstract). -/
-def chevalleyWarning' : Prop := True
-
-/-- Bertrand's postulate (abstract). -/
-def bertrandPostulate' : Prop := True

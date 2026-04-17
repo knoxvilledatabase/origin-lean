@@ -47,57 +47,6 @@ def Representation.dual (ρ : Representation G α)
 def Representation.IsTrivial' (ρ : Representation G α) : Prop :=
   ∀ g x, ρ.act g x = x
 
-/-- asAlgebraHom: represent as algebra homomorphism (abstract). -/
-def Representation.asAlgebraHom' (_ρ : Representation G α) : Prop := True
-
-/-- asAlgebraHom_single (abstract). -/
-def Representation.asAlgebraHom_single' (_ρ : Representation G α) : Prop := True
-
-/-- asAlgebraHom_of (abstract). -/
-def Representation.asAlgebraHom_of' (_ρ : Representation G α) : Prop := True
-
-/-- asModule: view as module over group algebra (abstract). -/
-def Representation.asModule' (_ρ : Representation G α) : Prop := True
-
-/-- asModuleEquiv: equivalence with module (abstract). -/
-def Representation.asModuleEquiv' (_ρ : Representation G α) : Prop := True
-
-/-- asModuleEquiv_symm_map_smul (abstract). -/
-def Representation.asModuleEquiv_symm_map_smul' (_ρ : Representation G α) : Prop := True
-
-/-- asModuleEquiv_symm_map_rho (abstract). -/
-def Representation.asModuleEquiv_symm_map_rho' (_ρ : Representation G α) : Prop := True
-
-/-- ofModule': construct from module (abstract). -/
-def Representation.ofModule'' : Prop := True
-
-/-- ofModule: construct from module (abstract). -/
-def Representation.ofModule' : Prop := True
-
-/-- ofModule_asAlgebraHom_apply_apply (abstract). -/
-def Representation.ofModule_asAlgebraHom' : Prop := True
-
-/-- ofModule_asModule_act (abstract). -/
-def Representation.ofModule_asModule_act' : Prop := True
-
-/-- smul_ofModule_asModule (abstract). -/
-def Representation.smul_ofModule_asModule' : Prop := True
-
-/-- ofMulAction_single (abstract). -/
-def Representation.ofMulAction_single' : Prop := True
-
-/-- ofDistribMulAction (abstract). -/
-def Representation.ofDistribMulAction' : Prop := True
-
-/-- ofMulAction (abstract). -/
-def Representation.ofMulAction' : Prop := True
-
-/-- ofAlgebraAut (abstract). -/
-def Representation.ofAlgebraAut' : Prop := True
-
-/-- ofMulDistribMulAction (abstract). -/
-def Representation.ofMulDistribMulAction' : Prop := True
-
 -- ============================================================================
 -- 2. ACTIONS (Action/Basic.lean, Concrete.lean)
 -- ============================================================================
@@ -131,15 +80,6 @@ structure ActionHom (A B : Action G α) where
   map : α → α
   comm : ∀ g x, map (A.act g x) = B.act g (map x)
 
-/-- ActionHom: hom_inv_hom (abstract). -/
-def ActionHom.hom_inv_hom' {A B : Action G α} (_f : ActionHom A B) : Prop := True
-
-/-- ActionHom: inv_hom_hom (abstract). -/
-def ActionHom.inv_hom_hom' {A B : Action G α} (_f : ActionHom A B) : Prop := True
-
-/-- mkIso: construct isomorphism of actions (abstract). -/
-def Action.mkIso' (_A _B : Action G α) : Prop := True
-
 /-- Identity action morphism. -/
 def ActionHom.id (A : Action G α) : ActionHom A A where
   map := fun a => a
@@ -161,57 +101,7 @@ def Action.ofMulAction [Mul G] (e : α) (smul : G → α → α) : Action G α w
   obj := e
   act := smul
 
-/-- Action.functor: the forgetful functor to underlying objects (abstract). -/
-def Action.functor' : Prop := True
-
-/-- Action.inverse: the inverse functor (abstract). -/
-def Action.inverse' : Prop := True
-
-/-- Action.unitIso: unit of equivalence (abstract). -/
-def Action.unitIso' : Prop := True
-
-/-- Action.counitIso: counit of equivalence (abstract). -/
-def Action.counitIso' : Prop := True
-
-/-- Action.functorCategoryEquivalence (abstract). -/
-def Action.functorCategoryEquivalence' : Prop := True
-
-/-- Action.forget: forgetful functor (abstract). -/
-def Action.forget' : Prop := True
-
-/-- Action.functorCategoryEquivalenceCompEvaluation (abstract). -/
-def Action.functorCategoryEquivalenceCompEvaluation' : Prop := True
-
-/-- Iso.conj_ρ (abstract). -/
-def Action.iso_conj_rho' : Prop := True
-
-/-- actionPunitEquivalence (abstract). -/
-def Action.punitEquivalence' : Prop := True
-
-/-- resId: restriction along id (abstract). -/
-def Action.resId' : Prop := True
-
-/-- resComp: restriction along composition (abstract). -/
-def Action.resComp' : Prop := True
-
 -- Action/Concrete.lean
-/-- ofMulActionLimitCone (abstract). -/
-def Action.ofMulActionLimitCone' : Prop := True
-
-/-- diagonalOneIsoLeftRegular (abstract). -/
-def Action.diagonalOneIsoLeftRegular' : Prop := True
-
-/-- toEndHom: map to endomorphism (abstract). -/
-def Action.toEndHom' : Prop := True
-
-/-- toEndHom_trivial_of_mem (abstract). -/
-def Action.toEndHom_trivial_of_mem' : Prop := True
-
-/-- quotientToEndHom (abstract). -/
-def Action.quotientToEndHom' : Prop := True
-
-/-- quotientToQuotientOfLE (abstract). -/
-def Action.quotientToQuotientOfLE' : Prop := True
 
 -- ============================================================================
 -- 3. CONTINUOUS ACTIONS (Action/Continuous.lean)
@@ -264,12 +154,6 @@ def IsSubrepresentation (act : G → α → α) (mem : α → Prop) : Prop :=
 def average [Add α] (act : G → α → α) (elements : List G) (x : α) : α :=
   (elements.map (fun g => act g x)).foldl (· + ·) x
 
-/-- invariants: the invariant submodule (abstract). -/
-def invariants' (_act : G → α → α) : Prop := True
-
-/-- invariantsEquivLinHom: Hom(k, V) ≅ V^G (abstract). -/
-def invariantsEquivLinHom' : Prop := True
-
 -- ============================================================================
 -- 6. CHARACTERS (Character.lean)
 -- ============================================================================
@@ -286,21 +170,6 @@ def IsClassFunction [Mul G] [Neg G] (χ : G → α) : Prop :=
 def AreOrthogonal (innerF : (G → α) → (G → α) → α) (zero : α)
     (χ₁ χ₂ : G → α) : Prop :=
   χ₁ ≠ χ₂ → innerF χ₁ χ₂ = zero
-
-/-- char_mul_comm: character is multiplicative on commuting elements (abstract). -/
-def char_mul_comm' : Prop := True
-
-/-- char_orthonormal: characters form an orthonormal basis (abstract). -/
-def char_orthonormal' : Prop := True
-
-/-- FDChar: character of a finite-dimensional representation (abstract). -/
-def fdChar' : Prop := True
-
-/-- char_tensor: character of tensor product (abstract). -/
-def char_tensor' : Prop := True
-
-/-- char_iso: isomorphic reps have equal characters (abstract). -/
-def char_iso' : Prop := True
 
 -- ============================================================================
 -- 7. IRREDUCIBILITY AND SCHUR'S LEMMA (FDRep.lean)
@@ -323,12 +192,6 @@ def IsFiniteDimensional (_ρ : Representation G α) (dim : Nat) : Prop :=
 
 /-- Finite-dimensional representations. -/
 abbrev FDRep' (G k : Type u) := Representation G k
-
-/-- FDRep.forget₂: forget to underlying module (abstract). -/
-def FDRep_forget2' : Prop := True
-
-/-- FDRep.instLinearOrder: ordering on FDReps (abstract). -/
-def FDRep_linearOrder' : Prop := True
 
 -- ============================================================================
 -- 8. MASCHKE'S THEOREM (Maschke.lean)
@@ -381,18 +244,7 @@ def groupCohomology' (n : Nat) (cocycleF coboundaryF : Cochain n G α → Prop) 
 /-- Inhomogeneous cochains: functions G^n → M. -/
 abbrev inhomogeneousCochains' (n : Nat) (G α : Type u) := Cochain n G α
 
-/-- isoInhomogeneousCochains (abstract). -/
-def isoInhomogeneousCochains' : Prop := True
-
 -- LowDegree.lean
-/-- H0: zeroth cohomology (abstract). -/
-def H0_module' : Prop := True
-
-/-- H1: first cohomology (abstract). -/
-def H1_module' : Prop := True
-
-/-- H2: second cohomology (abstract). -/
-def H2_module' : Prop := True
 
 /-- Z¹: 1-cocycles (crossed homomorphisms). -/
 def oneCocycles' [Mul G] [Add α] (act : G → α → α) : (G → α) → Prop :=
@@ -431,12 +283,6 @@ def isoTwoCocycles' [Mul G] [Add α] (act : G → α → α) : (G → G → α) 
 def IsHilbert90 [Mul G] [Add α] [Neg α] (act : G → α → α) : Prop :=
   ∀ f : G → α, IsCrossedHom act f → IsPrincipal act f
 
-/-- isMulOneCocycle: multiplicative 1-cocycle (abstract). -/
-def isMulOneCocycle' : Prop := True
-
-/-- hilbert90: the concrete statement (abstract). -/
-def hilbert90' : Prop := True
-
 -- ============================================================================
 -- 11. MONOIDAL STRUCTURE (Action/Monoidal.lean)
 -- ============================================================================
@@ -456,18 +302,6 @@ def IsBraidedRep (swap : α × β → β × α) (ρ₁ : Representation G α)
     (ρ₂ : Representation G β) : Prop :=
   ∀ g (a : α) (b : β), swap (ρ₁.act g a, ρ₂.act g b) =
     (ρ₂.act g (swap (a, b)).1, ρ₁.act g (swap (a, b)).2)
-
-/-- tensorUnitIso: unit for monoidal structure (abstract). -/
-def Action.tensorUnitIso' : Prop := True
-
-/-- leftDual_ρ: left dual action (abstract). -/
-def Action.leftDual_rho' : Prop := True
-
-/-- leftRegularTensorIso (abstract). -/
-def Action.leftRegularTensorIso' : Prop := True
-
-/-- diagonalSucc: diagonal of n+1 copies (abstract). -/
-def Action.diagonalSucc' : Prop := True
 
 -- ============================================================================
 -- 12. LIMITS AND COLIMITS (Action/Limits.lean)
@@ -489,36 +323,6 @@ def HasActionColimits
 def ForgetPreservesLimits
     (_forget : Action G α → α) : Prop := True
 
-/-- SingleObj.preservesLimit (abstract). -/
-def SingleObj_preservesLimit' : Prop := True
-
-/-- preservesLimit_of_preserves (abstract). -/
-def preservesLimit_of_preserves' : Prop := True
-
-/-- preservesLimitsOfShape_of_preserves (abstract). -/
-def preservesLimitsOfShape_of_preserves' : Prop := True
-
-/-- preservesLimitsOfSize_of_preserves (abstract). -/
-def preservesLimitsOfSize_of_preserves' : Prop := True
-
-/-- SingleObj.preservesColimit (abstract). -/
-def SingleObj_preservesColimit' : Prop := True
-
-/-- preservesColimit_of_preserves (abstract). -/
-def preservesColimit_of_preserves' : Prop := True
-
-/-- preservesColimitsOfShape_of_preserves (abstract). -/
-def preservesColimitsOfShape_of_preserves' : Prop := True
-
-/-- preservesColimitsOfSize_of_preserves (abstract). -/
-def preservesColimitsOfSize_of_preserves' : Prop := True
-
-/-- sum_hom: sum morphism (abstract). -/
-def Action.sum_hom' : Prop := True
-
-/-- abelianAux: auxiliary for abelian structure (abstract). -/
-def Action.abelianAux' : Prop := True
-
 -- ============================================================================
 -- 13. PROJECTIVE RESOLUTIONS (GroupCohomology/Resolution.lean)
 -- ============================================================================
@@ -533,9 +337,6 @@ def IsProjectiveResolution (chain : Nat → α) (d : Nat → α → α)
 def projectiveResolution' (n : Nat) (G α : Type u) : Type u :=
   (Fin (n + 1) → G) → α
 
-/-- forget₂ToModuleCatObj (abstract). -/
-def forget2ToModuleCatObj' : Prop := True
-
 -- ============================================================================
 -- 14. LINREP AND FDLINREP (LinHom.lean)
 -- ============================================================================
@@ -549,9 +350,6 @@ def IsLinearRep [Add α] [Mul k] (act : G → α → α)
 /-- The space of G-equivariant linear maps between representations. -/
 def linHom' (ρ₁ : Representation G α) (ρ₂ : Representation G β) : (α → β) → Prop :=
   IsEquivariant ρ₁.act ρ₂.act
-
-/-- dualTensorHomEquiv: Hom(V,W) ≅ V* ⊗ W (abstract). -/
-def dualTensorHomEquiv' : Prop := True
 
 /-- The category of representations of G over k. -/
 abbrev Rep' (G k : Type u) := Representation G k
