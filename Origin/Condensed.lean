@@ -171,13 +171,13 @@ def lanPresheafExt' (F : α → Condensed α) (extF : α → Condensed α) : α 
 def lanPresheafIso' (F G : α → Condensed α) (iso : ∀ a, F a = G a) : Prop := ∀ a, F a = G a
 
 /-- Natural isomorphism of Kan presheaf functors. -/
-def lanPresheafNatIso' (F G : α → Condensed α) (η : ∀ a, F a = G a) : Prop := ∀ a, F a = G a
+abbrev lanPresheafNatIso' := @lanPresheafIso'
 
 /-- Left Kan extension sheaf on profinite spaces. -/
 def lanSheafProfinite' (F : α → Condensed α) : α → Condensed α := F
 
 /-- Left Kan extension condensed set. -/
-def lanCondensedSet' (F : α → Condensed α) : α → Condensed α := F
+abbrev lanCondensedSet' := @lanSheafProfinite'
 
 /-- Finite Yoneda embedding: embed finite sets into condensed. -/
 def finYoneda' (n : Nat) (hn : n > 0) (h : Prop) : Condensed (Fin n) := ⟨⟨0, hn⟩, h⟩
@@ -195,14 +195,10 @@ def yonedaPresheaf (embed : α → Condensed α) :
 def yonedaIsSheaf (embed : α → Condensed α) : Prop :=
   ∀ a, (embed a).isSheaf
 
-/-- Functor from compact Hausdorff spaces to condensed sets. -/
-def compHausToCondensed' (embed : α → Condensed α) : α → Condensed α := embed
-
-/-- Functor from profinite spaces to condensed sets. -/
-def profiniteToCondensed' (embed : α → Condensed α) : α → Condensed α := embed
-
-/-- Functor from Stonean spaces to condensed sets. -/
-def stoneanToCondensed' (embed : α → Condensed α) : α → Condensed α := embed
+/-- Embedding functors: CompHaus, Profinite, Stonean all embed via Yoneda. -/
+abbrev compHausToCondensed' := @yonedaPresheaf
+abbrev profiniteToCondensed' := @yonedaPresheaf
+abbrev stoneanToCondensed' := @yonedaPresheaf
 
 -- ============================================================================
 -- 7. LIMITS AND COLIMITS (Limits.lean)
@@ -253,20 +249,14 @@ def IsExplicitSheaf (F : α → α) (preservesProd : (α → α) → Prop)
 /-- Construct a condensed object from a Stonean sheaf. -/
 def ofSheafStonean' (val : α) (h : Prop) : Condensed α := ⟨val, h⟩
 
-/-- Forget the Stonean sheaf structure. -/
-def ofSheafForgetStonean' (X : Condensed α) : α := X.val
+/-- All sheaf-forget functors are `underlying`. -/
+abbrev ofSheafForgetStonean' := @underlying
+abbrev ofSheafForgetProfinite' := @underlying
+abbrev ofSheafForgetCompHaus' := @underlying
 
-/-- Construct a condensed object from a profinite sheaf. -/
-def ofSheafProfinite' (val : α) (h : Prop) : Condensed α := ⟨val, h⟩
-
-/-- Forget the profinite sheaf structure. -/
-def ofSheafForgetProfinite' (X : Condensed α) : α := X.val
-
-/-- Construct a condensed object from a CompHaus sheaf. -/
-def ofSheafCompHaus' (val : α) (h : Prop) : Condensed α := ⟨val, h⟩
-
-/-- Forget the CompHaus sheaf structure. -/
-def ofSheafForgetCompHaus' (X : Condensed α) : α := X.val
+/-- All sheaf-construct functors are `discrete`. -/
+abbrev ofSheafProfinite' := @discrete
+abbrev ofSheafCompHaus' := @discrete
 
 -- ============================================================================
 -- 11. EQUIVALENCES (Equivalence.lean)
@@ -351,7 +341,7 @@ def IsCompactlyGeneratedEquiv (toTop : Condensed α → α)
 def toTopCatMap' (X Y : Condensed α) (f : CondensedHom X Y) : α → α := f.map
 
 /-- Functor from condensed sets to topological spaces. -/
-def condensedSetToTopCat' (X : Condensed α) : α := X.val
+abbrev condensedSetToTopCat' := @underlying
 
 /-- Counit of the Top-Condensed adjunction. -/
 def topCatAdjunctionCounit' (X : Condensed α) (reconst : α → α) : Condensed α :=
@@ -370,10 +360,10 @@ def topCatAdjunction' (toTop : Condensed α → α) (fromTop : α → Condensed 
   (∀ a, toTop (fromTop a) = a)
 
 /-- Functor from condensed sets to compactly generated spaces. -/
-def condensedSetToCompactlyGenerated' (X : Condensed α) : α := X.val
+abbrev condensedSetToCompactlyGenerated' := @underlying
 
 /-- Functor from compactly generated spaces to condensed sets. -/
-def compactlyGeneratedToCondensedSet' (a : α) (h : Prop) : Condensed α := ⟨a, h⟩
+abbrev compactlyGeneratedToCondensedSet' := @discrete
 
 /-- Adjunction between compactly generated and condensed. -/
 def compactlyGeneratedAdjunction' (toGen : Condensed α → α) (fromGen : α → Condensed α) : Prop :=
@@ -388,7 +378,7 @@ def compactlyGeneratedAdjunctionCounitIso' (X : Condensed α) (reconst : Condens
   reconst X = X
 
 /-- Functor from Top to sheaves on CompHaus-like sites. -/
-def topCatToSheafCompHausLike' (embed : α → Condensed α) : α → Condensed α := embed
+abbrev topCatToSheafCompHausLike' := @yonedaPresheaf
 
 /-- Functor from Top to condensed sets. -/
 abbrev topCatToCondensedSet' (embed : α → Condensed α) := embed
@@ -401,7 +391,7 @@ abbrev topCatToCondensedSet' (embed : α → Condensed α) := embed
 def ofSheafLightProfinite' (val : α) (h : Prop) : LightCondensed α := ⟨val, h⟩
 
 /-- Forget the light profinite sheaf structure. -/
-def ofSheafForgetLightProfinite' (X : LightCondensed α) : α := X.val
+def ofSheafForgetLightProfinite' (X : LightCondensed α) : α := X.val  -- LightCondensed has separate type
 
 /-- Functor from light profinite to light condensed sets. -/
 def lightProfiniteToLightCondSet' (embed : α → LightCondensed α) : α → LightCondensed α := embed
@@ -434,14 +424,9 @@ def sequentialAdjunctionCounitIso' (X : LightCondensed α) (reconst : LightConde
 /-- Functor from Top to light condensed sets. -/
 abbrev topCatToLightCondSet' (embed : α → LightCondensed α) := embed
 
--- Discrete/Module.lean
-
-/-- Components of the discrete functor isomorphism. -/
-def functorIsoDiscreteComponents' (F G : α → Condensed α) (η : ∀ a, F a = G a) : Prop := ∀ a, F a = G a
-
-/-- Isomorphism between functor and discrete. -/
-def functorIsoDiscrete' (F : α → Condensed α) (disc : α → Condensed α)
-    (iso : ∀ a, F a = disc a) : Prop := ∀ a, F a = disc a
+/-- Functor isomorphism components and discrete iso — same as lanPresheafIso. -/
+abbrev functorIsoDiscreteComponents' := @lanPresheafIso'
+abbrev functorIsoDiscrete' := @lanPresheafIso'
 
 /-- A fully faithful functor: injective and surjective on morphisms. -/
 def fullyFaithfulFunctor' (F : α → β) (injective : ∀ a b, F a = F b → a = b)

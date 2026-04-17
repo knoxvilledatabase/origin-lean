@@ -263,9 +263,6 @@ def cardEmbeddings (_ext : Prop) (card : Nat) : Prop :=
 -- 17. ADJOIN (Adjoin.lean) — largest uncovered area
 -- ============================================================================
 
-/-- Adjoin a set of elements to a field. -/
-def adjoin' (_S : α → Prop) : Prop := True  -- abstracted
-
 /-- Isomorphism from equality of intermediate fields. -/
 def equivOfEq' (mem₁ mem₂ : α → Prop) (_ : ∀ a, mem₁ a ↔ mem₂ a) (a : α) : α := a
 

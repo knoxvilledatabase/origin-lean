@@ -456,12 +456,6 @@ def graphLanguage : Language' where
   functions := fun _ => Empty
   relations := fun n => match n with | 2 => Unit | _ => Empty
 
-/-- The theory of algebraically closed fields of characteristic p. -/
-def IsACFp (_p : Nat) : Prop := True  -- abstracted
-
-/-- Lefschetz principle: ACF₀ and ACFₚ agree on sentences (for large p). -/
-def LefschetzPrinciple : Prop := True  -- abstracted
-
 -- ============================================================================
 -- 16. ORDER AND GRAPH (Order.lean, Graph.lean)
 -- ============================================================================

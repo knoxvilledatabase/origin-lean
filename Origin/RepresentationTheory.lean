@@ -101,8 +101,6 @@ def Action.ofMulAction [Mul G] (e : α) (smul : G → α → α) : Action G α w
   obj := e
   act := smul
 
--- Action/Concrete.lean
-
 -- ============================================================================
 -- 3. CONTINUOUS ACTIONS (Action/Continuous.lean)
 -- ============================================================================
@@ -244,8 +242,6 @@ def groupCohomology' (n : Nat) (cocycleF coboundaryF : Cochain n G α → Prop) 
 /-- Inhomogeneous cochains: functions G^n → M. -/
 abbrev inhomogeneousCochains' (n : Nat) (G α : Type u) := Cochain n G α
 
--- LowDegree.lean
-
 /-- Z¹: 1-cocycles (crossed homomorphisms). -/
 def oneCocycles' [Mul G] [Add α] (act : G → α → α) : (G → α) → Prop :=
   IsCrossedHom act
@@ -352,7 +348,7 @@ def linHom' (ρ₁ : Representation G α) (ρ₂ : Representation G β) : (α �
   IsEquivariant ρ₁.act ρ₂.act
 
 /-- The category of representations of G over k. -/
-abbrev Rep' (G k : Type u) := Representation G k
+abbrev Rep' := @FDRep'
 
 -- ============================================================================
 -- 15. REPRESENTATION ON OPTION: none is origin

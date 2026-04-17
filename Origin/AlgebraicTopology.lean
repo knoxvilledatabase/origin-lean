@@ -497,7 +497,6 @@ abbrev Path'.toArrow (p : Path' α) : α × α := (p.start, p.finish)
 abbrev Path'.toPath (a : α × α) : Path' α := ⟨a.1, a.2⟩
 abbrev Path'.fromArrow (a : α × α) : Path' α := ⟨a.1, a.2⟩
 abbrev Path'.fromPath (p : Path' α) : α × α := (p.start, p.finish)
-abbrev hcast {A B : Type u} (_eq : A = B) : Prop := True
 
 theorem heq_path_of_eq_image (f : α → β) (p q : Path' α)
     (hs : f p.start = f q.start) (hf : f p.finish = f q.finish) :
@@ -511,7 +510,6 @@ theorem eq_path_of_eq_image (f : α → β) (p q : Path' α)
     inducedMap f p = inducedMap f q := heq_path_of_eq_image f p q hs hf
 
 def uliftMapGroupoid (f : α → β) : Path' α → Path' β := inducedMap f
-abbrev prodToProdTopI : Prop := True
 def SimplyConnectedSpace (trivialFundGroup : Prop) : Prop := trivialFundGroup
 theorem paths_homotopic (p : Prop) : p → p := id
 
@@ -556,7 +554,6 @@ theorem DoldKan_QInfty_idem (a : α) :
     DoldKan_QInfty (DoldKan_QInfty a) = DoldKan_QInfty a := rfl
 theorem DoldKan_QInfty_f_idem (a : α) :
     DoldKan_QInfty (DoldKan_QInfty a) = DoldKan_QInfty a := rfl
-abbrev DoldKan_c : Prop := True
 def DoldKan_hσ (_n : Nat) : α → α := id
 def DoldKan_hσ' (_n _q : Nat) : α → α := id
 def DoldKan_Hσ (_n : Nat) : α → α := id
@@ -590,10 +587,8 @@ def DoldKan_Split_d (_n : Nat) : α → α := id
 
 def cechNerve (_f : α → β) : SimplicialObject α where
   face := fun _ => id; degen := fun _ => id
-abbrev cechNerveAdjunction : Prop := True
 def cechConerve (_f : α → β) : SimplicialObject α where
   face := fun _ => id; degen := fun _ => id
-abbrev cechConerveAdjunction : Prop := True
 
 -- ============================================================================
 -- 34. TOPOLOGICAL SIMPLEX / SINGULAR
@@ -613,8 +608,6 @@ theorem continuous_toTopMap (n m : Nat) (_f : Fin (n + 1) → Fin (m + 1)) :
 
 structure SimplicialCategoryStructure (α : Type u) where hom : α → α → Prop
 abbrev sHom (_s : SimplicialCategoryStructure α) (a b : α) : Prop := _s.hom a b
-abbrev sHomComp (_s : SimplicialCategoryStructure α) : Prop := True
-abbrev sHomFunctor (_s : SimplicialCategoryStructure α) : Prop := True
 
 -- ============================================================================
 -- 36. EXTRA DEGENERACY — EXTENDED
@@ -642,7 +635,6 @@ def standardSimplex (n : Nat) : SimplicialObject Nat where
   face := fun _ => id; degen := fun _ => id
 theorem standardSimplex_map_id (n : Nat) :
     (standardSimplex n).face 0 = id := rfl
-abbrev SSet_objMk : Prop := True
 def SSet_boundary (n : Nat) : SimplicialObject Nat := standardSimplex n
 def SSet_horn (n : Nat) (_i : Fin (n + 2)) : SimplicialObject Nat := standardSimplex n
 def SSet_hornInclusion (n : Nat) (_i : Fin (n + 2)) : Prop := True

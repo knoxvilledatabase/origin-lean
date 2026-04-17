@@ -246,11 +246,7 @@ def primeNumberTheorem (piF : α → α) (asymptF : α → α) (approx : (α →
 -- 14. NUMBER THEORY ON OPTION: none is origin
 -- ============================================================================
 
-/-- Valuation lifts through Option on some values. -/
-theorem nt_val_option [Mul α] [Add α] (vpF : α → α)
-    (h : ∀ a b, vpF (a * b) = vpF a + vpF b) (a b : α) :
-    Option.map vpF (some a * some b) =
-    Option.map vpF (some a) + Option.map vpF (some b) := by simp [h]
+-- nt_val_option = padic_val_mul (duplicate removed)
 
 -- ============================================================================
 -- 15. ARITHMETIC FUNCTIONS (ArithmeticFunction.lean)

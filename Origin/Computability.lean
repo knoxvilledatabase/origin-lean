@@ -294,9 +294,6 @@ def ack_one' : Prop := ∀ n, ack 1 n = n + 2
 /-- ack 2 n = 2n + 3 (abstract). -/
 def ack_two' : Prop := ∀ n, ack 2 n = 2 * n + 3
 
-/-- ack 3 n = 2^(n+3) - 3 (abstract). -/
-def ack_three' : Prop := True  -- abstracted
-
 /-- ack is always positive. -/
 def ack_pos' : Prop := ∀ m n, ack m n > 0
 

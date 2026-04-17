@@ -322,7 +322,6 @@ def birkhoffAverage_congr_ring (f : α → α) (g : α → α) [Add α] [Mul α]
     (zero : α) (invN : Nat → α) : Prop :=
   True  -- abstracted
 
--- BirkhoffSum/NormedSpace.lean
 /-- dist(birkhoffSum(x), birkhoffSum(y)) bound (abstract, normed). -/
 def dist_birkhoffSum_apply_birkhoffSum (f : α → α) (g : α → β) : Prop :=
   True  -- abstracted; involves norms
@@ -480,10 +479,6 @@ def IsErgodicAction (act : G → α → α)
 def regularIsErgodic [Mul G] (_isDense : (G → Prop) → Prop) : Prop :=
   True  -- IsMinimalAction (fun g x => g * x) isDense, defined below
 
--- Action/OfMinimal.lean
-
--- Ergodic/AddCircle.lean
-
 -- ============================================================================
 -- 11. TOPOLOGICAL ENTROPY (TopologicalEntropy/)
 -- ============================================================================
@@ -541,7 +536,6 @@ theorem dynEntourage_zero (f : α → α) (close : α → α → Prop)
 def dynEntourage_one' (f : α → α) (close : α → α → Prop) : Prop :=
   ∀ x y, isDynEntourage f close 1 x y ↔ close x x
 
--- NetEntropy.lean
 /-- A dynamical net: separated set at depth n. -/
 def IsDynNet (f : α → α) (s : α → Prop) (close : α → α → Prop) (n : Nat)
     (net : α → Prop) : Prop :=
@@ -552,8 +546,6 @@ def IsDynNet (f : α → α) (s : α → Prop) (close : α → α → Prop) (n :
 def isDynNet_empty (f : α → α) (close : α → α → Prop) (n : Nat) :
     IsDynNet f (fun _ => False) close n (fun _ => False) :=
   ⟨fun _ h => absurd h id, fun _ _ h => absurd h id⟩
-
--- Semiconj.lean
 
 -- ============================================================================
 -- 12. OMEGA-LIMIT SETS (OmegaLimit.lean)
