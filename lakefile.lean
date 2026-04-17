@@ -15,3 +15,6 @@ lean_lib Val where
 
 lean_lib Origin where
   srcDir := "."
+
+lean_lib Proofs where
+  srcDir := "."
