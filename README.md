@@ -1,6 +1,6 @@
 # Welcome to Origin!
 
-If you want to see what happens when the absolute rigor of pure mathematics meets the uncompromising logic of computer science, look no further than [Mathlib](https://github.com/leanprover-community/mathlib4). It isn't just a library; it's a monumental, community-driven effort to digitize the sum of human mathematical knowledge within the Lean theorem prover. Mathlib is widely considered the "gold standard" for formalized mathematics.
+[Mathlib](https://github.com/leanprover-community/mathlib4) is the largest formal mathematics library ever built. Its 2.16 million lines represent an extraordinary achievement: thousands of theorems across every major domain of mathematics, mechanically verified, contributed by a community of rigorous thinkers over years of careful work. The contributors who built Mathlib's nearly 200,000 theorems created the most rigorous work in the history of mathematics. 
 
 While studying Mathlib's 2.16 million lines, we noticed a pattern. Zero is confusing.  
 
