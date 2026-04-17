@@ -290,12 +290,18 @@ python3 scripts/origin.py stub <domain>
 # 6. Build (under 1 second — no Mathlib rebuild)
 lake build Origin.<DomainName>
 
-# 7. Generate and build the index (the dedup)
+# 7. Check for structural duplication
+python3 scripts/origin.py patterns
+# If your domain file pattern-matches on some/none, it's duplicating
+# Core. Use liftPred, liftBin₂, or Option.map instead. Fix before
+# proceeding. The build passing doesn't mean the architecture is right.
+
+# 8. Generate and build the index (the dedup)
 python3 scripts/origin.py index
 lake build Origin.Index
 # If collisions found: fix them, rebuild, index again
 
-# 8. Commit and push (only after build + index both pass)
+# 9. Commit and push (only after build + patterns + index all pass)
 ```
 
 **Answer:**
