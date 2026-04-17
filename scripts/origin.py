@@ -732,11 +732,13 @@ TIER1_KINDS = {"structure", "class", "inductive", "def", "abbrev"}
 TIER2_KINDS = {"theorem", "lemma"}
 
 
-def _build_mathlib_kind_map(domain):
+def _build_mathlib_kind_map(domain, detailed=False):
     """Build a map from stub_name -> mathlib_kind for a domain.
 
     Scans the extracted Mathlib files for the domain, collects
     genuine declarations, and maps their stub names to their kinds.
+
+    If detailed=True, returns stub_name -> (kind, mathlib_file) instead.
     """
     d = EXTRACTED / f"Mathlib_{domain}"
     if not d.exists():
@@ -746,9 +748,10 @@ def _build_mathlib_kind_map(domain):
         r'^(?:.*?)?(private\s+|protected\s+)?(noncomputable\s+)?'
         r'(theorem|lemma|def|structure|class|instance|abbrev|inductive)\s+(\S+)')
 
-    kind_map = {}  # stub_name -> kind
+    kind_map = {}  # stub_name -> kind (or (kind, file) if detailed)
     for f in sorted(d.rglob("*.lean")):
         text = f.read_text(errors="replace")
+        fname = str(f.relative_to(EXTRACTED))
         for line in text.split("\n"):
             m = mathlib_decl_re.match(line.strip())
             if m:
@@ -757,8 +760,9 @@ def _build_mathlib_kind_map(domain):
                 label = classifier.classify(kind, name, ctx)
                 if label == "genuine":
                     stub = _stub_name(name)
-                    if stub and stub not in kind_map:
-                        kind_map[_normalize_lean_name(stub)] = kind
+                    norm = _normalize_lean_name(stub) if stub else None
+                    if norm and norm not in kind_map:
+                        kind_map[norm] = (kind, fname) if detailed else kind
     return kind_map
 
 
@@ -887,7 +891,57 @@ def cmd_quality(domain=None):
     print(f"  {ui.BOLD}Finish line:{ui.RESET} T1 = 0")
     print()
 
-    if not domain:
+    if domain:
+        # Single domain: show detailed T1 stub listing
+        for dname, stem, total, stubs, real, t1, t2 in stats:
+            if t1 == 0:
+                continue
+            # Build detailed kind map (with Mathlib file locations)
+            mathlib_domain = stem_to_domain.get(stem)
+            if not mathlib_domain:
+                continue
+            detail_map = _build_mathlib_kind_map(mathlib_domain, detailed=True)
+            stub_names = _collect_stubs(ORIGIN / f"{stem}.lean")
+
+            # Collect T1 stubs with their Origin line numbers
+            origin_path = ORIGIN / f"{stem}.lean"
+            origin_lines = origin_path.read_text(errors="replace").split("\n")
+            stub_line_map = {}  # normalized_name -> line_number
+            for ln, line in enumerate(origin_lines):
+                if STUB_RE.match(line):
+                    m = ORIGIN_DECL_RE.match(line)
+                    if m and "private " not in line:
+                        stub_line_map[_normalize_lean_name(m.group(2))] = ln + 1
+
+            # Group T1 stubs by kind
+            from collections import defaultdict
+            by_kind = defaultdict(list)
+            for sname in stub_names:
+                info = detail_map.get(sname)
+                if not info:
+                    continue
+                mk, mfile = info
+                if mk not in TIER1_KINDS:
+                    continue
+                origin_ln = stub_line_map.get(sname, 0)
+                by_kind[mk].append((sname, mfile, origin_ln))
+
+            if by_kind:
+                print(f"  {ui.BOLD}T1 stubs to upgrade:{ui.RESET}")
+                print()
+                for mk in ["structure", "class", "inductive", "abbrev", "def"]:
+                    items = by_kind.get(mk, [])
+                    if not items:
+                        continue
+                    color = ui.MAGENTA if mk in ("structure", "class", "inductive") else ui.YELLOW
+                    print(f"  {color}{mk}{ui.RESET} ({len(items)}):")
+                    for sname, mfile, origin_ln in items:
+                        short_file = mfile.split("/", 1)[-1] if "/" in mfile else mfile
+                        ln_str = f":{origin_ln}" if origin_ln else ""
+                        print(f"    {sname:<40s} {ui.DIM}{short_file}{ui.RESET}  "
+                              f"{ui.DIM}{stem}.lean{ln_str}{ui.RESET}")
+                    print()
+    else:
         by_t1 = sorted(stats, key=lambda x: x[5], reverse=True)
         needs_work = [(d, t1, r) for d, _, _, _, r, t1, _ in by_t1 if t1 > 0][:5]
         if needs_work:
