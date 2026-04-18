@@ -1,4 +1,4 @@
-# Origin
+# 𝒪rigin
 
 n × 𝒪 = 𝒪
 
