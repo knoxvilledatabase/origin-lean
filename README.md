@@ -13,7 +13,7 @@ The shepherd never confused these.
 
 𝒪 is the ground. □ is the hand. Contents are the apple.
 
-Zero is a quantity — "no apples in the hand." The hand is still there. The ground is still there.
+Zero is a quantity, "no apples in the hand." The hand is still there. The ground is still there.
 
 You can have zero apples. You cannot have zero hand. You cannot have zero ground.
 
@@ -101,7 +101,7 @@ Every field that builds on calculus inherits this caveat. Differential equations
 |---|----------|
 | d/dx(c) = 𝒪 | d/dx(c) = 0 |
 
-The derivative of a constant is the ground, not the quantity zero. The function stopped changing. It didn't reach "no apples." It reached the ground — there is no rate of change.
+The derivative of a constant is the ground, not the quantity zero. The function stopped changing. It didn't reach "no apples." It reached the ground, there is no rate of change.
 
 | 𝒪 | Standard |
 |---|----------|
@@ -114,11 +114,11 @@ The derivative of a constant is the ground, not the quantity zero. The function 
 | A⁻¹ = det(A)⁻¹ × adj(A) | A⁻¹ = det(A)⁻¹ × adj(A), **provided det(A) ≠ 0** |
 | x = A⁻¹ × b | x = A⁻¹ × b, **provided A is invertible** |
 
-A matrix is a container — the word "matrix" comes from Latin *matrix*, meaning "womb." A thing that holds, that gives form.
+A matrix is a container, the word "matrix" comes from Latin *matrix*, meaning "womb." A thing that holds, that gives form.
 
-A singular matrix isn't the ground. It's an empty hand. det(A) = 0 means the container has nothing to grip — not that the container vanished. The container is still there. It still maps things. It just can't give a unique answer.
+A singular matrix isn't the ground. It's an empty hand. det(A) = 0 means the container has nothing to grip, not that the container vanished. The container is still there. It still maps things. It just can't give a unique answer.
 
-With □: det(A) = □ means the hand is empty. A⁻¹ = □. The rank tells you what the container was still doing. No caveat needed — the type tells you.
+With □: det(A) = □ means the hand is empty. A⁻¹ = □. The rank tells you what the container was still doing. No caveat needed, the type tells you.
 
 ### Probability
 
@@ -199,9 +199,9 @@ The container can't be reached either. The hand expands or contracts with the va
 
 So what are L'Hôpital's Rule, Laurent series, residues, and matrix rank actually doing?
 
-**L'Hôpital's Rule.** The limit hit 0/0 — standard math says "indeterminate" and differentiates to find the ratio. But the ratio was always there. The container held it. L'Hôpital isn't rescuing you from the ground. It's revealing what the container was holding all along.
+**L'Hôpital's Rule.** The limit hit 0/0, standard math says "indeterminate" and differentiates to find the ratio. But the ratio was always there. The container held it. L'Hôpital isn't rescuing you from the ground. It's revealing what the container was holding all along.
 
-**Laurent series.** A function hits a pole — standard math says "diverges." The Laurent series captures the behavior around the singularity. But those coefficients were always there. The container held them. The series isn't extracting information from the boundary. It's reading what was in the hand.
+**Laurent series.** A function hits a pole, standard math says "diverges." The Laurent series captures the behavior around the singularity. But those coefficients were always there. The container held them. The series isn't extracting information from the boundary. It's reading what was in the hand.
 
 **Residues.** You integrate *around* the singularity. Not through it. You go around it because you can't touch it. The residue is a value the container was holding. You never reached the ground. You never left the hand.
 
@@ -225,28 +225,36 @@ Because the ground doesn't swallow what you put on it. You set an apple on the g
 
 You try to scale the ground. You can't. There's nothing to scale. 𝒪 × a = 𝒪. The ground absorbed the operation.
 
-These aren't two incompatible roles. They're both what the ground does. It supports what stands on it and absorbs what tries to scale it. And the standard proof of n × 0 = 0 already says so — absorption follows from the additive identity plus distributivity. They aren't independent axioms. One causes the other.
+These aren't two incompatible roles. They're both what the ground does. It supports what stands on it and absorbs what tries to scale it. And the standard proof of n × 0 = 0 already says so, absorption follows from the additive identity plus distributivity. They aren't independent axioms. One causes the other.
 
-The third criticism will be: "A singular matrix isn't the ground — det(A) = 0 is a structural fact about the linear map, and 𝒪 doesn't dissolve it."
+The third criticism will be: "A singular matrix isn't the ground, det(A) = 0 is a structural fact about the linear map, and 𝒪 doesn't dissolve it."
 
-Correct. And that's the point. A singular matrix isn't the ground. It's an empty hand. The matrix (*matrix*: Latin for *womb*) is a container. It's still there. It still maps. It just can't grip uniquely. That's not 𝒪, that's □. The caveat dissolves — not into the ground, but into the container.
+Correct. And that's the point. A singular matrix isn't the ground. It's an empty hand. The matrix (*matrix*: Latin for *womb*) is a container. It's still there. It still maps. It just can't grip uniquely. That's not 𝒪, that's □. The caveat dissolves, not into the ground, but into the container.
 
 The fourth criticism will be: "When does a value become 𝒪? Where's the transition point?"
 
 Never. A value never becomes the ground. The ground was always there. Values are always values. There is no transition. There is no mode switch. There is no "approaching the ground."
 
-lim(x→0) log(x) = −∞ is values all the way. The values get more and more negative. They never become 𝒪. They never reach the ground. They can't. log(𝒪) = 𝒪 is not the end of that path — it's what happens when there was never a value to begin with.
+lim(x→0) log(x) = −∞ is values all the way. The values get more and more negative. They never become 𝒪. They never reach the ground. They can't. log(𝒪) = 𝒪 is not the end of that path, it's what happens when there was never a value to begin with.
 
 The question "when does a value become 𝒪" is the collapse restated as a question. The answer is the one law: the part cannot become the whole. Not eventually. Not in the limit. Not ever.
 
 ---
 
-## One Law
+## One Law, Two Directions
 
 The whole is greater than the part. A part cannot become its own whole. A symbol cannot become what made symbols possible.
 
-Every time mathematics gets "undefined," it's the same event. A value tried to reach the ground. A value tried to escape the container. The part tried to become the whole.
+You can't escape your level. The law has two directions:
 
-Every caveat, every paradox, every "undefined" is the system catching that violation. The 17 typeclasses, L'Hôpital's Rule, Laurent series, renormalization, NaN — they're all catching the same thing.
+**Down toward 𝒪.** A value tries to become the ground. Division by the ground, Russell's paradox, Gödel's incompleteness, the part tried to become the whole. The system says "undefined." It means: you tried to reach the ground from inside the system. You can't.
 
-One law. Three symbols. The shepherd always knew.
+**Out through □.** A value tries to escape its container. log(-1) in ℝ, √(-1) in ℝ, the container was too small to hold the result. A larger container (ℂ) holds it. The system says "undefined." It means: the answer exists, but not inside this hand.
+
+Every "undefined" in mathematics is one of these two. There is no third category.
+
+Standard math has "undefined" (no answer) and "indeterminate" (too many answers). But "indeterminate" is what happens when you can't tell which direction the violation went, because 0 is playing both roles. 0/0 looks indeterminate because you don't know: is this 𝒪/𝒪 (absorption, the answer is 𝒪) or is this value-zero / value-zero (the container holds the ratio, L'Hôpital finds it)? Separate the sorts and the indeterminacy dissolves. It was never a third category. It was the collapse observed from inside.
+
+Every caveat, every paradox, every "undefined" is the system catching a level violation. The 17 typeclasses, L'Hôpital's Rule, Laurent series, renormalization, NaN, they're all catching the same thing.
+
+One law. Two directions. Three symbols. The shepherd always knew.
