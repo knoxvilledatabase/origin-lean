@@ -1,57 +1,99 @@
-# Welcome to Origin!
+# Origin
 
-[Mathlib](https://github.com/leanprover-community/mathlib4) is the largest formal mathematics library ever built. Its 2.16 million lines represent an extraordinary achievement: thousands of theorems across every major domain of mathematics, mechanically verified, contributed by a community of rigorous thinkers over years of careful work. The contributors who built Mathlib's nearly 200,000 theorems created the most rigorous work in the history of mathematics. 
+n × 𝒪 = 𝒪
 
-While studying Mathlib's 2.16 million lines, we noticed a pattern. Zero is confusing.  
+Multiplication
+𝒪 × a = 𝒪
+a × 𝒪 = 𝒪
+a × b = a × b
 
-Not only is zero treated as a quantity, it's also treated as the ground the thinker about the number zero stands on.  
+Addition
+𝒪 + a = a
+a + 𝒪 = a
+a + b = a + b
 
-**The challenge:** prove the foundational laws of algebra, order, metric spaces, functors, topology, measure theory, logic, and physics without any of the Mathlib 17 zero-management typeclasses.
+Negation
+−𝒪 = 𝒪
+−a = −a
 
-**What is Origin?**
+Identity
+𝟙 = 𝟙
 
-```
-Step 1: Write origin as a cancellation.
-        origin = b - b
+Inverse
+𝒪⁻¹ = 𝒪
+a⁻¹ = a⁻¹
 
-Step 2: Multiply both sides by n.
-        n × origin = n × (b - b)
+Commutativity
+a + b = b + a
+a × b = b × a
 
-Step 3: Apply the distributive property.
-        n × (b - b) = nb - nb
+Associativity
+(a + b) + c = a + (b + c)
+(a × b) × c = a × (b × c)
 
-Step 4: A number minus itself cancels.
-        nb - nb = origin
+Distributivity
+a × (b + c) = a × b + a × c
+(a + b) × c = a × c + b × c
 
-Therefore: n × origin = origin
-           1 / origin = origin
-```
+Cancellation
+a + (−a) = 𝒪
 
-```
-origin.lean     312 lines    zero sorries
-```
+Negation Laws
+−(a + b) = −a + −b
+a × (−b) = −(a × b)
+−(−a) = a
+(−a) × b = −(a × b)
+(−a) × (−b) = a × b
 
-```bash
-git clone https://github.com/knoxvilledatabase/origin-lean.git
-cd origin-lean
-lake build
-```
+Identity Laws
+𝟙 × a = a
+a × 𝟙 = a
+a × a⁻¹ = 𝟙
 
----
+Lifting
+f(𝒪, a) = 𝒪
+f(a, 𝒪) = 𝒪
+f(a, b) = f(a, b)
 
+Predicate
+P(𝒪) = ⊥
+P(a) = P(a)
 
-## The Proofs
+Fixed Point
+f(a) ≠ a → v = map(f, v) → v = 𝒪
 
+Functor
+map(id, v) = v
+map(g, map(f, v)) = map(g ∘ f, v)
+map(f, 𝒪) = 𝒪
 
-| Group | What it proves | Key result |
-|-------|---------------|------------|
-| Algebra | Commutativity, associativity, distributivity, identity, inverse | `none * a = none`, `none⁻¹ = none` |
-| Order | Reflexivity, transitivity, antisymmetry | `none ≤ everything` |
-| Metric | dist_self, dist_comm, triangle inequality | Lifts through Option, distance to ground is `none` |
-| Functor | `map id = id`, `map (g ∘ f) = map g ∘ map f` | Option is a lawful functor |
-| Topology | Continuous maps preserve open sets | `map_preserves_open` |
-| Measure | Predicates compose under disjunction and conjunction | `liftPred` distributes over `∨` and `∧` |
-| Logic | The Liar, Russell, and Curry paradoxes | `no_some_fixed_point` |
-| Physics | 86 existence hypotheses dissolved | `some 0 ≠ none` |
+Metric
+d(a, a) = 0
+d(a, b) = d(b, a)
+d(a, c) ≤ d(a, b) + d(b, c)
+d(a, b) = 0 → a = b
+d(𝒪, a) = 𝒪
+d(a, 𝒪) = 𝒪
 
----
+Order
+𝒪 ≤ a
+a ≤ a
+a ≤ b ∧ b ≤ c → a ≤ c
+a ≤ b ∧ b ≤ a → a = b
+
+Topology
+f preserves open → map(f) preserves open
+
+Measure
+P(a) ∨ Q(a) ↔ (P ∨ Q)(a)
+P(a) ∧ Q(a) ↔ (P ∧ Q)(a)
+P(𝒪) ↔ ⊥
+
+Logic
+¬v = v → v = 𝒪
+
+Physics
+k × q × Q × 𝒪 = 𝒪
+a × 𝒪 = 𝒪
+¬P(𝒪)
+a ≠ 𝒪
