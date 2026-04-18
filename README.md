@@ -144,7 +144,9 @@ Separable equations require dividing by g(y). Singular solutions live precisely 
 | log(𝒪) = 𝒪 | log(0) is **undefined** (or −∞ as a limit) |
 | log(𝟙) = 𝒪 | log(1) = 0 |
 
-log(0) diverges to −∞ in standard math because 0 is a quantity and no power of a base reaches the quantity zero. But log(𝒪) = 𝒪 says: you took the log of the ground. The result is the ground. The function didn't diverge, it hit the ground.
+lim(x→0) log(x) = −∞. That's values doing value things. The values get more and more negative. They never become 𝒪. They never reach the ground. They can't. They're values.
+
+log(𝒪) = 𝒪 isn't the limit of log(x). It's what happens when there was never a value to begin with. The ground was asked to log. The ground absorbed.
 
 log(1) = 0 and log(𝟙) = 𝒪 are the same statement. The log of the multiplicative identity is the additive identity. In standard math, both are called "zero." With 𝒪, the additive identity is the ground. Same math, named honestly.
 
@@ -205,9 +207,9 @@ So what are L'Hôpital's Rule, Laurent series, residues, and matrix rank actuall
 
 **Rank of a singular matrix.** det = 0, but the rank tells you how much the matrix was doing before it became singular. The matrix is still a container. It still maps things. The rank is what □ was holding.
 
-None of these tools extract information from the ground. They reveal that the ground was never reached. The container was always there, always holding something. The value never left □.
+These four tools do different mathematics. L'Hôpital differentiates. Laurent expands. Residues integrate. Rank measures dimension. But they all discover the same thing: the value never left □.
 
-These tools exist because standard math thinks the value hit the ground. It didn't. It was in the container the whole time. Four fields built four different tools to discover what one symbol already knows.
+None of these tools extract information from the ground. They reveal that the ground was never reached. The container was always there, always holding something. The value never left □. Four fields built four different tools to discover what one symbol already knows.
 
 ---
 
@@ -228,6 +230,14 @@ These aren't two incompatible roles. They're both what the ground does. It suppo
 The third criticism will be: "A singular matrix isn't the ground — det(A) = 0 is a structural fact about the linear map, and 𝒪 doesn't dissolve it."
 
 Correct. And that's the point. A singular matrix isn't the ground. It's an empty hand. The matrix (*matrix*: Latin for *womb*) is a container. It's still there. It still maps. It just can't grip uniquely. That's not 𝒪, that's □. The caveat dissolves — not into the ground, but into the container.
+
+The fourth criticism will be: "When does a value become 𝒪? Where's the transition point?"
+
+Never. A value never becomes the ground. The ground was always there. Values are always values. There is no transition. There is no mode switch. There is no "approaching the ground."
+
+lim(x→0) log(x) = −∞ is values all the way. The values get more and more negative. They never become 𝒪. They never reach the ground. They can't. log(𝒪) = 𝒪 is not the end of that path — it's what happens when there was never a value to begin with.
+
+The question "when does a value become 𝒪" is the collapse restated as a question. The answer is the one law: the part cannot become the whole. Not eventually. Not in the limit. Not ever.
 
 ---
 
