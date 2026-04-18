@@ -11,9 +11,11 @@ A shepherd stands in a pasture. He's holding an apple. He knows three things:
 
 The shepherd never confused these.
 
-𝒪 is not zero. Zero is a quantity, it means "no apples in the hand." 𝒪 is the ground the shepherd stands on. 
+𝒪 is the ground. □ is the hand. Contents are the apple.
 
-You can have zero apples. You cannot have zero ground.
+Zero is a quantity — "no apples in the hand." The hand is still there. The ground is still there.
+
+You can have zero apples. You cannot have zero hand. You cannot have zero ground.
 
 ---
 
@@ -37,9 +39,9 @@ The ground supports what stands on it. The ground absorbs what tries to scale it
 
 ## The Laws, Side by Side
 
-Every law below is shown in two versions. 
+Every law below is shown in two versions.
 
-The 𝒪 version has no caveats. 
+The 𝒪 version has no caveats.
 
 The standard version shows every "provided," "when," "undefined," and "by convention" that the standard notation requires.
 
@@ -91,8 +93,6 @@ This is where calculus first needs help. When lim(g) = 0, standard math calls th
 
 With 𝒪: if lim(g) = 𝒪, then lim(f) / 𝒪 = 𝒪. Absorption. If lim(g) = 0 the quantity, arithmetic handles it normally.
 
-L'Hôpital's Rule still exists for values, when numerator and denominator both approach the quantity zero, you differentiate to find the ratio. But it's no longer rescuing you from a symbol crisis. It's doing calculus.
-
 Every field that builds on calculus inherits this caveat. Differential equations, complex analysis, physics, machine learning, all of them carry "when the denominator isn't zero" forward and add their own workarounds. 𝒪 removes the caveat at the source.
 
 ### Derivatives
@@ -101,7 +101,7 @@ Every field that builds on calculus inherits this caveat. Differential equations
 |---|----------|
 | d/dx(c) = 𝒪 | d/dx(c) = 0 |
 
-The derivative of a constant is the ground, not the quantity zero. The function stopped changing. It didn't reach "no apples." It reached the ground, there is no rate of change.
+The derivative of a constant is the ground, not the quantity zero. The function stopped changing. It didn't reach "no apples." It reached the ground — there is no rate of change.
 
 | 𝒪 | Standard |
 |---|----------|
@@ -114,7 +114,11 @@ The derivative of a constant is the ground, not the quantity zero. The function 
 | A⁻¹ = det(A)⁻¹ × adj(A) | A⁻¹ = det(A)⁻¹ × adj(A), **provided det(A) ≠ 0** |
 | x = A⁻¹ × b | x = A⁻¹ × b, **provided A is invertible** |
 
-If det(A) = 𝒪, absorption handles it. The matrix hit the ground. No special case. No "singular matrix" exception.
+A matrix is a container — the word "matrix" comes from Latin *matrix*, meaning "womb." A thing that holds, that gives form.
+
+A singular matrix isn't the ground. It's an empty hand. det(A) = 0 means the container has nothing to grip — not that the container vanished. The container is still there. It still maps things. It just can't give a unique answer.
+
+With □: det(A) = □ means the hand is empty. A⁻¹ = □. The rank tells you what the container was still doing. No caveat needed — the type tells you.
 
 ### Probability
 
@@ -185,6 +189,28 @@ The z-score is undefined when standard deviation is zero. Correlation is undefin
 
 ---
 
+## The Container
+
+The ground can't be reached. Symbols cannot touch the ground regardless of how hard they try. The ground is what made symbols possible.
+
+The container can't be reached either. The hand expands or contracts with the value. It holds 3, it holds 10 billion, it holds 0.0000001. You can't escape the container from inside the value. You can't hit the hand from inside the apple.
+
+So what are L'Hôpital's Rule, Laurent series, residues, and matrix rank actually doing?
+
+**L'Hôpital's Rule.** The limit hit 0/0 — standard math says "indeterminate" and differentiates to find the ratio. But the ratio was always there. The container held it. L'Hôpital isn't rescuing you from the ground. It's revealing what the container was holding all along.
+
+**Laurent series.** A function hits a pole — standard math says "diverges." The Laurent series captures the behavior around the singularity. But those coefficients were always there. The container held them. The series isn't extracting information from the boundary. It's reading what was in the hand.
+
+**Residues.** You integrate *around* the singularity. Not through it. You go around it because you can't touch it. The residue is a value the container was holding. You never reached the ground. You never left the hand.
+
+**Rank of a singular matrix.** det = 0, but the rank tells you how much the matrix was doing before it became singular. The matrix is still a container. It still maps things. The rank is what □ was holding.
+
+None of these tools extract information from the ground. They reveal that the ground was never reached. The container was always there, always holding something. The value never left □.
+
+These tools exist because standard math thinks the value hit the ground. It didn't. It was in the container the whole time. Four fields built four different tools to discover what one symbol already knows.
+
+---
+
 ## The Criticism and Why It Fails
 
 The first criticism will be: "𝒪 is just hiding failure cases behind a symbol."
@@ -197,14 +223,20 @@ Because the ground doesn't swallow what you put on it. You set an apple on the g
 
 You try to scale the ground. You can't. There's nothing to scale. 𝒪 × a = 𝒪. The ground absorbed the operation.
 
-These aren't two incompatible roles. They're both what the ground does. It supports what stands on it and absorbs what tries to scale it. And the standard proof of n × 0 = 0 already says so, absorption follows from the additive identity plus distributivity. They aren't independent axioms. One causes the other.
+These aren't two incompatible roles. They're both what the ground does. It supports what stands on it and absorbs what tries to scale it. And the standard proof of n × 0 = 0 already says so — absorption follows from the additive identity plus distributivity. They aren't independent axioms. One causes the other.
+
+The third criticism will be: "A singular matrix isn't the ground — det(A) = 0 is a structural fact about the linear map, and 𝒪 doesn't dissolve it."
+
+Correct. And that's the point. A singular matrix isn't the ground. It's an empty hand. The matrix (*matrix*: Latin for *womb*) is a container. It's still there. It still maps. It just can't grip uniquely. That's not 𝒪, that's □. The caveat dissolves — not into the ground, but into the container.
 
 ---
 
-## What This Means
+## One Law
 
-Every caveat shown above exists because one symbol plays two roles. Separate the roles, give the ground a name, and the caveats stop being manufactured.
+The whole is greater than the part. A part cannot become its own whole. A symbol cannot become what made symbols possible.
 
-This isn't a new theory. It's a new symbol. The math doesn't change. The laws are the same laws. The proofs are the same proofs. The only thing that changes is that the ground has a name, and every "provided ≠ 0" that was guarding against the ground becomes unnecessary because the ground is no longer pretending to be a number.
+Every time mathematics gets "undefined," it's the same event. A value tried to reach the ground. A value tried to escape the container. The part tried to become the whole.
 
-The shepherd always knew the difference.
+Every caveat, every paradox, every "undefined" is the system catching that violation. The 17 typeclasses, L'Hôpital's Rule, Laurent series, renormalization, NaN — they're all catching the same thing.
+
+One law. Three symbols. The shepherd always knew.
