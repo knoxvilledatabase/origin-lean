@@ -9,11 +9,11 @@ A shepherd stands in a pasture. He's holding an apple. He knows three things:
 - His hand. Whether holding an apple or not.
 - The apple, or its absence.
 
-The shepherd never confused these. Mathematics did.
+The shepherd never confused these.
 
-In 628 CE, Brahmagupta gave zero its arithmetic rules. One symbol got two jobs: the quantity "no apples" and the ground everything stands on. Every field of mathematics built on that symbol inherited the confusion.
+𝒪 is not zero. Zero is a quantity, it means "no apples in the hand." 𝒪 is the ground the shepherd stands on. 
 
-𝒪 is not zero. Zero is a quantity, it means "no apples in the hand." 𝒪 is the ground the hand rests on. You can have zero apples. You cannot have zero ground.
+You can have zero apples. You cannot have zero ground.
 
 ---
 
