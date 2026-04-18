@@ -92,8 +92,67 @@ P(𝒪) ↔ ⊥
 Logic
 ¬v = v → v = 𝒪
 
-Physics
-k × q × Q × 𝒪 = 𝒪
-a × 𝒪 = 𝒪
-¬P(𝒪)
-a ≠ 𝒪
+Limits
+lim(f + g) = lim(f) + lim(g)
+lim(f − g) = lim(f) − lim(g)
+lim(f × g) = lim(f) × lim(g)
+lim(f / g) = lim(f) / lim(g)
+lim(c × f) = c × lim(f)
+
+Derivatives
+d/dx(c) = 𝒪
+d/dx(f + g) = d/dx(f) + d/dx(g)
+d/dx(f − g) = d/dx(f) − d/dx(g)
+d/dx(f × g) = f × d/dx(g) + g × d/dx(f)
+d/dx(f / g) = (g × d/dx(f) − f × d/dx(g)) / g²
+d/dx(f ∘ g) = d/df(f) × d/dx(g)
+
+Integrals
+∫(f + g) = ∫f + ∫g
+∫(c × f) = c × ∫f
+∫d/dx(f) = f
+d/dx(∫f) = f
+
+Linear Algebra
+det(A × B) = det(A) × det(B)
+A × A⁻¹ = 𝟙
+A⁻¹ = det(A)⁻¹ × adj(A)
+x = A⁻¹ × b
+
+Probability
+P(A|B) = P(A ∩ B) / P(B)
+P(B|A) = P(A|B) × P(A) / P(B)
+P(A ∪ B) = P(A) + P(B) − P(A ∩ B)
+∑P(Aᵢ) = 𝟙
+
+Differential Equations
+dy/dx = f(x) × g(y)⁻¹
+y = ∫f(x) dx + c
+
+Logarithms
+log(a × b) = log(a) + log(b)
+log(a / b) = log(a) − log(b)
+log(aⁿ) = n × log(a)
+log(𝟙) = 𝒪
+log(𝒪) = 𝒪
+
+Trigonometry
+tan(x) = sin(x) / cos(x)
+sec(x) = 𝟙 / cos(x)
+csc(x) = 𝟙 / sin(x)
+cot(x) = cos(x) / sin(x)
+
+Information Theory
+H = −∑ p × log(p)
+𝒪 × log(𝒪) = 𝒪
+D(P ‖ Q) = ∑ p × log(p / q)
+
+Statistics
+z = (x − μ) / σ
+r = cov(X, Y) / (σ_X × σ_Y)
+χ² = ∑(observed − expected)² / expected
+
+Exponentials
+a⁰ = 𝟙
+𝒪⁰ = 𝒪
+𝒪ⁿ = 𝒪
