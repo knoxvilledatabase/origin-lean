@@ -37,7 +37,11 @@ The ground supports what stands on it. The ground absorbs what tries to scale it
 
 ## The Laws, Side by Side
 
-Every law below is shown in two versions. The 𝒪 version has no caveats. The standard version shows every "provided," "when," "undefined," and "by convention" that the standard notation requires.
+Every law below is shown in two versions. 
+
+The 𝒪 version has no caveats. 
+
+The standard version shows every "provided," "when," "undefined," and "by convention" that the standard notation requires.
 
 ### Multiplication
 
